@@ -1,0 +1,56 @@
+from django.db import models
+from django.template.defaultfilters import slugify
+from django.contrib.auth.models import User
+from .tag import Tag
+
+
+class Blog(models.Model):
+    """
+    An item created by a user.
+    """
+    author = models.ForeignKey(User, related_name='blog_written_by')
+    title = models.CharField(max_length=100)
+    slug = models.SlugField()
+    description = models.TextField(blank=True, help_text=(
+        "If omitted, the description will be the post's title."))
+    is_active = models.BooleanField(default=True, blank=True)
+    tags = models.ManyToManyField(Tag, related_name='blog')
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, null=False, blank=False, related_name='blog_created_by')
+    updated_by = models.ForeignKey(User, null=True, blank=False, related_name='blog_updated_by')
+
+    def save(self, *args, **kwargs):
+        self.do_unique_slug()
+        if not self.description:
+            self.description = self.title
+        super(Blog, self).save(*args, **kwargs)
+
+    def do_unique_slug(self):
+        """
+        Ensures that the slug is always unique for this post
+        """
+        if not self.id:
+            # make sure we have a slug first
+            if not len(self.slug.strip()):
+                self.slug = slugify(self.title)
+
+            self.slug = self.get_unique_slug(self.slug)
+            return True
+
+        return False
+
+    def get_unique_slug(self, slug):
+        """
+        Iterates until a unique slug is found
+        """
+        orig_slug = slug
+        counter = 1
+
+        while True:
+            posts = Blog.objects.filter(slug=slug)
+            if not posts.exists():
+                return slug
+
+            slug = '%s-%s' % (orig_slug, counter)
+            counter += 1
