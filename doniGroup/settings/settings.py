@@ -86,29 +86,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'doniGroup.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-DATABASES = {
-    # 'default': {
-    #     'NAME': 'my_database',
-    #     'ENGINE': 'sqlserver_ado',
-    #     'HOST': 'donigroup.cczhghwibti9.us-west-2.rds.amazonaws.com:1433 ',
-    #     'USER': 'immadimtiaz',
-    #     'PASSWORD': 'Giki1990????',
-    # }
-
-    'default': {
-        'ENGINE': MYSQL_ENGINE,
-        'NAME': MYSQL_DB,
-        'HOST': MYSQL_HOST,
-        'PORT': MYSQL_PORT,
-        'USER': MYSQL_USER,
-        'PASSWORD': MYSQL_PASSWORD,
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
