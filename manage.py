@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import os
 import sys
-
+from doniGroup.env import ENV_SETTINGS
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "doniGroup.settings.prod")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", ENV_SETTINGS)
     try:
         from django.core.management import execute_from_command_line
     except ImportError:
