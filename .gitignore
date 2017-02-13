@@ -2,5 +2,5 @@
 ################
 .idea/
 media/
-./doniGroup/settings/environment.py
+./doniGroup/env.py
 *.pyc
