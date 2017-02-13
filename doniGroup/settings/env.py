@@ -1,1 +1,0 @@
-ENV_SETTINGS = 'doniGroup.settings.prod'
