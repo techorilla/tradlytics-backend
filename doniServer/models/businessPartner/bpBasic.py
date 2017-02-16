@@ -27,3 +27,9 @@ class BpBasic(models.Model):
     @classmethod
     def get_admin_business(cls):
         return cls.objects.get(bp_admin=True)
+
+    @classmethod
+    def get_business_using_website(cls, url):
+        return cls.objects.get(bp_website__contains=url)
+
+

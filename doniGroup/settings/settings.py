@@ -43,8 +43,14 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # Application Apps
-    'doniServer'
+    'doniServer',
+    'grappelli',
+    'jsoneditor'
 ]
+
+# Admin JSON editor
+JSON_EDITOR_JS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/4.2.1/jsoneditor.js'
+JSON_EDITOR_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/4.2.1/jsoneditor.css'
 
 MIDDLEWARE = [
     'doniServer.middleware.SessionExpiry',
@@ -125,5 +131,5 @@ IS_HTTPS = False
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media'
-STATIC_ROOT = ''
+STATIC_ROOT = STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'

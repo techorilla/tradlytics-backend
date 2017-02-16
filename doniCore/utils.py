@@ -6,8 +6,6 @@ from doniServer.models.authentication.userProfile import UserProfile
 log = logging.getLogger("django")
 
 
-
-
 class Utilities(object):
     @classmethod
     def get_user_business(cls, user):

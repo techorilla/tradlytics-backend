@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from ..businessPartner.bpBasic import BpBasic
 from django.conf import settings
+from .productCategory import ProductCategory
 from django.db.models import Q
 import os
 import time
@@ -13,6 +14,7 @@ class Products(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=250)
     description = models.TextField(null=True)
+    category = models.ForeignKey(ProductCategory, null=True, blank=True)
     business = models.ForeignKey(BpBasic, default=BpBasic.get_admin_business().bp_id)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
@@ -62,4 +64,27 @@ class ProductImages(models.Model):
 
     def __unicode__(self):
         return self.image
+
+
+from django.contrib import admin
+
+
+class ProductAdmin(admin.ModelAdmin):
+    model = Products
+    list_display = ('name', 'description', 'category')
+    fieldsets = [
+        ('Product Details', {'fields': ['name', 'description']}),
+        ('Product Category', {'fields': ['category']})
+    ]
+
+    def save_model(self, request, obj, form, change):
+        obj.created_by = request.user
+        obj.business = request.user.profile.business
+        obj.save()
+
+
+
+
+
+
 
