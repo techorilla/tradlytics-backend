@@ -5,6 +5,7 @@ from doniServer.models import *
 
 admin.site.register(ProductCategory, ProductsCategoryAdmin)
 admin.site.register(Products, ProductAdmin)
+
 admin.site.register(ProductKeyword, ProductKeywordAdmin)
 admin.site.register(ProductsSpecification, ProductsSpecificationAdmin)
 admin.site.register(PriceMarket, PriceMarketAdmin)

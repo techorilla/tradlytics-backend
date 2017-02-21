@@ -1,0 +1,138 @@
+{% extends "base2.html" %}
+{% load staticfiles %}
+{% block content %}
+
+    <!-- Start Page Top -->
+    <section id="page-top" style="height:400px">
+        <div class="hero">
+
+            <img src='{% static "img/backgrounds/blog-background.jpg" %}' alt="hero">
+
+            <div class="page-top-title text-center">
+                <h2 class="white op-1">Doni & Company Blogs</h2>
+                <p class="home-subheading op-1">Read our market research</p>
+            </div>
+
+        </div>
+    </section>
+    <!-- End Page Top -->
+
+    <div class="site-wrapper content">
+
+        <!-- Start Blog Classic -->
+        <section id="blog">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-md-8">
+
+                        {% for obj in object_list %}
+                            <div class="blog-post">
+                                <!-- First Blog Post -->
+
+                                <h3 class="blog-post-title"><a href="{{ obj.get_absolute_url }}">{{ obj.title }}</a></h3>
+                                <ul class="blog-post-info">
+                                    <li><i class="ion-person"></i> {{ obj.user.get_full_name }}</li>
+                                    <li>
+                                        {% for tag in obj.all_tags %}
+                                        <a href="#"><i class="ion-pricetag"></i>{{ tag.name }}</a>
+                                        {% endfor %}
+                                    </li>
+                                    <li><a href="#"><i class="ion-chatboxes"></i> {{ obj.comments | length }} Comments</a></li>
+                                </ul>
+                                <div class="blog-post-date">
+                                    <h2>{{ obj.publish.day }}</h2>
+                                    <h5>{{ obj.publish|date:"M" | upper}} {{ obj.publish|date:"Y" | upper}}</h5>
+                                </div>
+                                {% if obj.image  %}
+                                    <a href="blog-single-post-1.html"><img class="img-responsive blog-img" src='{{ obj.image.url }}' alt=""></a>
+                                {% endif %}
+                                <p>
+                                    {% autoescape off %}
+                                        {{ obj.content | truncatechars_html:320 | safe}}
+                                    {% endautoescape %}
+                                <p>
+                                <a class="btn btn-primary btn-xs" href="{{ obj.get_absolute_url }}">Read More</a>
+                            </div>
+                        {% endfor %}
+
+                        <div class="blog-post">
+                            <!-- Second Blog Post -->
+                            <h3 class="blog-post-title"><a href="blog-single-post-2.html">Touch Slider Post</a></h3>
+                            <ul class="blog-post-info">
+                                <li><a href="#"><i class="ion-person"></i> By Vossen</a></li>
+                                <li><a href="#"><i class="ion-folder"></i> Design, Branding</a></li>
+                                <li><a href="#"><i class="ion-chatboxes"></i> 6 Comments</a></li>
+                            </ul>
+                            <div class="blog-post-date">
+                                <h2>18</h2>
+                                <h5>JUN 2015</h5>
+                            </div>
+
+                            <div id="owl-slider" class="owl-carousel">
+                                <div>
+                                    <img class="img-responsive" src='{% static "img/blog/blog-2.jpg" %}' alt="">
+                                </div>
+                                <div>
+                                    <img class="img-responsive" src='{% static "img/blog/blog-3.jpg" %}' alt="">
+                                </div>
+                                <div>
+                                    <img class="img-responsive" src='{% static "img/blog/blog-4.jpg" %}' alt="">
+                                </div>
+                            </div>
+
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, veritatis, tempora, necessitatibus inventore nisi quam quia repellat ut tempore laborum possimus eum dicta id animi corrupti debitis ipsum officiis rerum. <br>Consectetur inventore nisi corrupti debitis adipisicing elit.<p>
+                            <a class="btn btn-primary btn-xs" href="blog-single-post-2.html">Read More</a>
+                        </div>
+
+                        <div class="blog-post">
+                            <!-- Third Blog Post -->
+                            <h3 class="blog-post-title"><a href="blog-single-post-3.html">Video Post</a></h3>
+                            <ul class="blog-post-info">
+                                <li><a href="#"><i class="ion-person"></i> By Vossen</a></li>
+                                <li><a href="#"><i class="ion-folder"></i> Design, Branding</a></li>
+                                <li><a href="#"><i class="ion-chatboxes"></i> 6 Comments</a></li>
+                            </ul>
+                            <div class="blog-post-date">
+                                <h2>09</h2>
+                                <h5>SEP 2015</h5>
+                            </div>
+                            <div class="fluid-width-video-wrapper">
+                                <div class="video-container">
+                                    <iframe src="http://www.youtube.com/embed/amQzMHlMyWc?color=white&amp;showinfo=0"></iframe>
+                                </div>
+                            </div>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, veritatis, tempora, necessitatibus inventore nisi quam quia repellat ut tempore laborum possimus eum dicta id animi corrupti debitis ipsum officiis rerum. <br>Consectetur inventore nisi corrupti debitis adipisicing elit.<p>
+                            <a class="btn btn-primary btn-xs" href="blog-single-post-3.html">Read More</a>
+                        </div>
+
+                        <hr>
+                        <!-- Pager -->
+                        <ul class="pager">
+                            <li class="previous">
+                                <a href="#"><i class="ion-android-arrow-back"></i></a>
+                            </li>
+                            <li class="next">
+                                <a href="#"><i class="ion-android-arrow-forward"></i></a>
+                            </li>
+                        </ul>
+
+                    </div>
+
+                    {% include "blog_sidebar.html" %}
+
+                </div>
+            </div>
+        </section>
+        <!-- End Blog Classic -->
+
+        {% include "footer.html" %}
+
+
+        <!-- Start Back To Top -->
+        <a id="back-to-top"><i class="icon ion-chevron-up"></i></a>
+        <!-- End Back To Top -->
+
+    </div><!-- End Site Wrapper -->
+
+{% endblock content %}

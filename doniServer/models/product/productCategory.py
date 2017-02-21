@@ -12,6 +12,27 @@ class ProductCategory(models.Model):
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='prod_category_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='prod_category_updated_by')
 
+    @classmethod
+    def get_category_for_website(cls):
+        categories = cls.objects.all()
+        return [cat.get_category_list() for cat in categories]
+
+    @property
+    def category_class(self):
+        return '_'.join(self.name.lower().split(' '))
+
+    @property
+    def abc(self):
+        return 'abc'
+
+    def get_category_list(self):
+        return {
+            'name': self.name,
+            'products': self.products.all(),
+            'class': self.category_class,
+            'count': str(self.products.all().count())
+        }
+
     class Meta:
         db_table = 'product_category'
 

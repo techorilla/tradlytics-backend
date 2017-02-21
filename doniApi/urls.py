@@ -126,31 +126,6 @@ urlpatterns = (
         name='Products'),
 
 
-    # Blog Related API
-
-    url(r'blog/tag_list/$',
-        TagList.as_view(),
-        name='tag-list'),
-
-    url(r'blog/tag_list/(?P<pk>[0-9]+)/$',
-        TagDetail.as_view(),
-        name='tag-detail'),
-
-    url(r'blog/$',
-        BlogList.as_view(),
-        name='blog-list'),
-
-    url(r'^(?P<pk>[0-9]+)/$',
-        BlogDetail.as_view(),
-        name='blog-detail'),
-
-    # Tab Filters Related API
-
-    url(r'tabFilters/list/$',
-        TabFiltersAPI.as_view(),
-        name='tab-filters'
-        ),
-
     # DropDownRelatedAPI
     url(r'^dropDown/',
         include('doniApi.dropDown.urls')),

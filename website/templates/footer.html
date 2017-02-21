@@ -1,0 +1,78 @@
+{% load staticfiles %}
+<!-- Start Footer 1 -->
+<footer id="footer">
+    <div class="footer-widgets">
+        <div class="container">
+
+            <div class="col-md-3 col-sm-6 col-twitter">
+                <h4>Latest Tweet</h4>
+                <div class="tweet" style="max-height:300px">
+                    <a class="twitter-timeline" data-width="300" data-height="100" data-chrome="noheader nofooter noborders transparent"
+                       data-dnt="true" data-tweet-limit="1" data-theme="dark" data-link-color="#E20A16"
+                       href="https://twitter.com/DoniCompany"></a>
+                    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-footer">
+                <div class="subscription">
+                    <h4>Newsletter</h4>
+                    <p>Subscribe to receive new ideas, inspiration and our weekly news!</p>
+
+                    <form action="php/subscribe-mailchimp.php" method="post" id="subscribe-form" role="form">
+                        <div class="form-validation alert"></div>
+                        <div class="form-group subscribe-form-input">
+                            <input type="email" name="email" id="subscribe-form-email" class="footer-subscribe-input" placeholder="Your Email Address" autocomplete="off" />
+                            <button class="subscribe-form-submit btn-primary-full" data-loading-text="Loading...">Subscribe</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-footer">
+                <div class="contact">
+                    <h4>Contact us Today!</h4>
+                    <ul class="contact-details">
+                        <li><p><i class="icon ion-ios-location-outline highlight"></i> 101, Shalimar Centre, Altaf Hussain Road, New Challi - 74200, Karachi, Pakistan</p></li>
+                        <li><p><i class="icon ion-ios-telephone highlight"></i> (92)-21-32430152-5 (4 Lines)</p></li>
+                        <li><p><i class="icon ion-android-print highlight"></i> (92)-21-32432313, 32431366</p></li>
+                        <li><p><i class="icon ion-android-mail highlight"></i> <a href="info@donigroup.com">info@donigroup.com</a></p></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6 col-footer">
+                <h4>Membership and Affiliations</h4>
+                <p>Doni and Company is an agro commodity brokerage company based in Karachi, Pakistan.</p>
+                <!--<h6 class="grey-font">Membership and Affiliations</h6>-->
+                <div class="membership">
+                    <img src='{% static "img/clients/gpc.png" %}'>
+                    <img src='{% static "img/clients/gafta.png" %}'>
+                </div>
+            </div>
+
+        </div>
+    </div><!-- End Footer Widgets -->
+
+    <div class="footer-copyright">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-md-6 col-sm-12">
+                    <p>© 2015 <a href="index.html" class="logo">Doni & Company.</a> All Rights Reserved. </p>
+                </div>
+                <div class="col-md-6 col-sm-12">
+                    <ul id="social-icons">
+                        <li><a href="https://twitter.com/DoniCompany" target="_blank"><i class="icon ion-social-twitter"></i></a></li>
+                        <li><a class="social-icon" target="_blank" href="https://facebook.com/DoniGroup/"><i class="icon ion-social-facebook"></i></a></li>
+                        <li><a href="https://www.linkedin.com/company/doni-and-company" target="_blank"><i class="icon ion-social-linkedin"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div><!-- End Footer Copyright -->
+
+</footer>
+<!-- End Footer 1 -->

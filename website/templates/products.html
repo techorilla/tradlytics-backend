@@ -1,0 +1,83 @@
+{% extends "base2.html" %}
+{% load staticfiles %}
+{% block content %}
+
+
+    <!-- Start Page Top -->
+    <section id="page-top" style="height:400px">
+        <div class="hero" style="height:100%;">
+
+            <img src='{% static "img/backgrounds/product-background.jpg" %}' alt="hero">
+
+            <div class="page-top-title text-center">
+                <h2 class="white op-1">Products</h2>
+                <p class="home-subheading op-1"></p>
+            </div>
+
+        </div>
+    </section>
+    <!-- End Page Top -->
+
+
+    <div class="site-wrapper content">
+
+        <section id="portfolio" style="position: relative;" class="current">
+            <div class="separator"></div>
+            <div class="container">
+
+                <div class="col-md-12 text-center">
+{#                    <h3 class="section-title wow fadeInUp animated" style="visibility: visible;">Products</h3>#}
+{#                    <p class="subheading wow fadeInUp animated" style="visibility: visible;">Creating products and services that <span class="highlight">transform brands</span>.</p>#}
+                </div>
+
+                <div id="filters-container-fullwidth" class="cbp-l-filters-alignCenter wow fadeInUp animated" style="visibility: visible;">
+                    <div data-filter="*" class="cbp-filter-item-active cbp-filter-item">All
+                        <div class="cbp-filter-counter">{{ products | length }}</div>
+                    </div>
+                    {% for cat in categories %}
+                    <div data-filter=".{{ cat.class }}" class="cbp-filter-item">{{ cat.name }}
+                        <div class="cbp-filter-counter">{{ cat.count }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div id="grid-container-fullwidth" class="cbp-l-grid-fullScreen">
+                    <ul>
+                        {% for product in products %}
+                            <li class="cbp-item effect effects {{ product.category.category_class }}">
+                                <div class="img">
+                                    <img style="height:400px" src="{{ product.image }}" class="img-responsive" alt="" />
+                                    <div class="product-overlay" style="">
+                                        <ul class="product-expand expand">
+                                            <li class="cbp-l-caption-title" style="font-size: 24px;">
+                                                <a style="color: #ffffff;" href="{% url "web:single_product" %}?id={{ product.id }}">{{ product.name }}</a>
+                                            </li>
+                                            <li class="cbp-l-caption-desc" style="font-size:16px; color: #ffffff;">{{ product.category.name}}</li>
+{#                                            <li class="cbp-l-icon"><a href="img/portfolio/fullsize/1.jpg" class="cbp-lightbox" data-title="Dashboard<br>by Wunderwelt"><i class="icon-magnifier"></i></a></li>#}
+{#                                            <li class="cbp-l-icon"><a href="projects/project1.html" class="cbp-singlePage"><i class="icon-link"></i></a></li>#}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+
+{#                <div class="cbp-l-loadMore-button">#}
+{#                    <a href="projects/loadMore.html" class="cbp-l-loadMore-button-link wow fadeInUp animated" style="visibility: visible;">SHOW ME MORE</a>#}
+{#                    <!-- Portfolio AJAX load more button will be functional only on your server. Upload to your server when testing. -->#}
+{#                </div>#}
+            </div>
+        </section>
+
+        {% include "footer.html" %}
+
+
+        <!-- Start Back To Top -->
+        <a id="back-to-top"><i class="icon ion-chevron-up"></i></a>
+        <!-- End Back To Top -->
+
+    </div>
+
+{% endblock content %}

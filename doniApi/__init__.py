@@ -5,7 +5,6 @@ from reports import *
 from manifest import *
 from origins import *
 from pricing import *
-from blogs import *
 from tabFilters import *
 from authentication import *
 from website import *

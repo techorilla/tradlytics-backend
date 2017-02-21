@@ -22,9 +22,14 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    url(r"api/login/$", LoginAPI.as_view(), {"public_api": True}, name="login"),
-    url(r"api/logout/$", LogOutAPI.as_view(), name="logout"),
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('doniApi.urls')),
-    url(r'^grappelli/', include('grappelli.urls'))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  url(r"api/login/$", LoginAPI.as_view(), {"public_api": True}, name="login"),
+                  url(r"api/logout/$", LogOutAPI.as_view(), name="logout"),
+                  url(r'^admin/', admin.site.urls),
+                  url(r'^api/', include('doniApi.urls')),
+                  url(r'^grappelli/', include('grappelli.urls')),
+                  url(r'^', include("website.urls", namespace='web')),
+                  url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG is True:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

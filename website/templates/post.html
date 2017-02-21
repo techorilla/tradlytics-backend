@@ -1,0 +1,149 @@
+{% extends "base2.html" %}
+{% load staticfiles %}
+{% block content %}
+
+    <!-- Start Page Top -->
+    <section id="page-top" style="height:400px">
+        <div class="hero">
+
+            <img src='{% static "img/backgrounds/blog-background.jpg" %}' alt="hero">
+
+            <div class="page-top-title text-center">
+                <h2 class="white op-1">Doni & Company Blogs</h2>
+                <p class="home-subheading op-1">Read our market research</p>
+            </div>
+
+        </div>
+    </section>
+    <!-- End Page Top -->
+
+    <div class="site-wrapper content">
+
+        <!-- Start Blog Classic -->
+        <section id="blog">
+            <div class="container">
+                <div class="row">
+                    <!-- Blog Post -->
+                    <div class="col-md-8">
+                        <div class="blog-post">
+                            <h3 class="blog-post-title">{{ title }}</h3>
+                            {#                                <p class="lead">Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
+                            <ul class="blog-post-info">
+                                <li><a href="#"><i class="ion-clock"></i> {{ instance.publish.day }} {{ instance.publish |date:"F"  }} {{ instance.publish|date:"Y"}}</a></li>
+                                <li><a href="#"><i class="ion-person"></i> By {{ instance.user.get_full_name }}</a></li>
+                                <li><a href="#"><i class="ion-folder"></i> Design, Branding</a></li>
+                                <li><a href="#"><i class="ion-chatboxes"></i> {{ instance.comments | length }} Comments</a></li>
+                            </ul>
+                            <a href="#">
+                                <img class="img-responsive blog-img" src="{{ instance.image.url }}" alt="">
+                            </a>
+                            {% autoescape off %}
+                            {{ instance.content | safe}}
+                            {% endautoescape %}
+
+
+
+{#                            <!-- Comments -->#}
+{#                            <div class="comments">#}
+{##}
+{#                                <h4 class="comments-title">Comments <small class="number">(4)</small></h4><hr>#}
+{#                                <div class="comment depth-1">#}
+{#                                    <a class="pull-left" href="#">#}
+{#                                        <img class="avatar" src="img/blog/avatar.jpg" alt="">#}
+{#                                    </a>#}
+{#                                    <div class="media-body">#}
+{#                                        <h4 class="media-heading">Jack</h4>#}
+{#                                        <p class="time">Feb 25, 2015 at 9:30 PM</p>#}
+{#                                        <p>Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
+{#                                        <a class="comment-reply pull-right" href="#"><i class="ion-reply"></i> Reply</a>#}
+{#                                    </div>#}
+{#                                </div>#}
+{##}
+{#                                <div class="comment depth-1">#}
+{#                                    <a class="pull-left" href="#">#}
+{#                                        <img class="avatar" src="img/blog/avatar.jpg" alt="">#}
+{#                                    </a>#}
+{#                                    <div class="media-body">#}
+{#                                        <h4 class="media-heading">John</h4>#}
+{#                                        <p class="time">Feb 25, 2015 at 10:30 PM</p>#}
+{#                                        <p>Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
+{#                                        <a class="comment-reply pull-right" href="#"><i class="ion-reply"></i> Reply</a>#}
+{#                                    </div>#}
+{#                                </div>#}
+{##}
+{#                                <div class="comment depth-2">#}
+{#                                    <a class="pull-left" href="#">#}
+{#                                        <img class="avatar" src="img/blog/avatar.jpg" alt="">#}
+{#                                    </a>#}
+{#                                    <div class="media-body">#}
+{#                                        <h4 class="media-heading">Jacky</h4>#}
+{#                                        <p class="time">Feb 25, 2015 at 12:00 PM</p>#}
+{#                                        <p>Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
+{#                                        <a class="comment-reply pull-right" href="#"><i class="ion-reply"></i> Reply</a>#}
+{#                                    </div>#}
+{#                                </div>#}
+{##}
+{#                                <div class="comment depth-3">#}
+{#                                    <a class="pull-left" href="#">#}
+{#                                        <img class="avatar" src="img/blog/avatar.jpg" alt="">#}
+{#                                    </a>#}
+{#                                    <div class="media-body">#}
+{#                                        <h4 class="media-heading">Jane</h4>#}
+{#                                        <p class="time">Feb 25, 2015 at 12:30 PM</p>#}
+{#                                        <p>Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
+{#                                        <a class="comment-reply pull-right" href="#"><i class="ion-reply"></i> Reply</a>#}
+{#                                    </div>#}
+{#                                </div>#}
+{##}
+{#                            </div>#}
+
+
+                            <!-- Comment Form -->
+                            <div class="comment-form">
+                                <h4 class="comments-title">Leave a comment</h4>
+
+                                <form method="post" action="php/contact-form.php" name="contactform" id="contactform">
+                                    <fieldset>
+                                        <input name="name" type="text" id="name" placeholder="Name"/>
+                                        <input name="email" type="text" id="email" placeholder="Email"/>
+                                        <input name="subject" type="text" id="subject" placeholder="Website"/>
+                                    </fieldset>
+                                    <fieldset>
+                                        <textarea name="comments" cols="40" rows="3" id="comments" placeholder="Comment"></textarea>
+                                    </fieldset>
+                                </form>
+                                <a class="btn btn-primary btn-xs" href="#">Post Comment</a>
+                            </div>
+
+                            <hr>
+{#                            <!-- Pager -->#}
+{#                            <ul class="pager">#}
+{#                                <li class="previous">#}
+{#                                    <a href="#"><i class="ion-android-arrow-back"></i></a>#}
+{#                                </li>#}
+{#                                <li class="next">#}
+{#                                    <a href="#"><i class="ion-android-arrow-forward"></i></a>#}
+{#                                </li>#}
+{#                            </ul>#}
+
+                        </div>
+
+                    </div>
+
+                    {% include "blog_sidebar.html" %}
+
+                </div>
+            </div>
+        </section>
+        <!-- End Blog Classic -->
+
+        {% include "footer.html" %}
+
+
+        <!-- Start Back To Top -->
+        <a id="back-to-top"><i class="icon ion-chevron-up"></i></a>
+        <!-- End Back To Top -->
+
+    </div><!-- End Site Wrapper -->
+
+{% endblock content %}

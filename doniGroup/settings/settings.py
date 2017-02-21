@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from os.path import abspath, dirname
 
 from .constants import *
 
@@ -18,6 +19,8 @@ from .constants import *
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DJANGO_ROOT = dirname(dirname(dirname(abspath(__file__))))
+PROJECT_ROOT = os.path.join(dirname(DJANGO_ROOT), 'doniGroup')
 
 
 # Quick-start development settings - unsuitable for production
@@ -43,10 +46,22 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # Application Apps
+
     'doniServer',
     'grappelli',
-    'jsoneditor'
+    'jsoneditor',
+    'ckeditor',
+    'website',
+    'easy_thumbnails',
+
 ]
+
+
+
+
+CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'
+
+CKEDITOR_UPLOAD_PATH = os.path.join(PROJECT_ROOT, "website", 'static', 'blog'),
 
 # Admin JSON editor
 JSON_EDITOR_JS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/4.2.1/jsoneditor.js'
@@ -65,6 +80,8 @@ MIDDLEWARE = [
 ]
 
 
+
+
 # Authentication Backend
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -76,7 +93,7 @@ ROOT_URLCONF = 'doniGroup.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(PROJECT_ROOT,'website', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -131,5 +148,24 @@ IS_HTTPS = False
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media'
-STATIC_ROOT = STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, "website", 'static'),
+)
+
+CONTACT_US_EMAIL_TEMPLATE = '%s/doniEmail/templates/contact_us.tpl' % PROJECT_ROOT
+BASE_EMAIL_TEMPLATE = '%s/doniEmail/templates/base_email.tpl' % PROJECT_ROOT
+EMAIL_ASSETS = "%s/doniEmail/static/img/assets/" % PROJECT_ROOT
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'immadimtiaz@gmail.com'
+EMAIL_HOST_PASSWORD = 'scorpion2317150'
+
+from easy_thumbnails.conf import Settings as thumbnail_settings
+THUMBNAIL_PROCESSORS = (
+                           'image_cropping.thumbnail_processors.crop_corners',
+                       ) + thumbnail_settings.THUMBNAIL_PROCESSORS

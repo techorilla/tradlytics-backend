@@ -1,5 +1,5 @@
 from doniApi.apiImports import Response, GenericAPIView, status
-from doniServer.models import ProductKeyword, Products, ProductsSpecification, Origin, ProductImages
+from doniServer.models import ProductKeyword, Products, ProductsSpecification, Origin, ProductImage
 from django.db.models import Q
 
 class ProductsImageAPI(GenericAPIView):
@@ -34,7 +34,7 @@ class ProductsImageAPI(GenericAPIView):
         product = Products.objects.get(id=int(product_id))
         primary = bool(request.data.get('primary', False))
         image = request.FILES.get('product_image')
-        prod_image = ProductImages(product=product, image=image, primary=primary)
+        prod_image = ProductImage(product=product, image=image, primary=primary)
         prod_image.created_by = user
         prod_image.save()
         return Response({
@@ -45,7 +45,7 @@ class ProductsImageAPI(GenericAPIView):
 
     def delete(self, request, *args, **kwargs):
         image_id = kwargs.get('image_id')
-        prod_image = ProductImages.objects.get(id=image_id)
+        prod_image = ProductImage.objects.get(id=image_id)
         prod_image.delete()
         return Response(
             status=status.HTTP_200_OK
