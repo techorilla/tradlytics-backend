@@ -1,7 +1,7 @@
 # IDE Specific #
 ################
 .idea/
-media/
+
 *.pyc
 
 # CODE SPECIFIC #
