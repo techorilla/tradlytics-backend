@@ -22,6 +22,8 @@ class Command(BaseCommand):
                 mail_admins(
                     "IMP: CELERY IS DOWN!!", 
                     "Please restart..")
+            else:
+                log.info("Celery is running")
 
         except Exception, e:
 
