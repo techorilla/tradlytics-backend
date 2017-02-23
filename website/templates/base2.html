@@ -94,7 +94,7 @@
 <script src='{% static "js/plugins/cubeportfolio.min.js" %}'></script>
 <script src='{% static "js/plugins/owlcarousel.min.js" %}'></script>
 <script src='{% static "js/plugins/tweetie.min.js" %}'></script>
-<script src='http://maps.googleapis.com/maps/api/js?sensor=false'></script>
+<script src='http://maps.googleapis.com/maps/api/js?key=AIzaSyChOXTm0jxXRYtpOTvPES1N816fVDonXQQ&sensor=false&libraries=places'></script>
 <script src='{% static "js/plugins/gmap3.min.js" %}'></script>
 <script src='{% static "js/plugins/wow.min.js" %}'></script>
 <script src='{% static "js/plugins/counterup.min.js" %}'></script>
@@ -113,8 +113,7 @@
                 zoom: 16,
                 scrollwheel:false,
                 draggable: true,
-                mapTypeId : google.maps.MapTypeId.ROADMAP,
-                key: 'AIzaSyChOXTm0jxXRYtpOTvPES1N816fVDonXQQ'
+                mapTypeId : google.maps.MapTypeId.ROADMAP
             })
             .marker({
                 position: center,
