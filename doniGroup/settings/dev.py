@@ -9,6 +9,9 @@ MYSQL_USER = 'doniGroup'
 MYSQL_PASSWORD = 'Giki1990????'
 REDIS_HOST = ''
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 from os.path import abspath, dirname
+import djcelery
 
 from .constants import *
 
@@ -29,10 +30,9 @@ PROJECT_ROOT = os.path.join(dirname(DJANGO_ROOT), 'doniGroup')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '=^5p6c(@(e#^w!v_0cvwnfh11bwng6@dltr!z-ujdifxrm5eh3'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = ['tramodity.com', 'donigroup.com']
+
+ALLOWED_HOSTS = ['tramodity.com', 'donigroup.com', 'localhost']
 
 # Application definition
 
@@ -48,24 +48,49 @@ INSTALLED_APPS = [
     # Application Apps
 
     'doniServer',
+    'emailApp',
+    'website',
+
+    # Third Party Application
     'grappelli',
     'jsoneditor',
     'ckeditor',
-    'website',
     'easy_thumbnails',
+    'djcelery',
+    'markdownx',
+    'django_countries'
 
 ]
 
+# For django-countries all flag icon urls
+COUNTRIES_FLAG_URL = 'flags/1x1/{code}.svg'
 
-
-
+#CKE EDITOR TEXT EDITOR FOR DJANGO ADMIN
 CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'
-
 CKEDITOR_UPLOAD_PATH = os.path.join(PROJECT_ROOT, "website", 'static', 'blog'),
 
 # Admin JSON editor
 JSON_EDITOR_JS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/4.2.1/jsoneditor.js'
 JSON_EDITOR_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/4.2.1/jsoneditor.css'
+
+'''
+Celery Related Variables
+'''
+# CELERY BROKER IP
+BROKER_INTERNAL_IP = '127.0.0.1'
+# Broker settings.
+BROKER_PORT = 6379
+BROKER_URL = "redis://%s:%s//" % (BROKER_INTERNAL_IP, BROKER_PORT)
+# Using the database to store task state and results.
+CELERY_RESULT_BACKEND = "redis://%s:%s/" % (BROKER_INTERNAL_IP, BROKER_PORT)
+CELERY_RESULT_DBURI = "redis://%s:%s/0" % (BROKER_INTERNAL_IP, BROKER_PORT)
+CELERYD_MAX_TASKS_PER_CHILD = 4
+CELERY_REDIRECT_STDOUTS_LEVEL = 'ERROR'
+CELERY_TRACK_STARTED = True
+
+djcelery.setup_loader()
+
+
 
 MIDDLEWARE = [
     'doniServer.middleware.SessionExpiry',
@@ -79,14 +104,10 @@ MIDDLEWARE = [
 
 ]
 
-
-
-
 # Authentication Backend
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
-
 
 ROOT_URLCONF = 'doniGroup.urls'
 
@@ -154,15 +175,16 @@ STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, "website", 'static'),
 )
 
-CONTACT_US_EMAIL_TEMPLATE = '%s/doniEmail/templates/contact_us.tpl' % PROJECT_ROOT
-BASE_EMAIL_TEMPLATE = '%s/doniEmail/templates/base_email.tpl' % PROJECT_ROOT
-EMAIL_ASSETS = "%s/doniEmail/static/img/assets/" % PROJECT_ROOT
+CONTACT_US_EMAIL_TEMPLATE = '%s/emailApp/templates/contact_us.tpl' % PROJECT_ROOT
+BASE_EMAIL_TEMPLATE = '%s/emailApp/templates/base_email.tpl' % PROJECT_ROOT
+EMAIL_ASSETS = "%s/emailApp/static/img/assets/" % PROJECT_ROOT
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'immadimtiaz@gmail.com'
+EMAIL_INFO = ['immadimtiaz@gmail.com']
 EMAIL_HOST_PASSWORD = 'scorpion2317150'
 
 from easy_thumbnails.conf import Settings as thumbnail_settings

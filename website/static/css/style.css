@@ -3522,3 +3522,15 @@ pre {
     top: 45%;
     text-align: center;
 }
+
+.display-none{
+    display: none;
+}
+
+.project-origin-item {
+    font-size: 14px;
+    border-bottom: 1px solid #7a7a7a;
+    padding-bottom: 4px;
+    color: #7a7a7a;
+}
+

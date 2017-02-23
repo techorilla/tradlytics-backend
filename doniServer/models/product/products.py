@@ -8,7 +8,7 @@ from .productCategory import ProductCategory
 from django.db.models import Q
 import os
 import time
-
+from django_countries.fields import CountryField
 
 class Products(models.Model):
     id = models.AutoField(primary_key=True)
@@ -35,6 +35,10 @@ class Products(models.Model):
     @property
     def get_product_quality_keywords(self):
         return []
+
+    @property
+    def origins(self):
+        return self.countries.all()
 
     def get_product_list_obj(self, base_url):
         return {

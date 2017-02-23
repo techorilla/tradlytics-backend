@@ -131,7 +131,7 @@ urlpatterns = (
         include('doniApi.dropDown.urls')),
 
     # Website Related APIs
-    url(r'^contact_us/$',  ContactUsAPI.as_view(), name='website-contact-us'),
+    url(r'^contact_us/$',  ContactUsAPI.as_view(), {"public_api": True}, name='website-contact-us', ),
 
     url(r'^newsletter/$', NewsLetterAPI.as_view(), name='website-newsletter')
 

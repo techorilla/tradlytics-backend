@@ -28,7 +28,7 @@ urlpatterns = [
                   url(r'^api/', include('doniApi.urls')),
                   url(r'^grappelli/', include('grappelli.urls')),
                   url(r'^', include("website.urls", namespace='web')),
-                  url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+                  url(r'^markdownx/', include('markdownx.urls')),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG is True:

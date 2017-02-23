@@ -251,26 +251,42 @@
      Contact form
      ---------------------*/
     $('#contactform').submit(function(){
+        function validateEmail(email) {
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+
+        var is_correct_email = validateEmail($('#email').val());
+        console.log(is_correct_email);
+        if(!is_correct_email){
+            document.getElementById('message').innerHTML = 'Please enter a correct email';
+            return
+        }
+        console.log
+
         // var apiUrl = 'http://api.tramodity.com/api/contact_us/';
-        var apiUrl = 'http://localhost:8000/api/contact_us/';
+        var hostname = window.location.hostname;
+        var port = window.location.port;
+        var domain = ( port == "") ? hostname : hostname + ':' + port;
+        var apiUrl = 'http://'+domain+'/api/contact_us/';
 
         $("#message").slideUp(250,function() {
             $('#message').hide();
             $('#submit')
-                .after('<img src="img/assets/contact-form-loader.gif" class="loader" />')
+                .after('<i style="color:red; font-size:31px;" class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>')
                 .attr('disabled','disabled');
             $.post(apiUrl, {
                     name: $('#name').val(),
                     email: $('#email').val(),
                     subject: $('#subject').val(),
-                    comments: $('#comments').val(),
+                    comments: $('#comments').val()
                 },
                 function(data){
-                    document.getElementById('message').innerHTML = data;
+                    document.getElementById('message').innerHTML = data.message;
                     $('#message').slideDown(250);
-                    $('#contactform img.loader').fadeOut('slow',function(){$(this).remove()});
+                    $('#contactform i.fa').fadeOut('slow',function(){$(this).remove()});
                     $('#submit').removeAttr('disabled');
-                    if(data.match('success') != null) $('#contactform').slideUp(850, 'easeInOutExpo');
+                    if(data.success == true) $('#contactform').slideUp(850, 'easeInOutExpo');
                 }
             );
         });
