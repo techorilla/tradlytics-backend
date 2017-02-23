@@ -177,7 +177,7 @@ STATICFILES_DIRS = (
 
 CONTACT_US_EMAIL_TEMPLATE = '%s/emailApp/templates/contact_us.tpl' % PROJECT_ROOT
 BASE_EMAIL_TEMPLATE = '%s/emailApp/templates/base_email.tpl' % PROJECT_ROOT
-EMAIL_ASSETS = "%s/emailApp/static/img/assets/" % PROJECT_ROOT
+EMAIL_ASSETS = "%s/emailApp/static/img/assets/" % DJANGO_ROOT
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True

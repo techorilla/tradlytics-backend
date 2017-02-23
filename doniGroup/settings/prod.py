@@ -15,6 +15,8 @@ REDIS_HOST = ''
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+
+
 DATABASES = {
     # 'default': {
     #     'NAME': 'my_database',
