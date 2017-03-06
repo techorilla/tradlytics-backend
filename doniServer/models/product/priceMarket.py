@@ -7,7 +7,7 @@ import pycountry
 
 def get_all_countries():
     all_countries = list(pycountry.countries)
-    return [(country.alpha_3, country.name) for country in all_countries]
+    return [(country.alpha_2, country.name) for country in all_countries]
 
 
 def get_all_currencies():
@@ -25,8 +25,38 @@ class PriceMarket(models.Model):
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='price_market_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='price_market_updated_by')
 
+    def get_dropdown(self):
+        return {
+            'id': self.id,
+            'origin': self.country_name,
+            'currency': self.currency
+        }
+
+    @property
+    def country_name(self):
+        if self.origin != 'INT':
+            country = pycountry.countries.get(alpha_2=str(self.origin).upper())
+            return country.name
+        else:
+            return 'International'
+
+    def get_obj(self):
+        return {
+            'id': self.id,
+            'countryName': self.country_name,
+            'country': self.origin.upper() if self.origin != 'INT' else None,
+            'currency': self.currency,
+            'description': self.description,
+            'updated_at': self.updated_at,
+            'created_at': self.created_at,
+            'updated_by': self.updated_by.username if self.updated_by else None,
+            'created_by': self.created_by.username,
+            'isInternational': True if self.origin == 'INT' else False
+        }
+
     class Meta:
         db_table = 'price_market'
+        unique_together = ('origin', 'currency',)
 
     def __unicode__(self):
         return self.origin

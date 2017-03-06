@@ -84,7 +84,7 @@ a:focus, a:active, button::-moz-focus-inner, input[type="reset"]::-moz-focus-inn
         padding: 0 90px;
     }
 }
-@media (min-width: 768px) and (max-width: 992px)) {
+@media (min-width: 768px) and (max-width: 992px) {
     .container {
         width: 100%;
     }
@@ -626,7 +626,7 @@ nav {
     border-radius: 0;
     border-color: none;
     border-bottom: none;
-    top: 0;
+    top: 40px;
     left: 0;
     width: 100%;
     padding: 0;
@@ -3528,9 +3528,73 @@ pre {
 }
 
 .project-origin-item {
-    font-size: 14px;
+    font-size: 16px;
     border-bottom: 1px solid #7a7a7a;
     padding-bottom: 4px;
     color: #7a7a7a;
 }
+
+.marquee {
+  overflow: hidden;
+  border-bottom: 1px solid #000;
+  -webkit-box-shadow: inset 0px 2px 2px rgba(0, 0, 0, .5), 0px 1px 0px rgba(250, 250, 250, .2);
+  box-shadow: inset 0px 2px 2px rgba(0, 0, 0, .5), 0px 1px 0px rgba(250, 250, 250, .2);
+}
+
+.price-bar{
+    height: 40px;
+    z-index: 100;
+    background: #1C1513;
+    position: fixed;
+    top:0;
+    overflow: hidden;
+
+}
+
+.price-bar .price-item{
+    height: 100%;
+}
+
+.price-bar *{
+    float: left;
+    height: auto;
+    display: block;
+    padding-top:4px;
+}
+
+.price-bar * *{
+    padding: 5px;
+
+}
+
+.price-bar * .product-price{
+    color: #1691AC;
+    font-weight: bold;
+}
+
+
+
+
+.price-bar * .product-change{
+    margin-top: -3px;
+    border-right: 1px dashed #000000;
+}
+
+.price-bar * .product-change .fa-caret-down{
+    color:red;
+
+}
+
+
+.price-bar * .product-change .fa-caret-up{
+    color:greenyellow;
+}
+
+.price-bar * .product-item{
+    color: #ffffff;
+    font-weight: bold;
+}
+
+
+
 

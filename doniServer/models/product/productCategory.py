@@ -3,9 +3,10 @@ from django.db import models
 from django.utils import timezone
 from django.contrib import admin
 
+
 class ProductCategory(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, unique=True)
     description = models.TextField(null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
@@ -22,13 +23,36 @@ class ProductCategory(models.Model):
         return '_'.join(self.name.lower().split(' '))
 
     @property
-    def abc(self):
-        return 'abc'
+    def keyword_count(self):
+        keyword_count = self.keywords.all().count()
+        return int(keyword_count)
+
+    @property
+    def product_count(self):
+        product_count = self.products.all().count()
+        return int(product_count)
+
+    @classmethod
+    def get_category_drop_down(cls):
+        all_cat = cls.objects.all()
+        return [{
+            'id': cat.id,
+            'name': cat.name
+        } for cat in all_cat]
+
+    def get_obj(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'productCount': self.product_count,
+            'keywordCount': self.keyword_count,
+            'description': self.description
+        }
 
     def get_category_list(self):
         return {
             'name': self.name,
-            'products': self.products.all(),
+            'products': self.product_count,
             'class': self.category_class,
             'count': str(self.products.all().count())
         }

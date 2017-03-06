@@ -15,6 +15,8 @@ REDIS_HOST = ''
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+APP_URL = 'http://tramodity.com'
+
 DATABASES = {
     # 'default': {
     #     'NAME': 'my_database',

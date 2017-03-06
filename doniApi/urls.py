@@ -81,23 +81,35 @@ urlpatterns = (
 
     # Manifest Related API
 
+    # Price Market API
+
+    url(r'pricing/price_market/$',
+        PricingMarketAPI.as_view(),
+        name='Pricing_Market_API'
+        ),
+
+    # Product Items Pricing API
+
+    url(r'pricing/product_item/$',
+        ProductItemPricingAPI.as_view(),
+        name='Product_Item_Pricing_API'),
+
     # Product Pricing API
 
-    # Origins API
-
-    url(r'origin/(?P<origin_id>[0-9]+)/$',
-        OriginsAPI.as_view(),
-        name='Products Origin'),
-
-    url(r'origin/$',
-        OriginsAPI.as_view(),
-        name='Products Origin'),
+    url(r'pricing/(?P<product_id>[0-9]+)/$',
+        WebsitePricingAPI.as_view(),
+        name='website_pricing_api'
+        ),
 
     # Product Keyword API
 
-    url(r'keywords/$',
+    url(r'product/category',
+        ProductsCategoryAPI.as_view(),
+        name='Product_Category_API'),
+
+    url(r'product/keywords/$',
         ProductsKeywordAPI.as_view(),
-        name='Products Keywords'),
+        name='Products Keywords API'),
 
     url(r'product/keywords/(?P<product_id>[0-9]+)/$',
         ProductsKeywordAPI.as_view(),
@@ -124,6 +136,10 @@ urlpatterns = (
     url(r'product/$',
         ProductsAPI.as_view(),
         name='Products'),
+
+    url(r'^product_item/$',
+        ProductItemAPI.as_view(),
+        name='Products_Item_API'),
 
 
     # DropDownRelatedAPI

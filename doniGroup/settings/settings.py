@@ -65,6 +65,10 @@ INSTALLED_APPS = [
 # For django-countries all flag icon urls
 COUNTRIES_FLAG_URL = 'flags/1x1/{code}.svg'
 
+COUNTRIES_OVERRIDE = {
+    ('EU', 'European Union'),
+}
+
 #CKE EDITOR TEXT EDITOR FOR DJANGO ADMIN
 CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'
 CKEDITOR_UPLOAD_PATH = os.path.join(PROJECT_ROOT, "website", 'static', 'blog'),
@@ -185,7 +189,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'immadimtiaz@gmail.com'
 EMAIL_INFO = ['immadimtiaz@gmail.com']
-EMAIL_HOST_PASSWORD = 'scorpion2317150'
+
 
 from easy_thumbnails.conf import Settings as thumbnail_settings
 THUMBNAIL_PROCESSORS = (

@@ -25,7 +25,7 @@ urlpatterns = [
                   url(r"api/login/$", LoginAPI.as_view(), {"public_api": True}, name="login"),
                   url(r"api/logout/$", LogOutAPI.as_view(), name="logout"),
                   url(r'^admin/', admin.site.urls),
-                  url(r'^api/', include('doniApi.urls')),
+                  url(r'^api/', include('doniApi.urls', namespace='api')),
                   url(r'^grappelli/', include('grappelli.urls')),
                   url(r'^', include("website.urls", namespace='web')),
                   url(r'^markdownx/', include('markdownx.urls')),

@@ -8,6 +8,7 @@ class OriginsAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
+        print 'hello';
         origin_id = kwargs.get('origin_id')
         if origin_id is None:
             all_origins = Origin.objects.all()

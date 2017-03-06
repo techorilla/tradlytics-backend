@@ -13,7 +13,7 @@ class ProductOrigin(models.Model):
         ordering = ['product', 'country']
 
     def __unicode__(self):
-        return '%s:%s'%(self.product.name, self.country)
+        return '(%s:%s)' % (self.product.name, str(self.country.name))
 
 from django.contrib import admin
 

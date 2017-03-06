@@ -404,3 +404,28 @@
 
 {% endblock content %}
 
+{% block extrajs %}
+    <script>
+        /* -------------------
+         Google map
+         ---------------------*/
+        var center = [24.85193, 67.00657];
+        if($('#map').length > 0){
+            $('#map')
+                    .gmap3({
+                        center: center,
+                        styles: [ { stylers: [ { "saturation":-90 }, { "lightness": 0 }, { "gamma": 0.0 }]},],
+                        zoom: 16,
+                        scrollwheel:false,
+                        draggable: true,
+                        mapTypeId : google.maps.MapTypeId.ROADMAP
+                    })
+                    .marker({
+                        position: center,
+                        icon: '{% static "img/assets/marker.png" %}'
+                    });
+        }
+
+    </script>
+{%  endblock %}
+

@@ -8,3 +8,4 @@ from pricing import *
 from tabFilters import *
 from authentication import *
 from website import *
+from pricing import *

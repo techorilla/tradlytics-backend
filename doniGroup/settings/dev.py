@@ -9,6 +9,7 @@ MYSQL_USER = 'doniGroup'
 MYSQL_PASSWORD = 'Giki1990????'
 REDIS_HOST = ''
 
+APP_URL = 'http://localhost:8000'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

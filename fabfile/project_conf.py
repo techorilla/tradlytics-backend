@@ -21,34 +21,33 @@ fabconf = {}
 fabconf['FAB_CONFIG_PATH'] = os.path.dirname(__file__)
 
 # Project name
-fabconf['PROJECT_NAME'] = "tradlytics"
+fabconf['PROJECT_NAME'] = "doniGroup"
 
 # Username for connecting to EC2 instaces - Do not edit unless you have a
 # reason to
-fabconf['SERVER_USERNAME'] = "tradlytics"
+fabconf['SERVER_USERNAME'] = "backend"
 
-# Full local path for .ssh
-fabconf['SSH_PATH'] = "~/.ssh"
-
-# Name of the private key file you use to connect to EC2 instances
-fabconf['EC2_KEY_NAME'] = "my_ssh_key.pem"
-
-# Don't edit. Full path of the ssh key you use to connect to EC2 instances
-fabconf[
-    'SSH_PRIVATE_KEY_PATH'] = '%s/%s' % (fabconf['SSH_PATH'], fabconf['EC2_KEY_NAME'])
+# # Full local path for .ssh
+# fabconf['SSH_PATH'] = "~/.ssh"
+#
+# # Name of the private key file you use to connect to EC2 instances
+# fabconf['EC2_KEY_NAME'] = "my_ssh_key.pem"
+#
+# # Don't edit. Full path of the ssh key you use to connect to EC2 instances
+# fabconf[
+#     'SSH_PRIVATE_KEY_PATH'] = '%s/%s' % (fabconf['SSH_PATH'], fabconf['EC2_KEY_NAME'])
 
 # Where to install apps
-fabconf['APPS_DIR'] = "/home/%s/webapps" % fabconf['SERVER_USERNAME']
+fabconf['APPS_DIR'] = "/home/%s/doniGroup" % fabconf['SERVER_USERNAME']
 
 # Where you want your project installed: /APPS_DIR/PROJECT_NAME
-fabconf[
-    'PROJECT_PATH'] = "%s/%s" % (fabconf['APPS_DIR'], fabconf['PROJECT_NAME'])
+fabconf['PROJECT_PATH'] = "%s/%s" % (fabconf['APPS_DIR'], fabconf['PROJECT_NAME'])
 
 # Your Django's version "run migrations" command
 fabconf['RUN_MIGRATIONS_CMD'] = "python %s/manage.py syncdb" % fabconf['PROJECT_PATH']
 
 # App domains
-fabconf['DOMAINS'] = "example.com www.example.com"
+fabconf['DOMAINS'] = "tramodity.com www.tramodity.com"
 
 # Path for virtualenvs
 fabconf['VIRTUALENV_DIR'] = "/home/%s/.virtualenvs" % fabconf['SERVER_USERNAME']
@@ -57,7 +56,7 @@ fabconf['VIRTUALENV_DIR'] = "/home/%s/.virtualenvs" % fabconf['SERVER_USERNAME']
 fabconf['ADMIN_EMAIL'] = "immadimtiaz@gmail.com"
 
 # Git username for the server
-fabconf['GIT_USERNAME'] = "EC2"
+fabconf['GIT_USERNAME'] = "immadimtiaz"
 
 # Name of the private key file used for git deployments
 fabconf['GIT_DEPLOY_KEY_NAME'] = "git_rsa"

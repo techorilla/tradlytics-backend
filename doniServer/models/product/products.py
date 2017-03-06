@@ -10,6 +10,7 @@ import os
 import time
 from django_countries.fields import CountryField
 
+
 class Products(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=250)
@@ -30,23 +31,33 @@ class Products(models.Model):
     @classmethod
     def get_products_for_website(cls, base_url):
         products = cls.objects.all().order_by('name')
-        return [product.get_product_list_obj(base_url) for product in products]
+        return [product.get_product_list_obj(base_url, website=True) for product in products]
 
     @property
     def get_product_quality_keywords(self):
         return []
 
+    @classmethod
+    def get_dropdown(cls):
+        products = cls.objects.all().order_by('name')
+        products = [{
+            'id': prod.id,
+            'name': prod.name,
+            'category': 'No Category Entered' if prod.category is None else prod.category.name
+        } for prod in products]
+        return products
+
     @property
     def origins(self):
         return self.countries.all()
 
-    def get_product_list_obj(self, base_url):
+    def get_product_list_obj(self, base_url, website=False):
         return {
             'id': self.id,
             'name': self.name,
             'description': self.description,
             'image': self.get_product_image(base_url),
-            'category': self.category
+            'category': self.category if website else self.category.name if self.category else None
         }
 
     def get_product_single_website(self, base_url):
