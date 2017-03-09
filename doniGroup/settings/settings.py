@@ -32,7 +32,12 @@ SECRET_KEY = '=^5p6c(@(e#^w!v_0cvwnfh11bwng6@dltr!z-ujdifxrm5eh3'
 
 
 
-ALLOWED_HOSTS = ['tramodity.com', 'donigroup.com', 'localhost', '.tramodity,com']
+ALLOWED_HOSTS = [
+    'tramodity.com',
+    'donigroup.com',
+    'localhost',
+    'app.tramodity.com'
+]
 
 # Application definition
 
