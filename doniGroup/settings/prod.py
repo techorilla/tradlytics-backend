@@ -13,7 +13,7 @@ REDIS_HOST = ''
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 APP_URL = 'http://tramodity.com'
 CORS_ORIGIN_WHITELIST = (APP_URL, )
