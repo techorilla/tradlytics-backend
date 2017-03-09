@@ -15,7 +15,7 @@ REDIS_HOST = ''
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-APP_URL = 'http://tramodity.com'
+APP_URL = 'http://app.tramodity.com'
 CORS_ORIGIN_WHITELIST = (APP_URL, )
 
 CSRF_TRUSTED_ORIGINS = (
