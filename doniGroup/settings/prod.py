@@ -16,7 +16,23 @@ REDIS_HOST = ''
 DEBUG = False
 
 APP_URL = 'http://tramodity.com'
-CORS_ORIGIN_WHITELIST = ('http://app.tramodity.com')
+CORS_ORIGIN_WHITELIST = (APP_URL, )
+
+CSRF_TRUSTED_ORIGINS = (
+    APP_URL,
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
 
 DATABASES = {
     # 'default': {
