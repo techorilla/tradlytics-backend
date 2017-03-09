@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     'tramodity.com',
     'donigroup.com',
     'localhost',
+    '127.0.0.1',
     'app.tramodity.com'
 ]
 
