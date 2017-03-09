@@ -22,3 +22,41 @@ class ProductItemPrice(models.Model):
     class Meta:
         db_table = 'product_item_price'
         ordering = ('-price_time',)
+
+    @property
+    def get_market_current_price(self):
+        price_items = self.price_items
+        price = [item.get('priceValue') for item in price_items if item.get('currentValue')]
+        price = price[0]
+        return price
+
+    @classmethod
+    def get_all_prices(cls, start_time, end_time):
+        price_items = cls.objects.filter(price_time__gte=start_time, price_time__lte=end_time)
+        price_items = [item.get_obj() for item in price_items]
+        return price_items
+
+    def get_obj(self):
+        price_item = {
+            'id': self.id,
+            'showDetails': False,
+            'product': self.product_item.product_origin.product.name,
+            'productId': self.product_item.product_origin.product.id,
+            'priceMarketId': self.price_market.id,
+            'productName': self.product_item.product_origin.product.name,
+            'productItemId': self.product_item.id,
+            'priceItems': self.price_items,
+            'priceTime': self.price_time,
+            'comments': self.comments,
+            'keywords': self.product_item.keyword_str,
+            'productOriginName': self.product_item.product_origin.country.name,
+            'productOriginFlag': self.product_item.product_origin.country.flag,
+            'marketCurrency': self.price_market.currency,
+            'marketCountry': self.price_market.country_name,
+            'currentPrice': self.get_market_current_price,
+            'updatedBy': self.updated_by.username if self.updated_by else None,
+            'updatedAt': self.updated_at,
+            'createdBy': self.created_by.username if self.created_by else None,
+            'createdAt': self.created_at
+        }
+        return price_item

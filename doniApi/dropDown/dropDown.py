@@ -151,7 +151,12 @@ class ProductKeywords(GenericAPIView):
     model = ProductKeyword
 
     def get(self, request, *args, **kwargs):
-        keywords = ProductKeyword.objects.all()
+        product_id = request.GET.get('q')
+        if product_id != 'all':
+            product = Products.objects.get(id=product_id)
+            keywords = ProductKeyword.objects.filter(category=product.category)
+        else:
+            keywords = ProductKeyword.objects.all()
         keywords = [key.get_obj() for key in keywords]
         return Response({'list': keywords},  status=status.HTTP_200_OK)
 

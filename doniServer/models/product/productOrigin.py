@@ -9,8 +9,15 @@ class ProductOrigin(models.Model):
     country = CountryField(blank_label='(select country)', null=False)
     product = models.ForeignKey(Products, null=False, related_name='countries')
 
+
     class Meta:
         ordering = ['product', 'country']
+        unique_together = ('product', 'country',)
+
+    @property
+    def get_product_items(self):
+        product_items = self.origin_product_item.all()
+        return [item.get_dropdown() for item in product_items]
 
     def __unicode__(self):
         return '(%s:%s)' % (self.product.name, str(self.country.name))

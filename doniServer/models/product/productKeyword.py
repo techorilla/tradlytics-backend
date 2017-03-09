@@ -7,7 +7,7 @@ from .productCategory import ProductCategory
 
 class ProductKeyword(models.Model):
     id = models.AutoField(primary_key=True)
-    keyword = models.CharField(max_length=100, blank=False, unique=True)
+    keyword = models.CharField(max_length=100, blank=False)
     category = models.ForeignKey(ProductCategory, default=None, blank=True, null=True, related_name='keywords')
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
@@ -15,10 +15,11 @@ class ProductKeyword(models.Model):
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='keyword_updated_by')
 
     def __unicode__(self):
-        return self.keyword
+        return '(%s:%s)'%(self.keyword, self.category.name)
 
     class Meta:
         db_table = 'product_keywords'
+        unique_together = ('keyword', 'category',)
         ordering = ('keyword',)
 
     @property

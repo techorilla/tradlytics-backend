@@ -11,16 +11,21 @@ from django.contrib import admin
 class ProductItem(models.Model):
     keywords = models.ManyToManyField(ProductKeyword, related_name='product_items')
     product_origin = models.ForeignKey(ProductOrigin, null=True, blank=False, related_name='origin_product_item')
+    database_ids = models.CharField(max_length=250, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='prod_item_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='prod_item_updated_by')
+
+    class Meta:
+        ordering = ('id',)
 
     def get_dropdown(self):
         return {
             'id': self.id,
             'name': self.product_origin.product.name,
             'origin': self.product_origin.country.name,
+            'originFlag': self.product_origin.country.flag,
             'keywords': self.keyword_str
         }
 
@@ -42,6 +47,7 @@ class ProductItem(models.Model):
             'id': self.id,
             'productId': self.product_origin.product.id,
             'productName': self.product_origin.product.name,
+            'databaseIds': self.database_ids,
             'origin': self.product_origin.country.code.upper(),
             'productOriginName': self.product_origin.country.name,
             'productOriginFlag': self.product_origin.country.flag,
@@ -56,6 +62,6 @@ class ProductItem(models.Model):
 
 class ProductItemAdmin(admin.ModelAdmin):
     model = Products
-    list_display = ('product_origin',)
+    list_display = ('product_origin','database_ids', 'keyword_str')
 
 

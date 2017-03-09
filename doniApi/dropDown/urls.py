@@ -27,7 +27,7 @@ urlpatterns = (
         Designation.as_view(),
         name='Designation Drop Down'),
 
-    url(r'^product_quality/$',
+    url(r'^product_keywords/$',
         ProductKeywords.as_view(),
         name='Product quality Drop Down'),
 

@@ -28,14 +28,45 @@ class Products(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_obj(self, base_url):
+        return {
+            'id': self.id,
+            'info':{
+                'id': self.id,
+                'name': self.name,
+                'image': self.get_product_image(base_url),
+                'description': self.description,
+                'categoryId': self.category.id if self.category else None,
+                'categoryName': self.category.name if self.category else 'No Category Defined',
+
+            },
+            'origins': self.product_origins,
+            'productItems': self.product_items,
+            'updatedBy': self.updated_by.username if self.updated_by else None,
+            'updatedAt': self.updated_at,
+            'createdBy': self.created_by.username,
+            'createdAt': self.created_at
+        }
+
+    @property
+    def product_origins(self):
+        origins = self.countries.all()
+        origins = [origin.country.code for origin in origins]
+        return origins
+
+    @property
+    def product_items(self):
+        product_items = []
+        product_origin = self.countries.all()
+        for product in product_origin:
+            print product.get_product_items
+            product_items = product_items + product.get_product_items
+        return product_items
+
     @classmethod
     def get_products_for_website(cls, base_url):
         products = cls.objects.all().order_by('name')
         return [product.get_product_list_obj(base_url, website=True) for product in products]
-
-    @property
-    def get_product_quality_keywords(self):
-        return []
 
     @classmethod
     def get_dropdown(cls):
@@ -72,7 +103,7 @@ class Products(models.Model):
     def get_product_image(self, base_url):
         pre = 'https://' if settings.IS_HTTPS else 'http://'
         try:
-            product_image = self.product_images.filter(primary=True)[0]
+            product_image = self.product_images.filter(primary=True).order_by('-created_by')[0]
         except Exception, e:
             product_image = None
         return pre + base_url + '/media/' + str(product_image) if product_image else None

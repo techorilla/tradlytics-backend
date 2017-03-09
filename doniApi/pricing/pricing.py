@@ -39,17 +39,20 @@ class ProductItemPricingAPI(GenericAPIView):
         prod_price_item.price_market = price_market
         prod_price_item.price_time = dateutil.parser.parse(price_time)
         prod_price_item.save()
-        return Response({'success': True, 'message': msg}, status=status.HTTP_200_OK)
+        return Response({'success': True, 'message': msg, 'obj': prod_price_item.get_obj()}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         return self.save_product_item_price(request.data, request.user)
 
     def get(self,  request, *args, **kwargs):
-        queryset = ProductItemPrice.objects.all()
-
+        start_date = request.GET.get(u'startDate')
+        end_date = request.GET.get(u'endDate')
+        start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
+        end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
+        queryset = ProductItemPrice.get_all_prices(start_date, end_date)
         return Response({
-
-        })
+            'data': {'allPrices': queryset}
+        }, status=status.HTTP_200_OK)
 
     def put(self, request, *args, **kwargs):
         return self.save_product_item_price(request.data, request.user)
@@ -92,6 +95,7 @@ class PricingMarketAPI(GenericAPIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         data = request.data
+        print request.data
         return self.save_price_market(data, user)
 
     def put(self, request, *args, **kwargs):

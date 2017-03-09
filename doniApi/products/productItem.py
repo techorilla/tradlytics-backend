@@ -11,8 +11,8 @@ class ProductItemAPI(GenericAPIView):
         try:
             keywords_id = data.get('keywords')
             origin = data.get('origin')
-            print origin
             product_id = int(data.get('productId'))
+            database_ids = data.get('databaseIds')
             product_origin = ProductOrigin.objects.filter(country=Country(code=origin.upper()))\
                 .get(product__id=product_id)
             keywords = ProductKeyword.objects.filter(id__in=keywords_id)
@@ -20,14 +20,21 @@ class ProductItemAPI(GenericAPIView):
             if update:
                 product_item.updated_by = user
                 product_item.product_origin = product_origin
-                product_item.keywords.through.objects.all().delete()
+                product_item.database_ids = database_ids
+                keywords_removed = product_item.keywords.exclude(id__in=keywords_id)
+                # Removing Keywords
+                for keyword in keywords_removed:
+                    product_item.keywords.remove(keyword)
+                # Adding New Keywords
                 for keyword in keywords:
-                    product_item.keywords.add(keyword)
+                    if not product_item.keywords.filter(id=keyword.id).exists():
+                        product_item.keywords.add(keyword)
                 product_item.save()
 
             else:
                 product_item = ProductItem()
                 product_item.product_origin = product_origin
+                product_item.database_ids = database_ids
                 product_item.created_by = user
                 product_item.save()
                 for keyword in keywords:

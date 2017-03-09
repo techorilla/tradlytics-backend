@@ -20,7 +20,7 @@ class UserProfile(models.Model):
         upload_to=get_image_path, blank=True, null=True)
     profile_pic = models.ImageField(
         upload_to=get_image_path, blank=True, null=True)
-    business = models.OneToOneField(BpBasic)
+    business = models.ForeignKey(BpBasic, related_name='business_users')
     notify_new_transaction = models.BooleanField(default=False)
     notify_shipment_arrival = models.BooleanField(default=False)
     notify_messages = models.BooleanField(default=False)
@@ -29,6 +29,10 @@ class UserProfile(models.Model):
     notify_daily_reports = models.BooleanField(default=True)
     designation = models.ForeignKey(Designation, null=True)
     businessLocation = models.ForeignKey(BpLocation, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=None, null=True)
+    created_by = models.ForeignKey(User, null=True, blank=False, related_name='user_profile_created_by')
+    updated_by = models.ForeignKey(User, null=True, blank=False, related_name='user_profile_updated_by')
 
     class Meta:
         db_table = 'user_profile'
@@ -38,7 +42,7 @@ class UserProfile(models.Model):
             pre = 'https://'
         else:
             pre = 'http://'
-        return pre+base_url+'/media/'+str(self.profile_pic) if self.small_profile_pic else None
+        return pre+base_url+'/media/'+str(self.profile_pic) if self.profile_pic else None
 
     def complete_profile(self, base_url):
         return {

@@ -1,5 +1,5 @@
 from doniApi.apiImports import Response, GenericAPIView, status
-from doniServer.models import ProductKeyword, Products, ProductsSpecification, Origin, ProductImage
+from doniServer.models import ProductKeyword, Products, ProductsSpecification, Origin, ProductImage, ProductCategory
 from django.db.models import Q
 
 class ProductsImageAPI(GenericAPIView):
@@ -38,9 +38,8 @@ class ProductsImageAPI(GenericAPIView):
         prod_image.created_by = user
         prod_image.save()
         return Response({
-            'id': prod_image.id,
-            'image_url': prod_image.image.name,
-            'product_id': product_id,
+            'success': True,
+            'obj': product.get_obj(),
         }, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
@@ -52,35 +51,42 @@ class ProductsImageAPI(GenericAPIView):
         )
 
 
+class ProducOriginAPI(GenericAPIView):
+
+    def post(self, request,  *args, **kwargs):
+        data = request.data
+        product_id = data.get('product_id')
+        origins = data.get('origins')
+        return Response({})
+
+
 class ProductsAPI(GenericAPIView):
 
     def get(self, request, *args, **kwargs):
-        product_id = request.GET.get('id', None)
         base_url = request.META.get('HTTP_HOST')
-        if product_id is None:
-            all_products = Products.objects.all()
-            all_products = [product.get_product_list_obj(base_url) for product in all_products]
-            return Response({'allProducts': all_products}, status=status.HTTP_200_OK)
-        else:
-            product = Products.objects.get(id=int(product_id))
-            return Response({
-                'id': product.id,
-                'name': product.name,
-                'image': product.get_product_image(base_url)
-            }, status=status.HTTP_200_OK)
+        all_products = Products.objects.all()
+        all_products = [product.get_obj(base_url) for product in all_products]
+        return Response({'allProducts': all_products}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         user = request.user
+        base_url = request.META.get('HTTP_HOST')
         product_data = request.data.get('product')
         product_name = product_data.get('name')
         description = product_data.get('description')
+        category_id = product_data.get('categoryId')
+        category = ProductCategory.objects.get(id=category_id)
         new_product = Products(name=product_name)
+        new_product.category = category
         new_product.created_by = user
         new_product.description = description
         new_product.save()
         return Response({
-            'id': new_product.id
-        })
+            'id': new_product.id,
+            'obj': new_product.get_obj(base_url),
+            'success': True,
+            'message': 'Product added successfully.',
+            }, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
         product_id = request.data.get('id', None)
@@ -92,6 +98,7 @@ class ProductsAPI(GenericAPIView):
 
     def put(self, request, *args, **kwargs):
         user = request.user
+        base_url = request.META.get('HTTP_HOST')
         product_data = request.data.get('product')
         product_id = product_data.get('id')
         product_name = product_data.get('name')
@@ -101,6 +108,11 @@ class ProductsAPI(GenericAPIView):
         update_product.description = description
         update_product.updated_by = user
         update_product.save()
-        return Response({'id': product_id}, status=status.HTTP_200_OK)
+        return Response({
+            'id': update_product.id,
+            'obj': update_product.get_obj(base_url),
+            'success': True,
+            'message': 'Product updated successfully.',
+            }, status=status.HTTP_200_OK)
 
 

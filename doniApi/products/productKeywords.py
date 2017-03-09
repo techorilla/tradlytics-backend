@@ -35,7 +35,6 @@ class ProductsKeywordAPI(GenericAPIView):
         keyword_data = data
         keyword = keyword_data.get('name')
         update_id = keyword_data.get('id')
-        print update_id
         category_id = keyword_data.get('categoryId')
         if not self.check_keyword_already_exist(keyword, category_id, update_id):
             category = ProductCategory.objects.get(id=category_id)

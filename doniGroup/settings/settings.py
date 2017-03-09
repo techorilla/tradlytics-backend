@@ -66,6 +66,7 @@ INSTALLED_APPS = [
 COUNTRIES_FLAG_URL = 'flags/1x1/{code}.svg'
 
 COUNTRIES_OVERRIDE = {
+    ('RK', 'Russia / Ukraine'),
     ('EU', 'European Union'),
 }
 
