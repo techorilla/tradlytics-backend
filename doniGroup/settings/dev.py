@@ -10,6 +10,7 @@ MYSQL_PASSWORD = 'Giki1990????'
 REDIS_HOST = ''
 
 APP_URL = 'http://localhost:8000'
+CORS_ORIGIN_WHITELIST = ('localhost:8080')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

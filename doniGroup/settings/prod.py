@@ -16,6 +16,7 @@ REDIS_HOST = ''
 DEBUG = False
 
 APP_URL = 'http://tramodity.com'
+CORS_ORIGIN_WHITELIST = ('http://tramodity.com')
 
 DATABASES = {
     # 'default': {
