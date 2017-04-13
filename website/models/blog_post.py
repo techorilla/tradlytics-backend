@@ -76,7 +76,6 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-    @property
     def increment_visitor(self):
         self.visitors += 1
         self.save()
