@@ -38,6 +38,8 @@ class LoginAPI(APIView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
+        if user.is_anonymous():
+            return Response({}, status=status.HTTP_403_FORBIDDEN)
         base_url = request.META.get('HTTP_HOST')
         return Response({'userData': self.get_user_details(user.username, base_url)}, status=status.HTTP_200_OK)
 

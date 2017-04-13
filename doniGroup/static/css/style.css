@@ -3541,12 +3541,19 @@ pre {
   box-shadow: inset 0px 2px 2px rgba(0, 0, 0, .5), 0px 1px 0px rgba(250, 250, 250, .2);
 }
 
+.international-bar{
+    top: 0 !important;
+}
+
+.local-bar{
+    top: 40px !important;
+}
+
 .price-bar{
     height: 40px;
     z-index: 100;
     background: #1C1513;
     position: fixed;
-    top:0;
     overflow: hidden;
 
 }

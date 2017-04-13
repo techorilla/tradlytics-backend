@@ -62,12 +62,31 @@ urlpatterns = (
         PriceMarketDDAPI.as_view(),
         name='Price_Market_Drop_Down'),
 
-    url(r'countries/$',
+    url(r'country/$',
         CountryAPI.as_view(),
+        name='Countries_API'),
+
+    url(r'region/$',
+        RegionAPI.as_view(),
+        name='Countries_API'),
+
+    url(r'city/$',
+        CityAPI.as_view(),
         name='Countries_API'),
 
     url(r'shipment_month/$',
         ShipmentMonthDDAPI.as_view(),
         name='Shipement_Month_API'
+        ),
+
+    url(r'price_metric/$',
+        PriceMetricDDAPI.as_view(),
+        name='Shipement_Month_API'
+        ),
+
+    url(r'business/$',
+        BusinessDropDownAPI.as_view(),
+        name='Business_Drop_Down_API'
         )
+
 )

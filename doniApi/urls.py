@@ -1,11 +1,21 @@
 from doniApi import *
 from django.conf.urls import include, url
 
+
 '''
     All Data API for Doni Group
 '''
 
 urlpatterns = (
+    url(r'^dashboard/$', MainDashboardAPI.as_view(), name='Main_Dashboard_API'),
+
+    url(r'^website/research/display/$', BlogDisplayAPI.as_view(), name='Blogs_API'),
+
+    url(r'^website/research/$', BlogAPI.as_view(), name='Blogs_API'),
+
+    url(r'^website/research/(?P<research_id>[0-9]+)/$', BlogAPI.as_view(), name='Blogs_API'),
+
+    url(r'website/research_tags', BlogTagAPI.as_view(), name='BlogTagAPI'),
 
     # User Related API
 
@@ -19,29 +29,29 @@ urlpatterns = (
 
     # Business Partner Related API
 
-    url(r'bp_partner/(?P<bp_id>[a-zA-Z0-9.@_-]+)/basic/$',
+    url(r'business/list/$',
+        BusinessListAPI.as_view(),
+        name='Business List'),
+
+    url(r'business/basic/$',
         BpBasicAPI.as_view(),
         name='Business Partner Basic'),
 
-    url(r'bp_partner/(?P<bp_id>[a-zA-Z0-9.@_-]+)/bank/(?P<bank_id>[a-zA-Z0-9.@_-]+)/$',
-        BpContactNumberAPI.as_view(),
-        name='Business Partner Basic'),
-
-    url(r'bp_partner/(?P<bp_id>[a-zA-Z0-9.@_-]+)/contact_number/(?P<cn_id>[a-zA-Z0-9.@_-]+)/$',
-        BpContactNumberAPI.as_view(),
-        name='Business Partner Contact Number'),
-
-    url(r'bp_partner/(?P<bp_id>[a-zA-Z0-9.@_-]+)/contact_person/(?P<cp_id>[a-zA-Z0-9.@_-]+)/$',
-        BpContactNumberAPI.as_view(),
-        name='Business Partner Person'),
-
-    url(r'bp_partner/(?P<bp_id>[a-zA-Z0-9.@_-]+)/product/(?P<product_id>[a-zA-Z0-9.@_-]+)/$',
-        BpProductsAPI.as_view(),
-        name='Business Partner Products'),
-
-    url(r'bp_partner/(?P<bp_id>[a-zA-Z0-9.@_-]+)/location/$',
+    url('business/location/$',
         BpLocationAPI.as_view(),
-        name='Business Partner Locations'),
+        name='Business Location API'),
+
+    url('business/contact_person/$',
+        BpContactPersonAPI.as_view(),
+        name='Business Contact Person API'),
+
+    url('business/contact_number/$',
+        BpContactNumberAPI.as_view(),
+        name='Business Contact Number API'),
+
+    url('business/bank/$',
+        BpBankAPI.as_view(),
+        name='Business Bank API'),
 
     # Transaction Related API
 
@@ -94,11 +104,15 @@ urlpatterns = (
         ProductItemPricingAPI.as_view(),
         name='Product_Item_Pricing_API'),
 
+    url(r'pricing/summary/$',
+        PricingSummaryAPI.as_view(),
+        name='Price_Summary_API'),
+
     # Product Pricing API
 
-    url(r'pricing/(?P<product_id>[0-9]+)/$',
+    url(r'website/pricing/banner/$',
         WebsitePricingAPI.as_view(),
-        name='website_pricing_api'
+        name='Website_Pricing_API'
         ),
 
     # Product Keyword API
@@ -121,26 +135,31 @@ urlpatterns = (
 
     # Product API
 
-    # Product Image API
-
-    url(r'product/image/$',
-        ProductsImageAPI.as_view(),
-        name='Products Image'),
-
-    url(r'product/(?P<product_id>[0-9]+)/image/$',
-        ProductsImageAPI.as_view(),
-        name='Products Image'),
-
     # Product Related API
 
     url(r'product/$',
         ProductsAPI.as_view(),
         name='Products'),
 
+    url(r'product/website_status/$',
+        ProductOnWebsiteAPI.as_view(),
+        name='Products_Website_Status'),
+
+    url(r'product/(?P<product_id>[0-9]+)/$',
+        ProductsAPI.as_view(),
+        name='Products'),
+
+    url(r'product/origin/$',
+        ProducOriginAPI.as_view(),
+        name='Products Origins'),
+
     url(r'^product_item/$',
         ProductItemAPI.as_view(),
         name='Products_Item_API'),
 
+    url(r'^product_item/price_report/$',
+        ProductItemPriceReportAPI.as_view(),
+        name='Product_Item_Price_Report'),
 
     # DropDownRelatedAPI
     url(r'^dropDown/',
@@ -149,7 +168,22 @@ urlpatterns = (
     # Website Related APIs
     url(r'^contact_us/$',  ContactUsAPI.as_view(), {"public_api": True}, name='website-contact-us', ),
 
-    url(r'^newsletter/$', NewsLetterAPI.as_view(), name='website-newsletter')
+    url(r'^newsletter/$', NewsLetterAPI.as_view(), name='website-newsletter'),
+
+    # Manifest Related API
+
+    url(r'^manifest/$',
+        ManifestAPI.as_view(),
+        name='manifest_basic'),
+
+    url(r'^manifest/(?P<manifest_id>[0-9]+)/$',
+        ManifestAPI.as_view(),
+        name='manifest_basic'),
+
+    url(r'^manifest/dashboard/$',
+        ManifestDashboardAPI.as_view(),
+        name='manifest_dashboard'
+        )
 
 
 )

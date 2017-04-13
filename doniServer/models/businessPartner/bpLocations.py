@@ -2,17 +2,16 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from .bpBasic import BpBasic
-
+from cities_light.models import City, Region
 
 class BpLocation(models.Model):
-    bp = models.ForeignKey(BpBasic,
-                              null=False,
-                              blank=False)
+    bp = models.ForeignKey(BpBasic, null=False, blank=False, related_name='locations')
     address_id = models.AutoField(primary_key=True)
     address = models.TextField()
     city = models.CharField(max_length=100, null=True)
     state = models.CharField(max_length=100, null=True)
     country = models.CharField(max_length=100, null=True)
+    is_primary = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None,  null=True)
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='bp_location_created_by')
@@ -21,11 +20,33 @@ class BpLocation(models.Model):
     class Meta:
         db_table = 'bp_location'
 
-    def json_obj(self):
+    def get_obj(self):
+        regions = Region.objects.filter(country__code2=self.country).order_by('name')
+        cityOptions = dict()
+        stateOptions = dict()
+        stateOptions['list'] = [{
+                                    'id': state.name_ascii,
+                                    'name': state.name_ascii
+                                } for state in regions]
+
+        if self.state:
+            cities = City.objects.filter(country__code2=self.country).filter(region__name_ascii=self.state).order_by(
+                'name_ascii')
+        else:
+            cities = City.objects.filter(country__code2=self.country).filter().order_by('name_ascii')
+
+        cityOptions['list'] = [
+            {
+                'id': city.name_ascii,
+                'name': city.name_ascii
+            } for city in cities]
         return {
             'id': self.address_id,
             'address': self.address,
+            'isPrimary': self.is_primary,
             'city': self.city,
+            'cityOptions': cityOptions,
+            'stateOptions': stateOptions,
             'state': self.state,
             'country': self.country,
             'created_by': self.created_by.username,
@@ -33,11 +54,11 @@ class BpLocation(models.Model):
             'created_at': self.created_at
         }
 
-    def drop_down_obj(self):
-        return {
-            'id': self.address_id,
-            'address': self.address,
-            'city': self.city,
-            'state': self.state,
-            'country': self.country
-        }
+        def drop_down_obj(self):
+            return {
+                'id': self.address_id,
+                'address': self.address,
+                'city': self.city,
+                'state': self.state,
+                'country': self.country
+            }

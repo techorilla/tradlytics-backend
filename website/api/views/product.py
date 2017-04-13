@@ -20,7 +20,7 @@ class SingleProductPage(View):
     template_name = 'single_product.html'
 
     def get(self, request, *args, **kwargs):
-        product_id = query = request.GET.get("id")
+        product_id = request.GET.get("id")
         base_url = request.META.get('HTTP_HOST')
         product = Products.objects.get(id=product_id)
         context = {

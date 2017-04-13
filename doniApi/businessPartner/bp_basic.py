@@ -1,319 +1,114 @@
 from doniApi.apiImports import Response, GenericAPIView, status
+from doniCore.utils import Utilities
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from doniServer.models import BpBasic, BusinessType
+import json, os
+from datetime import datetime as dt
+
+
+class BusinessListAPI(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        business = Utilities.get_user_business(user)
+        base_url = request.META.get('HTTP_HOST')
+        all_business = BpBasic.objects.filter(created_by__profile__business=business).exclude(bp_id=business.bp_id)
+        all_business = map(lambda business: business.get_list_obj(base_url), all_business)
+        return Response({'businessList': all_business}, status=status.HTTP_200_OK)
 
 
 class BpBasicAPI(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+    messages = dict()
+    messages['errorPOST'] = 'Business was not created due to some error on server.'
+    messages['successPOST'] = 'Business created successfully.'
+    messages['successPUT'] = 'Business basic information updated successfully.'
+    messages['errorPUT'] = 'Business was not updated due to some error on server.'
+
     def get(self, request, *args, **kwargs):
-        bp_id = kwargs.get('bp_id')
-        if bp_id == 'all':
-            return Response({'businessPartners': [
-                {
-                    "bp_ID": 274,
-                    "bp_Name": "A.A Enterprises",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 0,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": None,
-                    "tr_date": None
-                }, {
-                    "bp_ID": 289,
-                    "bp_Name": "A.A. Corporation",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 2,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": None,
-                    "tr_date": None
-                }, {
-                    "bp_ID": 276,
-                    "bp_Name": "A.D Impex",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 2,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": None,
-                    "tr_date": None
-                }, {
-                    "bp_ID": 294,
-                    "bp_Name": "A.M Enterprises",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 2,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": None,
-                    "tr_date": None
-                }, {
-                    "bp_ID": 250,
-                    "bp_Name": "A.S International",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": True,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 2,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 1623,
-                    "tr_date": "2016-11-17T00:00:00"
-                }, {
-                    "bp_ID": 273,
-                    "bp_Name": "ABD Corporation - Faizan Nagaria",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": True,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 2,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 1538,
-                    "tr_date": "2016-11-09T00:00:00"
-                }, {
-                    "bp_ID": 12,
-                    "bp_Name": "Abdul Basit",
-                    "bp_cont_ID": 15,
-                    "bp_Cont_fullName": "Abdul Basit",
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 5,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 1655,
-                    "tr_date": "2016-11-21T00:00:00"
-                }, {
-                    "bp_ID": 171,
-                    "bp_Name": "Abdul Basit - Irfan - Jalil Paracha",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 3,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 295,
-                    "tr_date": "2016-03-10T00:00:00"
-                }, {
-                    "bp_ID": 157,
-                    "bp_Name": "Abdul Basit and Irfan",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": True,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 5,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 2004,
-                    "tr_date": "2016-12-16T00:00:00"
-                }, {
-                    "bp_ID": 77,
-                    "bp_Name": "Abdul Ghani",
-                    "bp_cont_ID": 17,
-                    "bp_Cont_fullName": "Abdul Ghani",
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 3,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 1957,
-                    "tr_date": "2016-12-07T00:00:00"
-                }, {
-                    "bp_ID": 215,
-                    "bp_Name": "Abdul Qadir Abdul Sattar",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 4,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 2007,
-                    "tr_date": "2016-12-16T00:00:00"
-                }, {
-                    "bp_ID": 76,
-                    "bp_Name": "Abdul Qayyum",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 4,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 1496,
-                    "tr_date": "2016-10-31T00:00:00"
-                }, {
-                    "bp_ID": 293,
-                    "bp_Name": "Abdul Sattar Dullay Wala",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 3,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 1923,
-                    "tr_date": "2016-12-05T00:00:00"
-                }, {
-                    "bp_ID": 114,
-                    "bp_Name": "Abrahem Abebe",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": False,
-                    "bp_isSeller": True,
-                    "bp_isShipper": True,
-                    "bp_credibilityIndex": 1,
-                    "bp_country": "Ethiopia",
-                    "tr_transactionID": None,
-                    "tr_date": None
-                }, {
-                    "bp_ID": 224,
-                    "bp_Name": "ACAA Absolute Alliance Incorporated",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": False,
-                    "bp_isSeller": True,
-                    "bp_isShipper": True,
-                    "bp_credibilityIndex": 2,
-                    "bp_country": "Canada",
-                    "tr_transactionID": 1048,
-                    "tr_date": "2016-07-17T00:00:00"
-                }, {
-                    "bp_ID": 103,
-                    "bp_Name": "Adroit Overseas",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": False,
-                    "bp_isSeller": True,
-                    "bp_isShipper": True,
-                    "bp_credibilityIndex": 3,
-                    "bp_country": "Singapore",
-                    "tr_transactionID": 370,
-                    "tr_date": "2016-03-07T00:00:00"
-                }, {
-                    "bp_ID": 192,
-                    "bp_Name": "Afrisian Ginning Ltd",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": False,
-                    "bp_isSeller": True,
-                    "bp_isShipper": True,
-                    "bp_credibilityIndex": 3,
-                    "bp_country": "Tanzania",
-                    "tr_transactionID": 1218,
-                    "tr_date": "2016-09-02T00:00:00"
-                }, {
-                    "bp_ID": 238,
-                    "bp_Name": "AG DALL MILL",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 2,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": None,
-                    "tr_date": None
-                }, {
-                    "bp_ID": 14,
-                    "bp_Name": "Agar International",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": True,
-                    "bp_isSeller": False,
-                    "bp_isShipper": False,
-                    "bp_credibilityIndex": 5,
-                    "bp_country": "Pakistan",
-                    "tr_transactionID": 889,
-                    "tr_date": "2016-06-23T00:00:00"
-                }, {
-                    "bp_ID": 168,
-                    "bp_Name": "Agri Commodities & Finance. FZE",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": False,
-                    "bp_isSeller": True,
-                    "bp_isShipper": True,
-                    "bp_credibilityIndex": 3,
-                    "bp_country": "Dubai",
-                    "tr_transactionID": 862,
-                    "tr_date": "2016-03-17T00:00:00"
-                }, {
-                    "bp_ID": 109,
-                    "bp_Name": "Agriex Australia",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": False,
-                    "bp_isSeller": True,
-                    "bp_isShipper": True,
-                    "bp_credibilityIndex": 3,
-                    "bp_country": "Singapore",
-                    "tr_transactionID": 1594,
-                    "tr_date": "2016-11-15T00:00:00"
-                }, {
-                    "bp_ID": 288,
-                    "bp_Name": "Agri-Oz Commodities Pty Ltd",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": False,
-                    "bp_isSeller": True,
-                    "bp_isShipper": True,
-                    "bp_credibilityIndex": 3,
-                    "bp_country": "Australia",
-                    "tr_transactionID": 1656,
-                    "tr_date": "2016-11-21T00:00:00"
-                }, {
-                    "bp_ID": 104,
-                    "bp_Name": "Agrocorp International",
-                    "bp_cont_ID": None,
-                    "bp_Cont_fullName": None,
-                    "bp_isBroker": False,
-                    "bp_isBuyer": False,
-                    "bp_isSeller": True,
-                    "bp_isShipper": True,
-                    "bp_credibilityIndex": 4,
-                    "bp_country": "Singapore",
-                    "tr_transactionID": 1160,
-                    "tr_date": "2016-08-17T00:00:00"
-                }
-            ]})
-        return Response()
+        bp_id = request.GET.get('bpId')
+        business = BpBasic.objects.get(bp_id=bp_id)
+        base_url = request.META.get('HTTP_HOST')
+        return Response({'business': business.get_obj(base_url)})
 
     def post(self, request, *args, **kwargs):
-        return Response()
-
-    def delete(self, request, *args, **kwargs):
-        return Response()
+        try:
+            logo = request.FILES.get('logo')
+            business_data = request.data.get('data')
+            business_data = json.loads(business_data)
+            business_type = business_data.get('bpType')
+            business_type = BusinessType.objects.filter(id__in=business_type)
+            business = BpBasic()
+            business.bp_logo = logo
+            business.bp_name = business_data.get('name')
+            business.bp_ntn = business_data.get('ntn')
+            business.bp_website = business_data.get('website')
+            business.created_by = request.user
+            business.save()
+            for type in business_type:
+                business.bp_types.add(type)
+            business.save()
+            return Response({
+                'success': True,
+                'bpId': business.bp_id,
+                'message': self.messages['successPOST']
+            }, status=status.HTTP_200_OK)
+        except Exception, e:
+            print str(e)
+            return Response({
+                'success': False,
+                'message': self.messages['errorPOST']
+            })
 
     def put(self, request, *args, **kwargs):
+        try:
+
+            logo = request.FILES.get('logo')
+            business_data = request.data.get('data')
+            business_data = json.loads(business_data)
+            business_id = business_data.get('bpId')
+            business_type_id = business_data.get('bpType')
+            business = BpBasic.objects.get(bp_id=business_id)
+            if business.bp_logo and logo:
+                path = Utilities.get_media_directory()+'/'+str(business.bp_logo)
+                os.remove(path)
+                business.bp_logo = logo
+            business.bp_name = business_data.get('name')
+            business.bp_ntn = business_data.get('ntn')
+            business.bp_website = business_data.get('website')
+            business.updated_by = request.user
+            business.updated_at = dt.now()
+            business.save()
+
+            business_type_removed = business.bp_types.exclude(id__in=business_type_id)
+            business_types = BusinessType.objects.filter(id__in=business_type_id)
+
+            # Removing Business Types
+            for type in business_type_removed:
+                business.bp_types.remove(type)
+            # Adding Business Types
+            for type in business_types:
+                if not business.bp_types.filter(id=type.id).exists():
+                    business.bp_types.add(type)
+            business.save()
+
+            return Response({
+                'success': True,
+                'bpId': business.bp_id,
+                'message': self.messages['successPUT']
+            })
+        except Exception, e:
+            print e
+            return Response({
+                'success': False,
+                'message': self.messages['errorPUT']
+            })
+
+    def delete(self, request, *args, **kwargs):
+
         return Response()
+
+

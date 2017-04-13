@@ -23,6 +23,11 @@
     <!-- Skin Color -->
     <link rel="stylesheet" href='{% static "css/colors/red.css" %}' id="color-skins"/>
 
+
+    {% block extrastyles %}
+
+    {% endblock %}
+
 </head>
 <body>
 <div id="fb-root"></div>
@@ -45,7 +50,7 @@
 <header>
     <!-- Start Header -->
 
-    <nav class="navbar navbar-default navbar-alt" role="navigation">
+    <nav class="navbar navbar-default navbar-alt navbar-small" role="navigation">
         <div class="container">
 
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -68,7 +73,8 @@
                     <li><a href='{% url "web:homePage" %}' class="{% if active_tab == 'home' %} active{% endif %}">Home</a></li>
                     <li class="to-section"><a href='{% url "web:homePage" %}#about' >About Us</a></li>
                     <li class="to-section"><a href='{% url "web:products" %}'>Products</a></li>
-                    <li><a href='{% url "web:blogs" %}' class="active">Blogs</a></li>
+                    <li class="to-section"><a href='{% url "web:pricingPage" %}'>Pricing</a></li>
+                    <li><a href='{% url "web:blogs" %}' class="active">Research</a></li>
                     <li class="to-section"><a href='{% url "web:homePage" %}#contact'>Contact</a></li>
                     <li><a class="social-icon" href="https://twitter.com/DoniCompany" target="_blank"><i class="icon icon-social-twitter"></i></a></li>
                     <li><a class="social-icon" href="https://facebook.com/DoniGroup/" target="_blank" href="#"><i class="icon icon-social-facebook"></i></a></li>
@@ -78,64 +84,13 @@
     </nav>
 
 </header>
-<!-- End Header -->
-<div class="col-lg-12 price-bar">
-    <marquee scrolldelay="2">
-        <div class="price-item" style="">
-            <p class="product-item">LMKB (IND)1</p>
-            <p class="product-price">$78.02</p>
-            <span class="product-change"><i class="fa fa-caret-down"></i></span>
-        </div>
-        <div class="price-item" style="">
-            <p class="product-item">RSKB (PAK)2</p>
-            <p class="product-price">$198.02</p>
-            <span class="product-change"><i class="fa fa-caret-up"></i></span>
-        </div>
-        <div class="price-item" style="">
-            <p class="product-item">LMKB3</p>
-            <p class="product-price">$78.02</p>
-            <span class="product-change"><i class="fa fa-caret-down"></i></span>
-        </div>
-        <div class="price-item" style="">
-            <p class="product-item">RSKB 4</p>
-            <p class="product-price">$198.02</p>
-            <span class="product-change"><i class="fa fa-caret-up"></i></span>
-        </div>
-        <div class="price-item" style="">
-            <p class="product-item">LMKB5</p>
-            <p class="product-price">$78.02</p>
-            <span class="product-change"><i class="fa fa-caret-down"></i></span>
-        </div>
-        <div class="price-item" style="">
-            <p class="product-item">RSKB 6</p>
-            <p class="product-price">$198.02</p>
-            <span class="product-change"><i class="fa fa-caret-up"></i></span>
-        </div>
-        <div class="price-item" style="">
-            <p class="product-item">LMKB 7</p>
-            <p class="product-price">$78.02</p>
-            <span class="product-change"><i class="fa fa-caret-down"></i></span>
-        </div>
-        <div class="price-item" style="">
-            <p class="product-item">RSKB 8</p>
-            <p class="product-price">$198.02</p>
-            <span class="product-change"><i class="fa fa-caret-up"></i></span>
-        </div>
-        <div class="price-item" style="">
-            <p class="product-item">LMKB</p>
-            <p class="product-price">$78.02</p>
-            <span class="product-change"><i class="fa fa-caret-down"></i></span>
-        </div>
-        <div class="price-item" style="">
-            <p class="product-item">RSKB</p>
-            <p class="product-price">$198.02</p>
-            <span class="product-change"><i class="fa fa-caret-up"></i></span>
-        </div>
-    </marquee>
-</div>
+
+{% block marquee %}
+
+{% endblock %}
+
 
 {% block content %}{% endblock content %}
-
 
 
 <script src="http://twitter.com/javascripts/blogger.js" type="text/javascript"></script>
@@ -157,6 +112,10 @@
 <script src='{% static "js/plugins/wow.min.js" %}'></script>
 <script src='{% static "js/plugins/counterup.min.js" %}'></script>
 <script src='{% static "js/scripts.js" %}'></script>
+
+{% if GOOGLE_ANALYTICS_PROPERTY_ID %}
+  {% include "path/to/your/ga.html" %}
+{% endif %}
 
 
 

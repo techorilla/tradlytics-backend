@@ -33,15 +33,6 @@
             <div class="row">
 
                 <div class="col-lg-12 col-sm-12">
-                    <div class="project-widget">
-                        <h4>Price Comparision</h4>
-                        <div id="pricing-chart" style="height: 600px; min-width: 310px"></div>
-                    </div>
-                </div>
-                <div class="col-lg-8 col-sm-12">
-                </div>
-
-                <div class="col-lg-4">
 
                     <div class="project-widget">
                         <h4>Description</h4>
@@ -50,16 +41,41 @@
 
                     <div class="project-widget">
                         <h4>Origins</h4>
-                        <div class="tags-list">
+                        <div class="tags-list col-lg-12 col-xs-12">
                             {% for country in product.origins %}
-                                <div style="cursor: default; margin-bottom: 10px; font-size: 14px; font-weight: bold;"><img src="{{ country.country.flag }}"
-                                                                                                                            width="50" height="50">
+                                <div class="col-md-3" style="cursor: default; margin-bottom: 10px; font-size: 14px; font-weight: bold;">
+                                    <img src="{{ country.country.flag }}" width="50" height="50">
                                     &nbsp; &nbsp;{{country.country.name}}</div>
                             {% endfor %}
+
                         </div>
                     </div>
 
+                    </br>
+                    </br>
+
+
+
                 </div>
+
+                <br>
+
+                <div class="col-lg-12 col-sm-12">
+                   <div class="project-widget">
+                        <h4>Product Variety</h4>
+                        <div class="tags-list col-lg-12 col-xs-12">
+                            {% for product in product.product_items %}
+                                <div class="col-md-3" style="cursor: default; margin-bottom: 10px; font-size: 14px; font-weight: bold;">
+                                    <img src="{{ product.originFlag }}" width="20" height="20">
+                                    &nbsp; &nbsp;{{product.keywords}}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+
+
+
 
             </div>
         </div><!-- End Container -->

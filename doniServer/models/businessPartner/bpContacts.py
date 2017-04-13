@@ -8,7 +8,8 @@ from .bpBasic import BpBasic
 class BpContact(models.Model):
     bp = models.ForeignKey(BpBasic,
                               null=False,
-                              blank=False)
+                              blank=False,
+                              related_name='contact_persons')
     id = models.AutoField(primary_key=True)
     is_primary = models.BooleanField(default=False)
     full_name = models.CharField(max_length=100, null=False, blank=False)
@@ -24,3 +25,14 @@ class BpContact(models.Model):
 
     class Meta:
         db_table = 'bp_contact'
+
+    def get_obj(self):
+        return {
+            'id': self.id,
+            'isPrimary': self.is_primary,
+            'fullName': self.full_name,
+            'designation': self.designation,
+            'email': self.email,
+            'primaryNumber': self.primary_number,
+            'secondaryNumber': self.secondary_number
+        }

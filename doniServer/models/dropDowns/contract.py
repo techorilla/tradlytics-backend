@@ -2,7 +2,6 @@ from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
 from django.utils import timezone
-from doniServer.models.businessPartner import BpBasic
 
 
 class TransactionContractType(models.Model):
@@ -12,7 +11,6 @@ class TransactionContractType(models.Model):
     updated_at = models.DateTimeField(default=None, null=True)
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='contract_type_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='contract_type_updated_by')
-    business = models.ForeignKey(BpBasic, null=True)
 
     class Meta:
         db_table = 'contract_type'

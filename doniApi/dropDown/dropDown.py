@@ -1,13 +1,15 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from doniServer.models.dropDowns import *
-from doniServer.models.product import ProductCategory, Products, PriceMarket, ProductKeyword, ProductItem
+from doniServer.models.product import ProductCategory, Products, PriceMarket, ProductKeyword, ProductItem, PriceMetric
 from doniServer.models.product.priceMarket import get_all_currencies
+from doniServer.models import BpBasic
 from django.utils import timezone
 from django.conf import settings
 from doniCore import Utilities
-from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta
+from datetime import datetime as dt
+import dateutil.parser
 
 
 class SimpleDropDownAPI(GenericAPIView):
@@ -19,7 +21,7 @@ class SimpleDropDownAPI(GenericAPIView):
         business = Utilities.get_user_business(user)
         q = request.GET.get('q')
         if q == 'all' or q == 'drop_down':
-            result_objects = self.model.objects.filter(business=business)
+            result_objects = self.model.objects.filter(created_by__profile__business=business)
             if q == 'all':
                 results = [res.get_list_obj() for res in result_objects]
             else:
@@ -61,19 +63,64 @@ class SimpleDropDownAPI(GenericAPIView):
         return Response({'id': id}, status=status.HTTP_200_OK)
 
 
+class BusinessDropDownAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        type = request.GET.get('type')
+        all_business = BpBasic.get_drop_down_obj(type)
+        return Response({
+            'list': all_business
+        }, status=status.HTTP_200_OK)
+
+
 class CountryAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
+
     def get(self, request, *args, **kwargs):
         from django_countries import countries
         all_countries = list(countries)
         all_countries = [{
-                             'ticked': False,
                              'name': c[1],
                              'code': c[0],
                              'image': settings.COUNTRIES_FLAG_URL.replace('{code}', str(c[0].lower()))
                          } for c in all_countries]
         return Response({'list': all_countries}, status=status.HTTP_200_OK)
 
+
+class RegionAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        country_code = request.GET.get('q')
+        from cities_light.models import Region
+        regions = Region.objects.filter(country__code2=country_code).order_by('name')
+        regions = [{
+                       'id': region.name_ascii,
+                       'name': region.name_ascii
+                   } for region in regions]
+        return Response({'list': regions}, status=status.HTTP_200_OK)
+
+
+class CityAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET
+        country_code = query.get('countryCode')
+        region = query.get('region')
+        from cities_light.models import City
+        if not region:
+            cities = City.objects.filter(country__code2=country_code).filter().order_by('name_ascii')
+        else:
+            cities = City.objects.filter(country__code2=country_code).filter(region__name_ascii=region).order_by('name_ascii')
+        cities = [
+            {
+                'id': city.name_ascii,
+                'name': city.name_ascii
+            } for city in cities
+        ]
+        return Response({'list': cities}, status=status.HTTP_200_OK)
 
 
 class ProductDDAPI(GenericAPIView):
@@ -93,9 +140,9 @@ class ProductOriginDDAPI(GenericAPIView):
         product = self.model.objects.get(id=product_id)
         origins = product.origins
         origins = [{
-                        'name': org.country.name,
-                        'code': org.country.code,
-                        'image': settings.COUNTRIES_FLAG_URL.replace('{code}', str(org.country.code.lower()))
+                       'name': org.country.name,
+                       'code': org.country.code,
+                       'image': settings.COUNTRIES_FLAG_URL.replace('{code}', str(org.country.code.lower()))
                    } for org in origins]
         return Response({'list': origins}, status=status.HTTP_200_OK)
 
@@ -123,9 +170,9 @@ class CurrencyDDAPI(GenericAPIView):
     def get(self, request, *args, **kwargs):
         currencies = get_all_currencies()
         currencies = [{
-            'code': currency[0],
-            'name': currency[1]
-        } for currency in currencies]
+                          'code': currency[0],
+                          'name': currency[1]
+                      } for currency in currencies]
         return Response({'list': currencies}, status=status.HTTP_200_OK)
 
 
@@ -143,6 +190,15 @@ class ContractType(SimpleDropDownAPI):
 
 class Designation(SimpleDropDownAPI):
     model = Designation
+
+
+class PriceMetricDDAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        metrics = PriceMetric.objects.all().order_by('metric')
+        metrics = [met.get_drop_down() for met in metrics]
+        return Response({'list': metrics}, status=status.HTTP_200_OK)
 
 
 class ProductKeywords(GenericAPIView):
@@ -180,8 +236,12 @@ class ShipmentMonthDDAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        today = dt.now()
-        current_month = str(today.year)+'-'+str(today.month)+'-1'
+        price_date = request.GET.get('q')
+        if price_date != 'all':
+            date = dateutil.parser.parse(price_date)
+        else:
+            date = dt.now()
+        current_month = str(date.year)+'-'+str(date.month)+'-1'
         start_month = dt.strptime(current_month, '%Y-%m-%d')
         price_span_months = 12
         shipment_months = []
@@ -190,10 +250,10 @@ class ShipmentMonthDDAPI(GenericAPIView):
             shipment_months.append(ship_month)
 
         shipment_months = [{
-            'startMonth': month,
-            'month': month.strftime("%B"),
-            'year': month.year
-        } for month in shipment_months]
+                               'startMonth': month,
+                               'month': month.strftime("%B"),
+                               'year': month.year
+                           } for month in shipment_months]
 
         return Response({'list': shipment_months}, status=status.HTTP_200_OK)
 

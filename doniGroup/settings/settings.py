@@ -64,8 +64,8 @@ INSTALLED_APPS = [
     'easy_thumbnails',
     'djcelery',
     'markdownx',
-    'django_countries'
-
+    'django_countries',
+    'cities_light'
 ]
 
 # For django-countries all flag icon urls
@@ -113,7 +113,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
 ]
 
 CORS_URLS_REGEX = r'^/api/.*$'
@@ -137,6 +136,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'website.context_processors.google_analytics'
             ],
         },
     },
@@ -206,3 +206,8 @@ from easy_thumbnails.conf import Settings as thumbnail_settings
 THUMBNAIL_PROCESSORS = (
                            'image_cropping.thumbnail_processors.crop_corners',
                        ) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
+
+## Google Analytics
+GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-97177253-1'
+GOOGLE_ANALYTICS_DOMAIN = 'tramodity.com'

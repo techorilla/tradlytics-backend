@@ -1,0 +1,1 @@
+from .manifestItem import ManifestItem

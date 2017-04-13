@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404, redirect
-
+from doniApi.apiImports import Response, GenericAPIView, status
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, get_object_or_404, redirect
@@ -16,7 +16,6 @@ from rest_framework.permissions import (
     IsAuthenticated,
     IsAdminUser,
     IsAuthenticatedOrReadOnly,
-
     )
 
 
@@ -26,9 +25,8 @@ class BlogPage(View):
     def get(self, request, *args, **kwargs):
         tags = Tag.objects.filter(blog__isnull=False).values('name', 'slug').distinct()
         today = timezone.now().date()
-        queryset_list = Post.objects.active()  # .order_by("-timestamp")
-        if request.user.is_staff or request.user.is_superuser:
-            queryset_list = Post.objects.all()
+        queryset_list = Post.objects.active().order_by("-timestamp")
+
 
         query = request.GET.get("q")
         tag = request.GET.get("tag")
@@ -77,7 +75,12 @@ class SingleBlog(View):
         if instance.publish > timezone.now().date() or instance.draft:
             if not request.user.is_staff or not request.user.is_superuser:
                 raise Http404
+
+        tags = Tag.objects.filter(blog__isnull=False).values('name', 'slug').distinct()
+        instance.increment_visitor()
+
         context = {
+            "tags": tags,
             "title": instance.title,
             "instance": instance,
             "share_string": urllib.pathname2url(instance.content),
@@ -86,8 +89,3 @@ class SingleBlog(View):
 
 
 
-class SingleBlogAPIView(RetrieveAPIView):
-    queryset = Post.objects.all()
-    serializer_class = SingleBlogSerializer
-    lookup_field = 'slug'
-    permission_classes = [AllowAny]

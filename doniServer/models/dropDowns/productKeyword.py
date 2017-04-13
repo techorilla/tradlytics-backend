@@ -2,7 +2,6 @@ from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
 from django.utils import timezone
-from doniServer.models.businessPartner import BpBasic
 
 
 class ProductQuality(models.Model):
@@ -12,7 +11,6 @@ class ProductQuality(models.Model):
     updated_at = models.DateTimeField(default=None, null=True)
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='quality_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='quality_updated_by')
-    business = models.ForeignKey(BpBasic, null=True)
 
     class Meta:
         db_table = 'product_quality'

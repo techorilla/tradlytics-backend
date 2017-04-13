@@ -1,10 +1,28 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from doniGroup.authentication import CsrfExemptSessionAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from doniServer.models import PriceMarket, ProductItemPrice, ProductItem
+from doniServer.models import PriceMarket, ProductItemPrice, ProductItem, PriceMetric, PriceSummary
 from django.db import IntegrityError
 from datetime import datetime as dt
 import dateutil.parser
+from django.db.models import Max
+
+
+class PricingSummaryAPI(GenericAPIView):
+    permission_class = (IsAuthenticated, )
+
+    def get(self, request, *args, **kwargs):
+        last_summary_date = PriceSummary.objects.all().aggregate(Max('summary_on'))
+        last_summary_date = last_summary_date.get('summary_on__max')
+        price_summary = PriceSummary.objects.filter(summary_on=last_summary_date)\
+            .order_by('product_item__product_origin__product__name')
+
+        return Response({
+            'data':
+                {
+                    'priceSummary': [price.summary for price in price_summary]
+                }
+        }, status=status.HTTP_200_OK)
 
 
 class ProductItemPricingAPI(GenericAPIView):
@@ -18,11 +36,13 @@ class ProductItemPricingAPI(GenericAPIView):
         update_id = data.get('id')
         product_item_id = data.get('productItemId')
         price_market_id = data.get('priceMarketId')
+        price_metric_metric = data.get('priceMetricId')
         price_time = data.get('priceTime')
         comments = data.get('comments')
         price_items = data.get('priceItems')
         product_item = ProductItem.objects.get(id=product_item_id)
         price_market = PriceMarket.objects.get(id=price_market_id)
+        price_metric = PriceMetric.objects.get(metric=price_metric_metric)
         if update_id:
             prod_price_item = ProductItemPrice.objects.get(id=update_id)
             msg = self.messages['successPUT']
@@ -33,6 +53,7 @@ class ProductItemPricingAPI(GenericAPIView):
             msg = self.messages['successPOST']
             prod_price_item.created_by = user
 
+        prod_price_item.price_metric = price_metric
         prod_price_item.comments = comments
         prod_price_item.price_items = price_items
         prod_price_item.product_item = product_item
@@ -115,50 +136,3 @@ class PricingMarketAPI(GenericAPIView):
         return Response({'success': True}, status=status.HTTP_200_OK)
 
 
-class WebsitePricingAPI(GenericAPIView):
-
-    permission_classes = (AllowAny,)
-    authentication_classes = (CsrfExemptSessionAuthentication,)
-
-    def get(self, request, *args, **kwargs):
-        data = {
-            0: {
-                'data': [
-                    [1267401600000, 29.02],
-                    [1267488000000, 90.46],
-                    [1267574400000, 28.46],
-                    [1267660800000, 8.63],
-                    [1267747200000, 28.59],
-                    [1268006400000, 28.63],
-                    [1268092800000, 2.80],
-                    [1268179200000, 28.97],
-                    [1268265600000, 129.18],
-                    [1268352000000, 3.27],
-                    [1268611200000, 29.29],
-                    [1268697600000, 229.37],
-                    [1268784000000, 9.63],
-                    [1268870400000, 29.61],
-                    [1268956800000, 249.59],
-                    [1269216000000, 29.60],
-                    [1269302400000, 29.88],
-                    [1269388800000, 59.65],
-                    [1269475200000, 30.01],
-                    [1269561600000, 9.66],
-                    [1269820800000, 29.59],
-                    [1269907200000, 29.77],
-                    [1269993600000, 19.29]
-
-                ],
-                'name': 'Number 2 or better, Australia'
-            }
-        }
-        return Response({'chartData': data})
-
-    def post(self, request, *args, **kwargs):
-        return Response()
-
-    def delete(self, request, *args, **kwargs):
-        return Response()
-
-    def put(self, request, *args, **kwargs):
-        return Response()

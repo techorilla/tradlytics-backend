@@ -6,15 +6,14 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import pre_save
 from django.utils import timezone
-from django.utils.safestring import mark_safe
 from django.utils.text import slugify
-
+from django.utils.safestring import mark_safe
 from markdown_deux import markdown
 from .blog_comment import Comment
 from .blog_tag import Tag
 import os
 from ..utitlities import get_read_time
-
+import time
 
 # Create your models here.
 # MVC MODEL VIEW CONTROLLER
@@ -26,7 +25,7 @@ from ..utitlities import get_read_time
 class PostManager(models.Manager):
     def active(self, *args, **kwargs):
         # Post.objects.all() = super(PostManager, self).all()
-        return super(PostManager, self).filter(draft=False).filter(publish__lte=timezone.now())
+        return super(PostManager, self).filter(draft=False, display_on_web=True).filter(publish__lte=timezone.now())
 
 
 def upload_location(instance, filename):
@@ -45,7 +44,7 @@ def upload_location(instance, filename):
     We add 1 to it, so we get what should be the same id as the the post we are creating.
     """
     print filename, new_id
-    return os.path.join('blogs', str(new_id), filename)
+    return os.path.join('blogs', str(new_id), str(time.time())+'_'+filename)
 
 
 class Post(models.Model):
@@ -61,8 +60,10 @@ class Post(models.Model):
     height_field = models.IntegerField(default=0)
     width_field = models.IntegerField(default=0)
     content = models.TextField()
+    display_on_web = models.BooleanField(default=False)
+    visitors = models.IntegerField(default=0)
     draft = models.BooleanField(default=False)
-    publish = models.DateField(auto_now=False, auto_now_add=False)
+    publish = models.DateField(auto_now=False, auto_now_add=False, default=None, null=True)
     read_time = models.IntegerField(default=0)  # models.TimeField(null=True, blank=True) #assume minutes
     updated = models.DateTimeField(auto_now=True, auto_now_add=False)
     timestamp = models.DateTimeField(auto_now=False, auto_now_add=True)
@@ -75,6 +76,27 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def increment_visitor(self):
+        self.visitors += 1
+        self.save()
+
+    @property
+    def safe_content(self):
+        return mark_safe(self.content)
+
+    def get_complete_obj(self, base_url):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'slug': self.slug,
+            'tags': [tag.name for tag in self.all_tags],
+            'image': self.get_blog_image(base_url),
+            'height': self.height_field,
+            'width': self.width_field,
+            'content': self.content
+        }
+
     def get_absolute_url(self):
         return reverse("web:detail", kwargs={"slug": self.slug})
 
@@ -84,11 +106,42 @@ class Post(models.Model):
     class Meta:
         ordering = ["-timestamp", "-updated"]
 
+    def get_list_obj(self, base_url, user):
+        return {
+            'id': self.id,
+            'visitors': self.visitors,
+            'canEdit': (self.user == user),
+            'displayOnWeb': self.display_on_web,
+            'canDelete': (self.user == user) or user.is_superuser,
+            'createdByImage': self.user.profile.get_profile_pic(base_url),
+            'createdBy': self.user.username,
+            'createdOn': self.timestamp,
+            'title': self.title,
+            'image': str(self.get_blog_image(base_url)),
+            'comments': self.comments.count(),
+            'isDraft': self.draft,
+            'reads': self.read_time,
+            'publishedOn': self.publish,
+            'tags': [{
+                'id': tag.id,
+                'name': tag.name
+            } for tag in self.all_tags]
+        }
+
+    def get_blog_image(self, base_url):
+        pre = 'https://' if settings.IS_HTTPS else 'http://'
+        return pre + base_url + '/media/' + str(self.image) if self.image else None
+
     @property
     def get_markdown(self):
-        content = self.content
-        markdown_text = markdown(content)
-        return mark_safe(markdown_text)
+        try:
+            content = self.content
+            markdown_text = markdown(content)
+            return mark_safe(markdown_text)
+        except Exception, e:
+            print str(e)
+            return None
+
 
     @property
     def comments(self):
@@ -126,30 +179,12 @@ def pre_save_post_receiver(sender, instance, *args, **kwargs):
         instance.slug = create_slug(instance)
 
     if instance.content:
-        html_string = instance.get_markdown()
+        html_string = instance.content
         read_time_var = get_read_time(html_string)
         instance.read_time = read_time_var
 
 
 pre_save.connect(pre_save_post_receiver, sender=Post)
-
-from django.contrib import admin
-from ckeditor.widgets import CKEditorWidget
-
-
-class PostModelAdmin(admin.ModelAdmin):
-    list_display = ["title", "updated", "timestamp"]
-    list_display_links = ["updated"]
-    list_editable = ["title"]
-    list_filter = ["updated", "timestamp"]
-
-    formfield_overrides = {
-        models.TextField: {'widget': CKEditorWidget},
-    }
-
-    search_fields = ["title", "content"]
-    class Meta:
-        model = Post
 
 
 

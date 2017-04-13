@@ -2,20 +2,27 @@ from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .bpTypes import BpType
+from ..dropDowns.bptype import BusinessType
+from django.conf import settings
+from django.db import connection
+import os
+import time
+
+
+def get_image_path(instance, filename):
+    return os.path.join('businessLogo', instance.bp_name, str(time.time())+'_'+filename)
 
 
 class BpBasic(models.Model):
     bp_id = models.AutoField(primary_key=True)
-    bp_name = models.CharField(max_length=255, blank=False, unique=True)
+    bp_logo = models.ImageField(
+        upload_to=get_image_path, blank=True, null=True)
+    bp_name = models.CharField(max_length=255, blank=False)
+    bp_ntn = models.CharField(max_length=30, blank=True)
     bp_website = models.CharField(max_length=255, null=False, blank=False)
     bp_credibility_index = models.IntegerField(default=1)
-    bp_country = models.CharField(max_length=250, null=True)
-    bp_address = models.TextField(null=True, blank=True)
-    bp_types = models.ManyToManyField(BpType)
-    bp_on_contract = models.BooleanField(default=False)
+    bp_types = models.ManyToManyField(BusinessType, related_name='business')
     bp_admin = models.BooleanField(default=False)
-
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='bp_basic_created_by')
@@ -24,12 +31,144 @@ class BpBasic(models.Model):
     class Meta:
         db_table = 'bp_basic'
 
+    @property
+    def primary_contact(self):
+        try:
+            contact_person = self.contact_persons.get(is_primary=True)
+            contact_person_name = contact_person.full_name
+        except Exception, e:
+            contact_person_name = None
+        return contact_person_name
+
+    @property
+    def primary_state(self):
+        try:
+            primary_location = self.locations.get(is_primary=True)
+            state = primary_location.state
+            return state
+        except Exception, e:
+            return None
+
+    @property
+    def primary_city(self):
+        try:
+            primary_location = self.locations.get(is_primary=True)
+            city = primary_location.city
+            return city
+        except Exception, e:
+            return None
+
+    @property
+    def primary_origin(self):
+        try:
+            primary_location = self.locations.get(is_primary=True)
+            primary_country_code = primary_location.country
+            from django_countries import countries
+            primary_country = dict(countries)[primary_country_code]
+            primary_country_flag = settings.COUNTRIES_FLAG_URL.replace('{code}', str(primary_country_code.lower()))
+        except Exception, e:
+            primary_country_code = None
+            primary_country = None
+            primary_country_flag = None
+        return primary_country, primary_country_code, primary_country_flag
+
+
+    @classmethod
+    def get_drop_down_obj(cls, business_type):
+        cur = connection.cursor()
+        cur.callproc('business_drop_down_list', [business_type, ])
+        field_names = [i[0] for i in cur.description]
+        all_business = cur.fetchall()
+        cur.close()
+        return [dict(zip(field_names, item)) for item in all_business]
+
+    def get_list_obj(self, base_url):
+        bp_types_id, bp_type_str = self.get_by_types_names()
+        try:
+            contact_person = self.contact_persons.get(is_primary=True)
+            contact_person_name = contact_person.full_name
+        except Exception, e:
+            contact_person_name = None
+
+        try:
+            primary_location = self.locations.get(is_primary=True)
+            primary_country_code = primary_location.country
+            from django_countries import countries
+            primary_country = dict(countries)[primary_country_code]
+
+        except Exception, e:
+            primary_country_code = None
+            primary_country = None
+
+
+
+        return {
+            'bpId': self.bp_id,
+            'logo': self.get_logo(base_url),
+            'name': self.bp_name,
+            'website': self.bp_website,
+            'ntn': self.bp_ntn,
+            'bpTypeId': bp_types_id,
+            'bpTypeStr': bp_type_str,
+            'contactPerson': contact_person_name,
+            'countryCode': primary_country_code,
+            'country': primary_country
+        }
+
+    def get_by_type_id(self):
+        bp_types = self.bp_types.all().order_by('name')
+        bp_types = [type.id for type in bp_types]
+        return bp_types
+
+    def get_by_types_names(self):
+        bp_types = self.bp_types.all().order_by('name')
+        bp_types = [{
+                        'id': typ.id,
+                        'name': typ.name
+                    } for typ in bp_types]
+        bp_types_names = [typ.get('name') for typ in bp_types]
+        bp_types_id = [typ.get('id') for typ in bp_types]
+        bp_types_names = ', '.join(bp_types_names)
+        return bp_types_id, bp_types_names
+
+    def get_obj(self, base_url):
+        locations = self.locations.all()
+        contact_persons = self.contact_persons.all()
+        contact_persons = [cont_person.get_obj() for cont_person in contact_persons]
+        locations = [loc.get_obj() for loc in locations]
+        contacts = self.contacts.all()
+        contacts = [cont.get_obj() for cont in contacts]
+        banks = self.banks.all()
+        banks = [bank.get_obj() for bank in banks]
+        return {
+            'bpId': self.bp_id,
+            'logo': self.get_logo(base_url),
+            'name': self.bp_name,
+            'website': self.bp_website,
+            'ntn': self.bp_ntn,
+            'bpType': self.get_by_type_id(),
+            'banks': banks,
+            'locations': locations,
+            'contacts': contacts,
+            'contactPersons': contact_persons
+        }
+
+
+    def get_logo(self, base_url):
+        if settings.IS_HTTPS:
+            pre = 'https://'
+        else:
+            pre = 'http://'
+        return pre + base_url + '/media/' + str(self.bp_logo) if self.bp_logo else None
+
     @classmethod
     def get_admin_business(cls):
-        return cls.objects.get(bp_admin=True)
+        business_admin = cls.objects.get(bp_admin=True)
+        return business_admin
 
     @classmethod
     def get_business_using_website(cls, url):
-        return cls.objects.get(bp_website__contains=url)
+        business = cls.objects.get(bp_website__contains=url)
+        return business
 
 

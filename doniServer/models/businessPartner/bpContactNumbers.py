@@ -5,9 +5,7 @@ from .bpBasic import BpBasic
 
 
 class BpContactNumber(models.Model):
-    bp = models.ForeignKey(BpBasic,
-                              null=False,
-                              blank=False)
+    bp = models.ForeignKey(BpBasic, null=False, blank=False, related_name='contacts')
 
     id = models.AutoField(primary_key=True)
     contact_number = models.CharField(max_length=254, null=False)
@@ -20,3 +18,10 @@ class BpContactNumber(models.Model):
 
     class Meta:
         db_table = 'bp_contact_number'
+
+    def get_obj(self):
+        return {
+            'id': self.id,
+            'contactNumber': self.contact_number,
+            'contactType': self.type
+        }

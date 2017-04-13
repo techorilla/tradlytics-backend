@@ -2,6 +2,11 @@
 (function($) {
     "use strict";
 
+
+    var pages = {
+        'home': ''
+    };
+
     /* -------------------
      Revolution Sliders
      ---------------------*/
@@ -161,12 +166,15 @@
         /* -------------------
          Header Animation
          ---------------------*/
-        if ($(this).scrollTop() > 5){
-            $('nav').addClass("navbar-small")
+        if(window.location.pathname === '/'){
+            if ($(this).scrollTop() > 5){
+                $('nav').addClass("navbar-small");
+            }
+            else{
+                $('nav').removeClass("navbar-small")
+            }
         }
-        else{
-            $('nav').removeClass("navbar-small")
-        }
+
         /* -------------------
          Back to top button popup
          ---------------------*/

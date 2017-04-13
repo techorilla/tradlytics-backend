@@ -3,20 +3,20 @@
 {% block content %}
 
 
-    <!-- Start Page Top -->
-    <section id="page-top" style="height:400px">
-        <div class="hero" style="height:100%;">
+    <!--&lt;!&ndash; Start Page Top &ndash;&gt;-->
+    <!--<section id="page-top" style="height:400px">-->
+        <!--<div class="hero" style="height:100%;">-->
 
-            <img src='{% static "img/backgrounds/product-background.jpg" %}' alt="hero">
+            <!--<img src='{% static "img/backgrounds/product-background.jpg" %}' alt="hero">-->
 
-            <div class="page-top-title text-center">
-                <h2 class="white op-1">Products</h2>
-                <p class="home-subheading op-1"></p>
-            </div>
+            <!--<div class="page-top-title text-center">-->
+                <!--<h2 class="white op-1">Products</h2>-->
+                <!--<p class="home-subheading op-1"></p>-->
+            <!--</div>-->
 
-        </div>
-    </section>
-    <!-- End Page Top -->
+        <!--</div>-->
+    <!--</section>-->
+    <!--&lt;!&ndash; End Page Top &ndash;&gt;-->
 
 
     <div class="site-wrapper content">
@@ -27,7 +27,7 @@
 
                 <div class="col-md-12 text-center">
 {#                    <h3 class="section-title wow fadeInUp animated" style="visibility: visible;">Products</h3>#}
-{#                    <p class="subheading wow fadeInUp animated" style="visibility: visible;">Creating products and services that <span class="highlight">transform brands</span>.</p>#}
+                    <p class="subheading wow fadeInUp animated" style="visibility: visible;">Creating products and services that <span class="highlight">transform brands</span>.</p>
                 </div>
 
                 <div id="filters-container-fullwidth" class="cbp-l-filters-alignCenter wow fadeInUp animated" style="visibility: visible;">
@@ -50,7 +50,7 @@
                                     <div class="product-overlay" style="">
                                         <ul class="product-expand expand">
                                             <li class="cbp-l-caption-title" style="font-size: 24px;">
-                                                <a style="color: #ffffff;" href="{% url "web:single_product" %}?id={{ product.id }}">{{ product.name }}</a>
+                                                <a style="color: #ffffff;" href="{% url 'web:single_product' %}?id={{ product.id }}">{{ product.name }}</a>
                                             </li>
                                             <li class="cbp-l-caption-desc" style="font-size:16px; color: #ffffff;">{{ product.category.name}}</li>
 {#                                            <li class="cbp-l-icon"><a href="img/portfolio/fullsize/1.jpg" class="cbp-lightbox" data-title="Dashboard<br>by Wunderwelt"><i class="icon-magnifier"></i></a></li>#}
