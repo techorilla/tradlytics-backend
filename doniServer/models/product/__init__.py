@@ -1,4 +1,4 @@
-from .productSpecification import ProductsSpecification, ProductsSpecificationAdmin
+from .productSpecification import ProductsSpecification
 from .productItem import ProductItem, ProductItemAdmin
 from .productKeyword import ProductKeyword, ProductKeywordAdmin
 from .productPrice import ProductPrice, ProductPriceAdmin

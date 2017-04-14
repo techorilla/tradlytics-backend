@@ -59,7 +59,6 @@ INSTALLED_APPS = [
 
     # Third Party Application
     'grappelli',
-    'jsoneditor',
     'ckeditor',
     'easy_thumbnails',
     'djcelery',

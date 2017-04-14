@@ -34,8 +34,6 @@ class Price(models.Model):
 
 
 from django.contrib import admin
-from jsoneditor.forms import JSONEditor
-
 
 class ProductPriceAdmin(admin.ModelAdmin):
     model = ProductPrice

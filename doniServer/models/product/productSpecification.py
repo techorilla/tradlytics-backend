@@ -36,23 +36,23 @@ class ProductsSpecification(models.Model):
         return self.name
 
 
-from django.contrib import admin
-from jsoneditor.forms import JSONEditor
+# from django.contrib import admin
+# from jsoneditor.forms import JSONEditor
 
 
-class ProductsSpecificationAdmin(admin.ModelAdmin):
-    model = ProductsSpecification
-    formfield_overrides = {
-        JSONField: {'widget': JSONEditor},
-    }
-    fieldsets = [
-        ('Specification Details', {'fields': ['name', 'productCategory']}),
-        ('Specifications', {'fields': ['specs']})
-    ]
-
-    def save_model(self, request, obj, form, change):
-        obj.created_by = request.user
-        obj.save()
+# class ProductsSpecificationAdmin(admin.ModelAdmin):
+#     model = ProductsSpecification
+#     formfield_overrides = {
+#         JSONField: {'widget': JSONEditor},
+#     }
+#     fieldsets = [
+#         ('Specification Details', {'fields': ['name', 'productCategory']}),
+#         ('Specifications', {'fields': ['specs']})
+#     ]
+#
+#     def save_model(self, request, obj, form, change):
+#         obj.created_by = request.user
+#         obj.save()
 
 
 
