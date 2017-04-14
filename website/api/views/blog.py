@@ -86,7 +86,6 @@ class SingleBlog(View):
 
             "share_string": urllib.pathname2url(share_string),
         }
-        print 'hello_2'
         return render(request, self.template_name, context)
 
 
