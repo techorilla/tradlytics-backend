@@ -78,13 +78,15 @@ class SingleBlog(View):
 
         tags = Tag.objects.filter(blog__isnull=False).values('name', 'slug').distinct()
         instance.increment_visitor()
-
+        import re
+        share_string = re.sub(r'[^\x00-\x7F]+', ' ', instance.content)
         context = {
             "tags": tags,
-            "title": instance.title,
             "instance": instance,
-            "share_string": urllib.pathname2url(instance.content),
+
+            "share_string": urllib.pathname2url(share_string),
         }
+        print 'hello_2'
         return render(request, self.template_name, context)
 
 

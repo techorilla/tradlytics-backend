@@ -26,7 +26,7 @@
                 <!-- Blog Post -->
                 <div class="col-md-8">
                     <div class="blog-post">
-                        <h3 class="blog-post-title">{{ title }}</h3>
+                        <h3 class="blog-post-title">{{ instance.title }}</h3>
                         {#                                <p class="lead">Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
                         <div class="author-description">
                             <div class="author-image">
@@ -57,7 +57,7 @@
                             <img class="img-responsive blog-img" src="{{ instance.image.url }}" alt="">
                         </a>
                         {% autoescape off %}
-                        {{ instance.content}}
+                        {{ instance.get_markdown }}
                         {% endautoescape %}
 
                         </br>

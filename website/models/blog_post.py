@@ -135,8 +135,9 @@ class Post(models.Model):
     def get_markdown(self):
         try:
             content = self.content
-            markdown_text = markdown(content)
-            return mark_safe(markdown_text)
+            return content
+            # markdown_text = markdown(content)
+            # return mark_safe(markdown_text)
         except Exception, e:
             print str(e)
             return None
