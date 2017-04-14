@@ -64,7 +64,8 @@ INSTALLED_APPS = [
     'djcelery',
     'markdownx',
     'django_countries',
-    'cities_light'
+    'cities_light',
+    'django_crontab'
 ]
 
 # For django-countries all flag icon urls
@@ -210,3 +211,7 @@ THUMBNAIL_PROCESSORS = (
 ## Google Analytics
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-97177253-1'
 GOOGLE_ANALYTICS_DOMAIN = 'tramodity.com'
+
+# CRONJOBS = [
+#     ('* * * * *', 'print_date'),
+# ]

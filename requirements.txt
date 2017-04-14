@@ -19,6 +19,7 @@ django-ckeditor==5.2.1
 django-contrib-comments==1.8.0
 django-cors-headers==2.0.2
 django-countries==4.0
+django-crontab==0.7.1
 django-filter==0.15.3
 django-generic-positions==0.2.2
 django-grappelli==2.9.1
