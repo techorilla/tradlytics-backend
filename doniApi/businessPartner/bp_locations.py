@@ -18,11 +18,12 @@ class BpLocationAPI(GenericAPIView):
         business = Utilities.get_user_business(user)
         q = request.GET.get('q')
         if q == 'all' or q == 'drop_down':
-            locations = BpLocation.objects.filter(bp=business)
             if q == 'all':
+                locations = BpLocation.objects.filter(bp=business)
                 locations = [loc.get_obj() for loc in locations]
             else:
-                locations = [loc.drop_down_obj() for loc in locations]
+                locations = BpLocation.drop_down_obj(business)
+                print locations
             return Response({'locations': locations}, status=status.HTTP_200_OK)
         else:
             location = BpLocation.objects.get(id=q)

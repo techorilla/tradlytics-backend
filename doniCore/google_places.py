@@ -4,10 +4,12 @@ import json
 import urllib
 import re
 import time
+from django.conf import settings
 
 
 class GooglePlaces(object):
-    GOOGLE_API_KEY = 'AIzaSyBo_6vyHY2wE1G3wlY0PfH6_oW-leyCbWk'
+
+    GOOGLE_API_KEY = settings.GOOGLE_API_KEY
 
     def get_place(self, place_id, region):
 

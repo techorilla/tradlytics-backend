@@ -1,12 +1,20 @@
 from doniApi import *
 from django.conf.urls import include, url
 
+from doniApi.authentication.Login import LoginAPI
+from doniApi.authentication.Logout import LogOutAPI
+
 
 '''
     All Data API for Doni Group
 '''
 
 urlpatterns = (
+    url(r"login/$", LoginAPI.as_view(), {"public_api": True}, name="login"),
+    url(r"logout/$", LogOutAPI.as_view(), name="logout"),
+
+    url(r"^get_google_access_token/$", GetGoogleAccessTokenAPI.as_view(), name='Google_Access_Token'),
+
     url(r'^dashboard/$', MainDashboardAPI.as_view(), name='Main_Dashboard_API'),
 
     url(r'^website/research/display/$', BlogDisplayAPI.as_view(), name='Blogs_API'),
@@ -18,6 +26,10 @@ urlpatterns = (
     url(r'website/research_tags', BlogTagAPI.as_view(), name='BlogTagAPI'),
 
     # User Related API
+
+    url(r'^user/changePassword/$',
+        ChangePassword.as_view(),
+        name='Change_Password'),
 
     url(r'user/$',
         User.as_view(),

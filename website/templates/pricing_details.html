@@ -13,16 +13,27 @@
 
 <section id="price-list" class="parallax-section-6" style="height:100%; background-position: 50% -117px;">
     <div class="col-md-12 text-center wow fadeInUp">
-        <h3 class="section-title">Product Pricing</h3>
-        <p class="subheading">International and Local Market price comparison with local import volumes. </p>
+        <h3 class="section-title">
+
+            {{productItem.product_origin.product.name}}</h3>
+        <p class="subheading">{{productItem.keyword_str}}</p>
     </div>
 
     <div class="container" style="height:100%">
         <div class="col-md-offset-8 col-md-4">
-           <div id="priceReportRange" class="pull-right" style="">
-            <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
-            <span></span> <b class="caret"></b>
-        </div>
+            <div id="priceReportRange" class="pull-right dropdown" style="">
+                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                <span></span> <b class="caret"></b>
+            </div>
+            <!--<div>-->
+                <!--<li class="dropdown">-->
+                    <!--<a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown"></b></a>-->
+                    <!--<ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">-->
+                        <!--<li><a href="#dropdown-1" tabindex="-1" data-toggle="tab">International Price (USD)</a></li>-->
+                        <!--<li><a href="#dropdown-2" tabindex="-1" data-toggle="tab">Local Price (PKR)</a></li>-->
+                    <!--</ul>-->
+                <!--</li>-->
+            <!--</div>-->
         </div>
 
         <div style="width:100%; height:400px;" id="chartdiv"></div>
@@ -45,31 +56,31 @@
 <script src='{% static "js/daterangepicker.js" %}'></script>
 
 <script>
-$(function() {
+    $(function() {
 
-    var start = moment().subtract(29, 'days');
-    var end = moment();
+        var start = moment().subtract(29, 'days');
+        var end = moment();
 
-    function cb(start, end) {
-        $('#priceReportRange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-    }
-
-    $('#priceReportRange').daterangepicker({
-        startDate: start,
-        endDate: end,
-        ranges: {
-           'Today': [moment(), moment()],
-           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment().endOf('month')],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        function cb(start, end) {
+            $('#priceReportRange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         }
-    }, cb);
 
-    cb(start, end);
+        $('#priceReportRange').daterangepicker({
+            startDate: start,
+            endDate: end,
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
 
-});
+        cb(start, end);
+
+    });
 </script>
 
 <script>

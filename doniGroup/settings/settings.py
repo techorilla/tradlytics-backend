@@ -207,8 +207,11 @@ THUMBNAIL_PROCESSORS = (
                            'image_cropping.thumbnail_processors.crop_corners',
                        ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
+GOOGLE_SERVICE_ACCOUNT_JSON = '%s/doniServer/accounts/googleAnalytics/client_secret.json' % PROJECT_ROOT
+GOOGLE_API_KEY = 'AIzaSyBo_6vyHY2wE1G3wlY0PfH6_oW-leyCbWk'
 
 ## Google Analytics
+GOOGLE_ANALYTICS_PROFILE_ID = '147714020'
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-97177253-1'
 GOOGLE_ANALYTICS_DOMAIN = 'tramodity.com'
 

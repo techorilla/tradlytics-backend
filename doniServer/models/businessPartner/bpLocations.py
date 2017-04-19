@@ -54,11 +54,7 @@ class BpLocation(models.Model):
             'created_at': self.created_at
         }
 
-        def drop_down_obj(self):
-            return {
-                'id': self.address_id,
-                'address': self.address,
-                'city': self.city,
-                'state': self.state,
-                'country': self.country
-            }
+    @classmethod
+    def drop_down_obj(cls, business):
+        return cls.objects.extra(select={'id': 'address_id'}).filter(bp=business)\
+            .values('id', 'address', 'city', 'state', 'country')

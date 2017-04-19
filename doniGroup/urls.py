@@ -15,15 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from doniApi.authentication.Login import LoginAPI
-from doniApi.authentication.Logout import LogOutAPI
+
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
-                  url(r"api/login/$", LoginAPI.as_view(), {"public_api": True}, name="login"),
-                  url(r"api/logout/$", LogOutAPI.as_view(), name="logout"),
                   url(r'^admin/', admin.site.urls),
                   url(r'^api/', include('doniApi.urls', namespace='api')),
                   url(r'^grappelli/', include('grappelli.urls')),

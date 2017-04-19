@@ -7,24 +7,33 @@ from django.contrib.auth.models import *
 class ChangePassword(APIView):
 
     def post(self, request, *args, **kwargs):
-        params = request.DATA if request.DATA else request.DATA
+        params = request.data
+
+        def error_response(error):
+            return Response({
+                'success': error,
+                'message': 'Incorrect Password'
+            },  status=status.HTTP_200_OK)
+
         if request.user.is_authenticated():
-            password = params.get('current_password')
-            user = authenticate(email=request.user.email,
+            print request.user
+            password = params.get('oldPassword')
+            user = authenticate(username=request.user.username,
                                 password=password,
                                 dashboard=True)
             if not user:
-                return Response('error', status.HTTP_400_BAD_REQUEST)
-            new_password = params.get('new_password')
-            confirm_password = params.get('confirm_password')
-
+                return error_response('Incorrect Password')
+            new_password = params.get('newPassword')
+            confirm_password = params.get('confirmPassword')
+            print new_password, confirm_password
             if new_password and new_password == confirm_password:
                 try:
                     user = User.objects.get(username=request.user.username)
                     user.set_password(new_password)
                     user.save()
-                    return Response('success')
-                except:
-                    return Response('error', status.HTTP_400_BAD_REQUEST)
-
-        return Response('error', status.HTTP_400_BAD_REQUEST)
+                    return Response({
+                        'success': True,
+                        'message': 'User Password Changed successfully'
+                    }, status=status.HTTP_200_OK)
+                except Exception, e:
+                    return error_response(str(e))

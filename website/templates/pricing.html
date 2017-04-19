@@ -28,7 +28,10 @@
             <div class="col-md-6 col-sm-12 col-xs-12 cbp-item prodItem_{{ price.summary.productId }}" style="margin-right: 0px;">
                 <div class="price-box">
                     <div class="price-table">
-                        <h3 class="label">{{price.summary.productName | slice:":16"}}</h3>
+                        <h3 class="label">
+                            <img style="padding-right: 10px"
+                                 src="{{ price.product_item.product_origin.country.flag}}"
+                                 width="30" height="30">{{price.summary.productName | slice:":16"}}</h3>
                         <div class="col-md-6">
                             <p class="price grey">
                                 <span class="time-period">International Market</span>

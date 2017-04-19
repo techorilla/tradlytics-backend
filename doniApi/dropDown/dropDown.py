@@ -33,28 +33,47 @@ class SimpleDropDownAPI(GenericAPIView):
 
 
     def put(self, request, *args, **kwargs):
-        user = request.user
-        id = request.data.get('id')
-        name = request.data.get('name')
-        drop_down_obj = self.model.objects.get(id=id)
-        drop_down_obj.name = name
-        drop_down_obj.updated_by = user
-        drop_down_obj.updated_at = timezone.now()
-        drop_down_obj.save()
-        return Response({'obj': drop_down_obj.get_list_obj()}, status=status.HTTP_200_OK)
+        try:
+            user = request.user
+            id = request.data.get('id')
+            name = request.data.get('name')
+            drop_down_obj = self.model.objects.get(id=id)
+            drop_down_obj.name = name
+            drop_down_obj.updated_by = user
+            drop_down_obj.updated_at = timezone.now()
+            drop_down_obj.save()
+            return Response({
+                'success': True,
+                'message': 'Dropdown value updated successfully',
+                'obj': drop_down_obj.get_list_obj()
+            }, status=status.HTTP_200_OK)
+        except Exception, e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        user = request.user
-        business = Utilities.get_user_business(user)
-        name = request.data.get('name')
-        drop_down_obj = self.model.objects.create(
-            name=name,
-            created_at=timezone.now(),
-            created_by=user,
-            updated_at=None,
-            business=business
-        )
-        return Response({'obj': drop_down_obj.get_list_obj()}, status=status.HTTP_200_OK)
+        try:
+
+            user = request.user
+            name = request.data.get('name')
+            drop_down_obj = self.model.objects.create(
+                name=name,
+                created_at=timezone.now(),
+                created_by=user,
+                updated_at=None
+            )
+            return Response({
+                'success': True,
+                'message': 'Drop down value added successfully',
+                'obj': drop_down_obj.get_list_obj()
+            }, status=status.HTTP_200_OK)
+        except Exception, e:
+            return Response({
+                'success': False,
+                'message': str(e),
+            }, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
         id = request.data.get('id')

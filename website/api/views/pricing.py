@@ -34,9 +34,7 @@ class PricingDetail(View):
         product_id = query = request.GET.get("id")
         base_url = request.META.get('HTTP_HOST')
         product_item = ProductItem.objects.get(id=product_id)
-
-
         context = {
-            'product_item': product_item
+            'productItem': product_item
         }
         return render(request, self.template_name, context)
