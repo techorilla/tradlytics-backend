@@ -78,12 +78,19 @@ class BlogAPI(GenericAPIView):
             width = research_data.get('width')
             research_content = research_data.get('content')
             if research_id:
+
                 success_message = self.messages['successPUT']
+
                 research = Post.objects.get(id=research_id)
+                print 'herre'
                 research.updated = dt.now()
+
                 if research.image and research_image:
-                    path = Utilities.get_media_directory() + '/' + str(research.image)
-                    os.remove(path)
+                    try:
+                        path = Utilities.get_media_directory() + '/' + str(research.image)
+                        os.remove(path)
+                    except:
+                        pass
             else:
                 research = Post()
                 success_message = self.messages['successPOST']
@@ -128,8 +135,11 @@ class BlogAPI(GenericAPIView):
             research_id = kwargs.get('research_id')
             research = Post.objects.get(id=research_id)
             if research.image:
-                path = Utilities.get_media_directory() + '/' + str(research.image)
-                os.remove(path)
+                try:
+                    path = Utilities.get_media_directory() + '/' + str(research.image)
+                    os.remove(path)
+                except:
+                    pass
 
             if (research.user == user) or user.is_superuser:
                 research.delete()

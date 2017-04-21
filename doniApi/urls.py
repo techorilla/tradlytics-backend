@@ -13,9 +13,11 @@ urlpatterns = (
     url(r"login/$", LoginAPI.as_view(), {"public_api": True}, name="login"),
     url(r"logout/$", LogOutAPI.as_view(), name="logout"),
 
-    url(r"^get_google_access_token/$", GetGoogleAccessTokenAPI.as_view(), name='Google_Access_Token'),
+    url(r"^auth/google_analytics/$", GetGoogleAccessTokenAPI.as_view(), name='Google_Access_Token'),
 
     url(r'^dashboard/$', MainDashboardAPI.as_view(), name='Main_Dashboard_API'),
+
+    url(r'website/dashboard/$', WebsiteDashboardAPI.as_view(), name='Website_Dashboard_API'),
 
     url(r'^website/research/display/$', BlogDisplayAPI.as_view(), name='Blogs_API'),
 
