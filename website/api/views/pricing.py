@@ -13,7 +13,7 @@ class PricingPage(View):
         base_url = request.META.get('HTTP_HOST')
         last_summary_date = PriceSummary.objects.all().aggregate(Max('summary_on'))
         last_summary_date = last_summary_date.get('summary_on__max')
-        price_summary = PriceSummary.objects.filter(summary_on=last_summary_date) \
+        price_summary = PriceSummary.objects.filter(summary_on=last_summary_date, product_item__price_on_website=True) \
             .order_by('product_item__product_origin__product__name')
         all_products = Products.objects.all()
 

@@ -175,6 +175,10 @@ urlpatterns = (
         ProductItemAPI.as_view(),
         name='Products_Item_API'),
 
+    url(r'^product_item/price_on_website/$',
+        ProductItemPriceOnWebsiteAPI.as_view(),
+        name='Product_Item_Price_On_Website'),
+
     url(r'^product_item/price_report/$',
         ProductItemPriceReportAPI.as_view(),
         name='Product_Item_Price_Report'),

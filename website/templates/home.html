@@ -2,6 +2,57 @@
 {% load staticfiles %}
 {% block content %}
 
+
+<div class="row price-bar">
+    <div class="col-lg-12 price-legends">
+        <div class="col-lg-4">
+            <div class="legends col-lg-6">
+                <div class="legend-box int"></div>
+                <div>International</div>
+            </div>
+            <div class="legends col-lg-6">
+                <div class="legend-box local"></div>
+                <div>Local</div>
+            </div>
+        </div>
+        <div class="col-lg-offset-2 col-lg-4">
+            <div class="metric">
+                <span>PKR/Kg</span>
+                <span class="active">USD/PMT</span>
+            </div>
+        </div>
+    </div>
+    <div class="marquee col-lg-12" data-gap='10'>
+        {% for price in prices %}
+        <span class="product-price-slide-item">
+            <img width="20" height="20" src="{{price.originFlag}}">
+            <p class="productCountry">{{price.origin}}</p>
+            <p class="productCode"><a href="{% url 'web:pricing_detail' %}?id={{price.id }}">{{price.productCode}}</a></p>
+            <p class="productPrice international">{{price.currency}} {{price.lastPrice}}</p>
+            {% if price.change > 0 %}
+            <p class="productChange"><i class="fa fa-caret-up"></i></p>
+            {% endif %}
+            {% if price.change < 0 %}
+            <p class="productChange"><i class="fa fa-caret-down"></i></p>
+            {% endif %}
+            {% if price.change == 0 %}
+            <p class="productChange"><i class="fa fa-minus"></i></p>
+            {% endif %}
+            <p class="productPrice local">PKR {{price.lastPrice}}</p>
+            {% if price.change > 0 %}
+            <p class="productChange"><i class="fa fa-caret-up"></i></p>
+            {% endif %}
+            {% if price.change < 0 %}
+            <p class="productChange"><i class="fa fa-caret-down"></i></p>
+            {% endif %}
+            {% if price.change == 0 %}
+            <p class="productChange"><i class="fa fa-minus"></i></p>
+            {% endif %}
+        </span>
+        {% endfor %}
+    </div>
+</div>
+
 <!-- Start Home Revolution Slider Parallax Section -->
 <section id="home-revolution-slider">
     <div class="hero">
@@ -406,82 +457,38 @@
 
 {% block marquee %}
 <!-- End Header -->
-<div class="col-lg-12 price-bar hidden-sm hidden-xs international-bar">
-    <div class="col-lg-1" style="">
-        <p class="product-item">International</p>
-    </div>
-    <div class="col-lg-11">
-        <marquee scrolldelay="1" id="InternationalPrices">
-        </marquee>
-    </div>
+<!--<div class="col-lg-12 hidden-sm hidden-xs international-bar">-->
+<!--</div>-->
+<!--<div class="col-lg-12 hidden-sm hidden-xs local-bar price-bar">-->
+<!--<div class="col-lg-1">-->
+<!--<p class="product-item">Local PKT</p>-->
+<!--</div>-->
+<!--<div class="col-lg-11">-->
+<!--<marquee scrolldelay="1" id="LocalPrices">-->
+<!--</marquee>-->
 
-</div>
-<div class="col-lg-12 hidden-sm hidden-xs local-bar price-bar">
-    <div class="col-lg-1">
-        <p class="product-item">Local PKT</p>
-    </div>
-    <div class="col-lg-11">
-        <marquee scrolldelay="1" id="LocalPrices">
-        </marquee>
+<!--</div>-->
 
-    </div>
-
-</div>
+<!--</div>-->
 {% endblock %}
 
 {% block extrajs %}
+<!--<script src='{% static "js/marque.js" %}'></script>-->
 <script>
 
-    (function(){
-        var hostname = window.location.hostname;
-        var port = window.location.port;
-        var domain = ( port == "") ? hostname : hostname + ':' + port;
-        var apiUrl = 'http://'+domain+'/api/website/pricing/banner/';
-        $.ajax({
-            url: apiUrl,
-            type: 'GET',
-            success: function(res) {
-                var internationalPrice = res.internationalPrice;
-                var localPrice = res.localPrice;
-                function setPrices(elementId, priceList){
-                    var divAppend = document.getElementById(elementId);
-                    var width = 400*priceList.length;
-                    divAppend.style.width = width.toString()+'px';
-                    for(var price in priceList){
-                        var div = document.createElement('div');
-                        var priceItem = priceList[price];
-                        div.className = 'price-item';
-                        div.innerHTML = '<img style="padding-top:6px;" src="'+priceItem.originFlag+'" width="20" height="20"><p class="product-item">'+ priceItem.origin+ ' ' +priceItem.productCode+'</p>';
-                        div.innerHTML = div.innerHTML + '<p class="product-item">'+ priceItem.keywords +'</p>';
-                        div.innerHTML = div.innerHTML + '<p class="product-price">'+ priceItem.currency+' '+ priceItem.lastPrice +'</p>';
 
-
-                        if(priceItem.priceChange > 0){
-                            div.innerHTML = div.innerHTML + '<span class="product-change"><i class="fa fa-caret-up"></i></span>';
-                        }
-                        else if(priceItem.priceChange < 0){
-                            div.innerHTML = div.innerHTML + '<span class="product-change"><i class="fa fa-caret-down"></i></span>';
-                        }
-                        else{
-                            div.innerHTML = div.innerHTML + '<span class="product-change"><i class="fa fa-minus"></i></span>';
-                        }
-
-                        divAppend.appendChild(div);
-                    }
-
-                }
-                setPrices('InternationalPrices', internationalPrice);
-                setPrices('LocalPrices', localPrice);
-                console.log(internationalPrice.length);
-                console.log(localPrice.length);
-
-
-            }
+    $(window).load(function() {
+        console.log(screen)
+        $('.marquee').marquee({
+            pauseOnHover: true,
+            duplicated: true,
+            delayBeforeStart: 200,
+            duration: 10000,
         });
-    }());
+    });
 
     $('nav').removeClass("navbar-small");
-     $('nav').addClass("navbar-top-80px");
+    $('nav').addClass("navbar-top-80px");
     /* -------------------
      Google map
      ---------------------*/
@@ -503,6 +510,10 @@
                     icon: '{% static "img/assets/marker.png" %}'
                 });
     }
+
+
+
+
 
 </script>
 {%  endblock %}

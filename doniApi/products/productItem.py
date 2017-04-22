@@ -4,6 +4,34 @@ from doniServer.models import ProductItem, ProductKeyword, ProductOrigin
 from django_countries.fields import Country
 import traceback
 
+class ProductItemPriceOnWebsiteAPI(GenericAPIView):
+
+    def post(self, request, *args, ** kwargs):
+        try:
+            data = request.data
+            product_item_id = data.get('productItemId')
+            product_on_website = data.get('priceOnWebsite')
+            product_item = ProductItem.objects.get(id=product_item_id)
+            product_item.price_on_website=product_on_website
+            product_item.save()
+            product_name = product_item.product_origin.product.name
+            product_country = product_item.product_origin.country.name
+            product_keyword_str = product_item.keyword_str
+            if product_on_website:
+                message = 'Product %s  %s from %s price is now being displayed on website.'
+            else:
+                message = 'Product %s  %s from %s price is removed from website.'
+            return Response({
+                'success': True,
+                'message': message % (product_name, product_keyword_str, product_country)
+            }, status=status.HTTP_200_OK)
+        except Exception, e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            }, status=status.HTTP_200_OK)
+
+
 
 class ProductItemAPI(GenericAPIView):
 

@@ -24,3 +24,13 @@ class BusinessSettingsAPI(GenericAPIView):
                 'success': False,
                 'message': str(e)
             })
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        business = user.profile.business
+        business_obj = dict()
+        business_obj['website'] = business.bp_website
+        return Response({
+          'success': True,
+          'business': business_obj
+        })

@@ -11,6 +11,7 @@ from django.contrib import admin
 class ProductItem(models.Model):
     keywords = models.ManyToManyField(ProductKeyword, related_name='product_items')
     product_origin = models.ForeignKey(ProductOrigin, null=True, blank=False, related_name='origin_product_item')
+    price_on_website = models.BooleanField(default=False)
     database_ids = models.CharField(max_length=250, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
@@ -50,7 +51,7 @@ class ProductItem(models.Model):
                 percentange_change = 'NA'
             return {
                 'id': self.id,
-                'productCode': self.product_origin.product.product_code,
+                'productCode': self.product_origin.product.product_code if self.product_origin.product.product_code else self.product_origin.product.name,
                 'origin': self.product_origin.country.code,
                 'originFlag': self.product_origin.country.flag,
                 'name': self.product_origin.product.name,
@@ -168,6 +169,7 @@ class ProductItem(models.Model):
             'productId': self.product_origin.product.id,
             'productName': self.product_origin.product.name,
             'databaseIds': self.database_ids,
+            'priceOnWebsite': self.price_on_website,
             'origin': self.product_origin.country.code.upper(),
             'productOriginName': self.product_origin.country.name,
             'productOriginFlag': self.product_origin.country.flag,

@@ -42,6 +42,7 @@ class Products(models.Model):
                 'onWebsite': self.on_website,
                 'id': self.id,
                 'name': self.name,
+                'productCode': self.product_code,
                 'image': self.get_product_image(base_url),
                 'description': self.description,
                 'categoryId': self.category.id if self.category else None,

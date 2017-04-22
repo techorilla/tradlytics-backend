@@ -624,7 +624,7 @@ nav {
 }
 
 .navbar-top-80px{
-    top:80px !important;
+    top:70px !important;
 }
 .navbar-default {
     top: 0;
@@ -3620,78 +3620,128 @@ pre {
 
 .marquee {
   overflow: hidden;
-  border-bottom: 1px solid #000;
-  -webkit-box-shadow: inset 0px 2px 2px rgba(0, 0, 0, .5), 0px 1px 0px rgba(250, 250, 250, .2);
-  box-shadow: inset 0px 2px 2px rgba(0, 0, 0, .5), 0px 1px 0px rgba(250, 250, 250, .2);
+    height: 40px;
+    width: 1660px;
+    margin-top: 20px;
 }
 .international-bar{
-    top: 0 !important;
-    background: #1C1513;
+    height: 60px;
 }
 
-.local-bar{
-    top: 40px !important;
-    background: #716F6E;
+.price-options{
+    height:20px
 }
 
 .price-bar{
-    height: 40px;
+    padding-left: 30px;
+    padding-right: 30px;
+    top: 0 !important;
+    background: #1C1513;
     z-index: 100;
     position: fixed;
-
 }
 
-.international-bar * .product-change{
-    border-right: 1px dashed #000000;
+.product-price-slide-item{
+    float:left;
+    padding-left: 20px;
+    padding-right: 20px
 }
 
-.local-bar * .product-change{
-    border-right: 1px dashed rgba(86, 86, 86, 0.32);
-}
-
-.price-bar .price-item{
-    height: 100%;
-    max-width: 600px;
-}
-
-.price-bar *{
+.product-price-slide-item *{
     float: left;
-    height: auto;
-    display: block;
-    padding-top:4px;
 }
 
-.price-bar * *{
-    padding: 3px;
-
-}
-
-.price-bar * .product-price{
-    color: #F6F6F6;
-    font-weight: 700;
-}
-
-
-
-
-
-
-.price-bar * .product-change .fa-caret-down{
-    color:red;
-    padding-top:1px;
+.product-price-slide-item .productCode a{
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
 
 }
 
-
-.price-bar * .product-change .fa-caret-up{
-    color:greenyellow;
+.product-price-slide-item .productPrice.international{
+   color: #21B799;
 }
 
-.price-bar * .product-item{
-    color: #ffffff;
+.product-price-slide-item .productPrice.local{
+   color: orange;
+}
+
+.product-price-slide-item .productChange .fa{
+
+    font-size: 20px;
+}
+
+.product-price-slide-item .productChange .fa-caret-up{
+     padding-top: 0px;
+    color: yellowgreen;
+}
+
+.product-price-slide-item .productChange .fa-caret-down{
+    color: red;
+     padding-top: 2px;
+}
+
+.product-price-slide-item .productChange .fa-minus{
+    color: gray;
+}
+
+.product-price-slide-item *{
+    padding-left: 10px;
+}
+
+.price-legends{
+    color: white;
+    height: 20px;
+    padding-top:10px;
+}
+
+.price-legends .legends{
+    float: left;
+    padding-top: 2px;
+    padding-right: 2px;
+}
+
+.price-legends .legends .legend-box{
+    width: 15px;
+    height: 15px;
+    float:left;
+    border: 1px solid gray;
+    margin-right:10px;
+}
+
+.price-legends .legends .legend-box.int{
+   background: #21B799;
+}
+
+.price-legends .legends .legend-box.local{
+    background: orange;
+}
+
+.price-legends .metric{
+    text-align: right;
+}
+
+.price-legends .metric span{
+    padding-left:5px;
+    padding-right:5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border: 1px solid gray;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
     font-weight: bold;
 }
 
+.price-legends .metric span.active{
+    background: #E20A16;
+    font-size: 13px;
+    font-weight: bolder;
+}
+
+.price-legends .metric span:hover{
+    background: rgba(128, 128, 128, 0.16);
+}
 
 
 
