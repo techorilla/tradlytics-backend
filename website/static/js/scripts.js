@@ -169,9 +169,15 @@
         if(window.location.pathname === '/'){
             if ($(this).scrollTop() > 5){
                 $('nav').addClass("navbar-small");
+                $('.price-legends').addClass('no-display');
+                $('.marquee').addClass('margin-10px');
+                $('.price-bar').addClass('small');
             }
             else{
                 $('nav').removeClass("navbar-small")
+                $('.price-legends').removeClass('no-display');
+                $('.marquee').removeClass('margin-10px');
+                $('.price-bar').removeClass('small');
             }
         }
 

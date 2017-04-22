@@ -5,48 +5,47 @@
 
 <div class="row price-bar">
     <div class="col-lg-12 price-legends">
-        <div class="col-lg-4">
-            <div class="legends col-lg-6">
-                <div class="legend-box int"></div>
-                <div>International</div>
+        <div class="col-lg-4 col-sm-12">
+            <div class="legends">
+                <div class="int">International Price</div>
             </div>
-            <div class="legends col-lg-6">
-                <div class="legend-box local"></div>
-                <div>Local</div>
+            <div class="legends">
+                <div class="local">Local Price</div>
             </div>
         </div>
-        <div class="col-lg-offset-2 col-lg-4">
+        <div class="col-lg-offset-3 col-lg-4 col-sm-12">
             <div class="metric">
-                <span>PKR/Kg</span>
-                <span class="active">USD/PMT</span>
+                Convert All Prices To
+                <span>Rs/kg</span>
+                <span class="active">US$/Pmt</span>
             </div>
         </div>
     </div>
     <div class="marquee col-lg-12" data-gap='10'>
         {% for price in prices %}
         <span class="product-price-slide-item">
-            <img width="20" height="20" src="{{price.originFlag}}">
+            <img width="25" height="20" src="{{price.originFlag}}">
             <p class="productCountry">{{price.origin}}</p>
             <p class="productCode"><a href="{% url 'web:pricing_detail' %}?id={{price.id }}">{{price.productCode}}</a></p>
             <p class="productPrice international">{{price.currency}} {{price.lastPrice}}</p>
             {% if price.change > 0 %}
-            <p class="productChange"><i class="fa fa-caret-up"></i></p>
+            <p class="productChange no-padding"><i class="fa fa-caret-up"></i></p>
             {% endif %}
             {% if price.change < 0 %}
-            <p class="productChange"><i class="fa fa-caret-down"></i></p>
+            <p class="productChange no-padding"><i class="fa fa-caret-down"></i></p>
             {% endif %}
             {% if price.change == 0 %}
-            <p class="productChange"><i class="fa fa-minus"></i></p>
+            <p class="productChange no-padding"><i class="fa fa-minus"></i></p>
             {% endif %}
             <p class="productPrice local">PKR {{price.lastPrice}}</p>
             {% if price.change > 0 %}
-            <p class="productChange"><i class="fa fa-caret-up"></i></p>
+            <p class="productChange no-padding"><i class="fa fa-caret-up"></i></p>
             {% endif %}
             {% if price.change < 0 %}
-            <p class="productChange"><i class="fa fa-caret-down"></i></p>
+            <p class="productChange no-padding"><i class="fa fa-caret-down"></i></p>
             {% endif %}
             {% if price.change == 0 %}
-            <p class="productChange"><i class="fa fa-minus"></i></p>
+            <p class="productChange no-padding"><i class="fa fa-minus"></i></p>
             {% endif %}
         </span>
         {% endfor %}
@@ -482,8 +481,8 @@
         $('.marquee').marquee({
             pauseOnHover: true,
             duplicated: true,
-            delayBeforeStart: 200,
-            duration: 10000,
+            delayBeforeStart: 100,
+            duration: 20000
         });
     });
 

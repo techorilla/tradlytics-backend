@@ -624,10 +624,11 @@ nav {
 }
 
 .navbar-top-80px{
-    top:70px !important;
+    top:60px;
+
 }
 .navbar-default {
-    top: 0;
+    top: 60px;
     position: fixed;
     background-color: #fff;
     border-radius: 0;
@@ -636,13 +637,14 @@ nav {
     left: 0;
     width: 100%;
     padding: 0;
-    z-index: 4;
+    z-index: 101;
     /*border-bottom: 1px solid rgba(255,255,255,0.25);*/
 }
 .navbar-alt {
     background-color: transparent;
 }
 .navbar-small {
+    top: 40px;
     background: #fff;
     -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
     -moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.15);
@@ -1879,9 +1881,9 @@ blockquote strong {
     padding-bottom: 75px;
 }
 /*@media (max-width:992px) {*/
-    /*#price-list {*/
-        /*display: none;*/
-    /*}*/
+/*#price-list {*/
+/*display: none;*/
+/*}*/
 /*}*/
 .price-list-box {
     padding-left: 7px;
@@ -2010,13 +2012,13 @@ blockquote strong {
 }
 
 /*.price-box:hover {*/
-    /*padding-top: 0px;*/
-    /*padding-bottom: 0px;*/
+/*padding-top: 0px;*/
+/*padding-bottom: 0px;*/
 
-    /*box-shadow: 0px 0px 13px rgba(255,255,255,.4);*/
-    /*-moz-box-shadow: 0px 0px 13px rgba(255,255,255,.4);*/
-    /*-webkit-box-shadow: 0px 0px 13px rgba(255,255,255,.4);*/
-    /*-o-box-shadow: 0px 0px 13px rgba(255,255,255,.4);*/
+/*box-shadow: 0px 0px 13px rgba(255,255,255,.4);*/
+/*-moz-box-shadow: 0px 0px 13px rgba(255,255,255,.4);*/
+/*-webkit-box-shadow: 0px 0px 13px rgba(255,255,255,.4);*/
+/*-o-box-shadow: 0px 0px 13px rgba(255,255,255,.4);*/
 /*}*/
 .featured .price-table .price {
     padding: 30px 0;
@@ -3619,11 +3621,16 @@ pre {
 }
 
 .marquee {
-  overflow: hidden;
-    height: 40px;
+    overflow: hidden;
+    height: 30px;
     width: 1660px;
-    margin-top: 20px;
+    margin-top: 18px;
 }
+
+.marquee.margin-10px{
+    margin-top: 10px !important;
+}
+
 .international-bar{
     height: 60px;
 }
@@ -3636,9 +3643,13 @@ pre {
     padding-left: 30px;
     padding-right: 30px;
     top: 0 !important;
-    background: #1C1513;
+    background: rgba(28, 21, 19, 0.75);
     z-index: 100;
     position: fixed;
+}
+
+.price-bar.small{
+    background: rgba(28, 21, 19, 0.90);
 }
 
 .product-price-slide-item{
@@ -3651,6 +3662,10 @@ pre {
     float: left;
 }
 
+.product-price-slide-item .no-padding{
+    padding-left: 0px !important;
+}
+
 .product-price-slide-item .productCode a{
     color: white;
     font-weight: bold;
@@ -3658,27 +3673,41 @@ pre {
 
 }
 
+.product-price-slide-item .productPrice{
+    font-weight: bold;
+}
+
 .product-price-slide-item .productPrice.international{
-   color: #21B799;
+    color: #2C9BFF;
 }
 
 .product-price-slide-item .productPrice.local{
-   color: orange;
+    color: #0aec92;
+}
+
+.product-price-slide-item img{
+    margin-top: 0px;
+}
+
+.product-price-slide-item .productCountry{
+    font-weight: bold;
+    color: #c1bdbd;
 }
 
 .product-price-slide-item .productChange .fa{
-
+    padding-left: 5px !important;
+    padding-right: 10px !important;
     font-size: 20px;
 }
 
 .product-price-slide-item .productChange .fa-caret-up{
-     padding-top: 0px;
+    padding-top: 0px;
     color: yellowgreen;
 }
 
 .product-price-slide-item .productChange .fa-caret-down{
     color: red;
-     padding-top: 2px;
+    padding-top: 2px;
 }
 
 .product-price-slide-item .productChange .fa-minus{
@@ -3702,26 +3731,34 @@ pre {
 }
 
 .price-legends .legends .legend-box{
-    width: 15px;
-    height: 15px;
+    width: 20px;
+    height: 12px;
+    margin-top: 4px;
     float:left;
     border: 1px solid gray;
     margin-right:10px;
 }
 
-.price-legends .legends .legend-box.int{
-   background: #21B799;
+.price-legends .legends .int{
+    color: #2C9BFF;
+    font-weight: bold;
 }
 
-.price-legends .legends .legend-box.local{
-    background: orange;
+.price-legends .legends .local{
+    color: #0aec92;
+    font-weight: bold;
+    margin-left: 25px;
+
 }
 
 .price-legends .metric{
+    font-size: 11px;
+    font-weight: bold;
     text-align: right;
 }
 
 .price-legends .metric span{
+    margin-left: 10px;
     padding-left:5px;
     padding-right:5px;
     padding-top: 2px;
@@ -3741,6 +3778,14 @@ pre {
 
 .price-legends .metric span:hover{
     background: rgba(128, 128, 128, 0.16);
+}
+
+.price-legends.no-display{
+    display: none;
+}
+
+.price-legends.display{
+    display: block;
 }
 
 
