@@ -37,3 +37,4 @@ DATABASES = {
         'PASSWORD': MYSQL_PASSWORD,
     }
 }
+

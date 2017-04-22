@@ -12,15 +12,15 @@ class WebsiteDashboardAPI(GenericAPIView):
         user = request.user
         business = user.profile.business
         googe_analytics_connected = business.ga_token.exists()
-        ga_token = business.ga_token.all().order_by('-created')[0]
-        expiry = ga_token.data.get('token_expiry')
-        expiry_date = dateutil.parser.parse(expiry)
-        expiry_date = expiry_date.replace(tzinfo=pytz.UTC)
-        is_expired = (dt.now(pytz.utc) > expiry_date)
-        print is_expired
-        if is_expired:
-            ga_token.delete()
-            googe_analytics_connected = False
+        if googe_analytics_connected:
+            ga_token = business.ga_token.all().order_by('-created')[0]
+            expiry = ga_token.data.get('token_expiry')
+            expiry_date = dateutil.parser.parse(expiry)
+            expiry_date = expiry_date.replace(tzinfo=pytz.UTC)
+            is_expired = (dt.now(pytz.utc) > expiry_date)
+            if is_expired:
+                ga_token.delete()
+                googe_analytics_connected = False
         dashboard_data = dict()
         dashboard_data['googleAnalyticsConnected'] = googe_analytics_connected
         if googe_analytics_connected and not is_expired:

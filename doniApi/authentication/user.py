@@ -22,8 +22,11 @@ class UserProfilePicAPI(GenericAPIView):
         user_profile = UserProfile.objects.get(user__id=user_id)
 
         if user_profile.profile_pic:
-            path = Utilities.get_media_directory()+'/'+str(user_profile.profile_pic)
-            os.remove(path)
+            try:
+                path = Utilities.get_media_directory()+'/'+str(user_profile.profile_pic)
+                os.remove(path)
+            except OSError:
+                pass
         user_profile.profile_pic = pic
         user_profile.save()
         print user_profile.__dict__

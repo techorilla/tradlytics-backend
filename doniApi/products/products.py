@@ -49,7 +49,6 @@ class ProductOnWebsiteAPI(GenericAPIView):
         try:
             print request.data
             product_id = request.data.get('productId')
-            print product_id
             status = request.data.get('status')
             product = Products.objects.get(id=product_id)
             product.on_website = status

@@ -43,6 +43,10 @@ urlpatterns = (
 
     # Business Partner Related API
 
+    url(r'business/self/$',
+        BusinessSettingsAPI.as_view(),
+        name='Self_Business'),
+
     url(r'business/list/$',
         BusinessListAPI.as_view(),
         name='Business List'),
