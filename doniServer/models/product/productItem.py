@@ -67,6 +67,7 @@ class ProductItem(models.Model):
         else:
             return None
 
+
     @property
     def price_market_summary(self):
         international = self.get_last_two_international_market_rate()

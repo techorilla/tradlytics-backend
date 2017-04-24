@@ -172,9 +172,11 @@
                 $('.price-legends').addClass('no-display');
                 $('.marquee').addClass('margin-10px');
                 $('.price-bar').addClass('small');
+                $('nav').addClass("navbar-top-40px");
             }
             else{
-                $('nav').removeClass("navbar-small")
+                $('nav').removeClass("navbar-top-40px");
+                $('nav').removeClass("navbar-small");
                 $('.price-legends').removeClass('no-display');
                 $('.marquee').removeClass('margin-10px');
                 $('.price-bar').removeClass('small');

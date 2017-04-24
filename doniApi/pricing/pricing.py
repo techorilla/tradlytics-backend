@@ -60,6 +60,7 @@ class ProductItemPricingAPI(GenericAPIView):
         prod_price_item.price_market = price_market
         prod_price_item.price_time = dateutil.parser.parse(price_time)
         prod_price_item.save()
+        PriceSummary.get_price_summary_for_product(product_item)
         return Response({'success': True, 'message': msg, 'obj': prod_price_item.get_obj()}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):

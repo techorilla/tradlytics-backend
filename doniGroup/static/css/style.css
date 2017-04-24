@@ -623,12 +623,15 @@ nav {
     border: none;
 }
 
-.navbar-top-80px{
-    top:60px;
-
+.navbar-top-40px{
+    top:40px !important;
 }
+
+
+
+
 .navbar-default {
-    top: 60px;
+    top: 25px;
     position: fixed;
     background-color: #fff;
     border-radius: 0;
@@ -644,7 +647,7 @@ nav {
     background-color: transparent;
 }
 .navbar-small {
-    top: 40px;
+    top: 0;
     background: #fff;
     -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
     -moz-box-shadow:0 1px 4px rgba(0, 0, 0, 0.15);
