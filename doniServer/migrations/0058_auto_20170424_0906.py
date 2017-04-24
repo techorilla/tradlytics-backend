@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('doniServer', '0057_auto_20170424_0847'),
+        ('doniServer', '0056_pricemetric_kgs'),
     ]
 
     operations = [
