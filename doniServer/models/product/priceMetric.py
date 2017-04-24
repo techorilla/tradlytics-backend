@@ -5,7 +5,7 @@ from django.utils import timezone
 
 class PriceMetric(models.Model):
     metric = models.CharField(max_length=250, unique=True)
-    kgs = models.IntegerField(null=False)
+    kgs = models.IntegerField(null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='price_metric_created_by')
