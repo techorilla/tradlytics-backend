@@ -51,7 +51,8 @@ class ProductItem(models.Model):
         for (product_item, international, local, day_before_int_price, day_before_local_price) in ticker_items:
             item = dict()
             item['name'] = product_item.product_origin.product.name
-            item['productCode'] = product_item.product_origin.product.product_code
+            item['productCode'] = product_item.product_origin.product.product_code if \
+                product_item.product_origin.product.product_code  else product_item.product_origin.product.name
             item['flagUrl'] = product_item.product_origin.country.flag
             item['id'] = product_item.id
             item['country'] = product_item.product_origin.country.code
