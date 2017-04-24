@@ -6,12 +6,15 @@ from django.db import models
 from .priceMarket import PriceMarket
 from django.utils import timezone
 from django.contrib import admin
+from datetime import datetime as dt, timedelta
+
 
 
 class ProductItem(models.Model):
     keywords = models.ManyToManyField(ProductKeyword, related_name='product_items')
     product_origin = models.ForeignKey(ProductOrigin, null=True, blank=False, related_name='origin_product_item')
     price_on_website = models.BooleanField(default=False)
+    import_expense = models.FloatField(default=1.07)
     database_ids = models.CharField(max_length=250, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
@@ -21,10 +24,86 @@ class ProductItem(models.Model):
     class Meta:
         ordering = ('id',)
 
+
+    @classmethod
+    def get_price_ticker(cls):
+        day_before = dt.now() - timedelta(days=1)
+        ticker_products = ProductItem.objects.filter(price_on_website=True).distinct()
+        ticker_items = []
+        for product_item in ticker_products:
+            day_before_local_price = product_item.price_product_item.filter(
+                price_time__startswith=day_before,
+                price_market__origin='PK').order_by('-price_time')
+            local_price = product_item.price_product_item.filter(
+                price_time__startswith=dt.now().date(),
+                price_market__origin='PK').order_by('-price_time')
+            day_before_int_price = product_item.price_product_item.filter(
+                price_time__startswith=day_before,
+                price_market__origin='PK').order_by('-price_time')
+            int_price = product_item.price_product_item.filter(
+                price_time__startswith=dt.now().date(),
+                price_market__origin='int').order_by('-price_time')
+            local_price = None if not local_price.exists() else local_price.first()
+            int_price = None if not int_price.exists() else int_price.first()
+            item = (product_item, int_price, local_price, day_before_int_price, day_before_local_price)
+            ticker_items.append(item)
+        ticker_obj = []
+        for (product_item, international, local, day_before_int_price, day_before_local_price) in ticker_items:
+            item = dict()
+            item['name'] = product_item.product_origin.product.name
+            item['productCode'] = product_item.product_origin.product.product_code
+            item['flagUrl'] = product_item.product_origin.country.flag
+            item['id'] = product_item.id
+            item['country'] = product_item.product_origin.country.code
+            item['keywords'] = product_item.keyword_str
+            item['localPrice'] = 'NA' if not local else '%s %.2f / %s'% (
+                local.price_market.currency,
+                local.current_price,
+                local.price_metric.metric)
+            try:
+                item['localPriceChange'] = float(local.current_price - day_before_local_price.current_price) if day_before_local_price else 0.00
+            except:
+                item['localPriceChange'] = 0.00
+            item['localPrice_pkr_pkg'] = 'NA' if not local else 'Rs %.2f / kg' % local.rs_per_kg
+
+            try:
+                item['localPrice_pkr_pkg_change'] = float(local.rs_per_kg - day_before_local_price.rs_per_kg) if day_before_local_price else 0.00
+            except:
+                item['localPrice_pkr_pkg_change'] = 0.00
+
+            item['localPrice_usd_pmt'] = 'NA' if not local else 'US$ %.2f / MT' % local.usd_per_pmt
+            item['localPrice_usd_pmt_change'] = float(local.usd_per_pmt - day_before_local_price.usd_per_pmt) if day_before_local_price else 0.00
+            item['internationalPrice'] = 'NA' if not international else '%s %s/%s' % (
+                international.price_market.currency,
+                international.current_price,
+                international.price_metric.metric)
+            item['internationalPriceChange'] = float(international.current_price - day_before_int_price.current_price) if day_before_int_price else 0.00
+            item['internationalPrice_pkr_pkg'] = 'NA' if not international else 'Rs %.2f / kg' % international.rs_per_kg
+            try:
+                item['internationalPrice_pkr_pkg_change'] = float(international.rs_per_kg - day_before_int_price.rs_per_kg) if day_before_int_price else 0.00
+            except:
+                item['internationalPrice_pkr_pkg_change'] = 0.00
+
+            item['internationalPrice_usd_pmt'] = 'NA' if not international else 'US$ %.2f / MT' % international.usd_per_pmt
+
+            try:
+                item['internationalPrice_usd_pmt_change'] = float(international.usd_per_pmt - day_before_int_price.usd_per_pmt) if day_before_int_price else 0.00
+            except:
+                item['internationalPrice_usd_pmt_change'] = 0.00
+            ticker_obj.append(item)
+        return ticker_obj
+
+
+
+
+
+
+
     def get_dropdown(self):
         return {
             'id': self.id,
             'name': self.product_origin.product.name,
+            'importExpense': self.import_expense,
             'origin': self.product_origin.country.name,
             'originFlag': self.product_origin.country.flag,
             'keywords': self.keyword_str
@@ -167,6 +246,7 @@ class ProductItem(models.Model):
     def get_obj(self):
         return {
             'id': self.id,
+            'importExpense': self.import_expense,
             'productId': self.product_origin.product.id,
             'productName': self.product_origin.product.name,
             'databaseIds': self.database_ids,

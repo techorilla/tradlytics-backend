@@ -3647,7 +3647,8 @@ pre {
     padding-right: 30px;
     top: 0 !important;
     background: rgba(28, 21, 19, 0.75);
-    z-index: 100;
+    z-index: 105;
+    z-index: 105;
     position: fixed;
 }
 
@@ -3790,6 +3791,8 @@ pre {
 .price-legends.display{
     display: block;
 }
+
+
 
 
 

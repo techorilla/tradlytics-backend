@@ -37,6 +37,7 @@ class ProductItemAPI(GenericAPIView):
 
     def save_product_item(self, data, user, product_item=None, update=False):
         try:
+            import_expense = data.get('importExpense')
             keywords_id = data.get('keywords')
             origin = data.get('origin')
             product_id = int(data.get('productId'))
@@ -46,6 +47,7 @@ class ProductItemAPI(GenericAPIView):
             keywords = ProductKeyword.objects.filter(id__in=keywords_id)
 
             if update:
+                product_item.import_expense = import_expense
                 product_item.updated_by = user
                 product_item.product_origin = product_origin
                 product_item.database_ids = database_ids
@@ -61,6 +63,7 @@ class ProductItemAPI(GenericAPIView):
 
             else:
                 product_item = ProductItem()
+                product_item.import_expense = import_expense
                 product_item.product_origin = product_origin
                 product_item.database_ids = database_ids
                 product_item.created_by = user

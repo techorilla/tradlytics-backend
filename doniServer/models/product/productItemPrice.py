@@ -10,6 +10,26 @@ from dateutil.relativedelta import relativedelta
 import dateutil.parser
 import numpy as np
 import pytz
+from django.contrib.auth.models import *
+from django.conf import settings
+from doniServer.models.exchangeRate import CurrencyExchange
+from django.db.models.signals import pre_save
+
+
+def fix_all_product_item():
+    all_prices = ProductItemPrice.objects.all()
+    for price in all_prices:
+        exchange_rate = CurrencyExchange.objects.filter(exchange_rate_on__startswith=price.price_time.date())\
+            .order_by('-exchange_rate_on').first()
+        if not exchange_rate:
+            exchange_rate = CurrencyExchange.objects.filter(exchange_rate_on__lte=price.price_time)\
+            .order_by('-exchange_rate_on').first()
+        price.current_price = price.get_market_current_price
+        price.rs_per_kg = price.convert_rs_per_kg(exchange_rate.exchange_rate)
+        price.usd_per_pmt = price.convert_usd_per_pmt(exchange_rate.exchange_rate)
+        price.save()
+
+
 
 
 class ProductItemPrice(models.Model):
@@ -19,6 +39,9 @@ class ProductItemPrice(models.Model):
     price_metric = models.ForeignKey(PriceMetric, null=True, related_name='metric_prices')
     price_time = models.DateTimeField(default=timezone.now, db_index=True)
     price_items = JSONField(null=False)
+    rs_per_kg = models.FloatField(null=True)
+    usd_per_pmt = models.FloatField(null=True)
+    current_price = models.FloatField(null=True)
     comments = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
@@ -28,6 +51,33 @@ class ProductItemPrice(models.Model):
     class Meta:
         db_table = 'product_item_price'
         ordering = ('-price_time',)
+
+
+    def convert_rs_per_kg(self, exchange_rate):
+        current_price = self.get_market_current_price
+        metric = self.price_metric
+        kgs = metric.kgs
+        price_pkg = float(current_price)/kgs
+        import_expense = self.product_item.import_expense
+        currency = self.price_market.currency
+        if currency == 'PKR':
+            return float(price_pkg)
+        elif currency == 'USD':
+             return float(price_pkg * exchange_rate * import_expense)
+
+
+    def convert_usd_per_pmt(self, exchange_rate):
+        current_price = self.get_market_current_price
+        metric = self.price_metric
+        kgs = metric.kgs
+        price_pkg = float(current_price)/kgs
+        price_pmt = 1000*price_pkg
+        import_expense = self.product_item.import_expense
+        currency = self.price_market.currency
+        if currency == 'USD':
+            return float(price_pmt)
+        elif currency == 'PKR':
+            return float(float(price_pmt)/float(exchange_rate*import_expense))
 
     def get_weekly_high_low(self):
         week_prices = ProductItemPrice.objects \
@@ -152,7 +202,7 @@ class ProductItemPrice(models.Model):
             'productItemId': self.product_item.id,
             'priceItems': self.price_items,
             'priceMetric': self.price_metric.metric if self.price_metric else None,
-            'priceMetricId': self.price_metric.id if self.price_metric else None,
+            'priceMetricId': self.price_metric.metric if self.price_metric else None,
             'priceTime': self.price_time,
             'comments': self.comments,
             'keywords': self.product_item.keyword_str,
@@ -167,3 +217,14 @@ class ProductItemPrice(models.Model):
             'createdAt': self.created_at
         }
         return price_item
+
+
+
+def pre_save_product_item_price_receiver(sender, instance, *args, **kwargs):
+    exchange_rate = CurrencyExchange.objects.filter(exchange_rate_on__lte=instance.price_time).order_by('-exchange_rate_on').first()
+    instance.current_price = instance.get_market_current_price
+    instance.rs_per_kg = instance.convert_rs_per_kg(exchange_rate.exchange_rate)
+    instance.usd_per_pmt = instance.convert_usd_per_pmt(exchange_rate.exchange_rate)
+
+
+pre_save.connect(pre_save_product_item_price_receiver, sender=ProductItemPrice)

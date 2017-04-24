@@ -16,37 +16,81 @@
         <div class="col-lg-offset-3 col-lg-4 col-sm-12">
             <div class="metric">
                 Convert All Prices To
-                <span>Rs/kg</span>
-                <span class="active">US$/Pmt</span>
+                <span id="rs_to_kg">Rs/kg</span>
+                <span id="us_pmt">US$/Pmt</span>
             </div>
         </div>
     </div>
     <div class="marquee col-lg-12" data-gap='10'>
-        {% for price in prices %}
+        {% for item in ticker_items %}
         <span class="product-price-slide-item">
-            <img width="25" height="20" src="{{price.originFlag}}">
-            <p class="productCountry">{{price.origin}}</p>
-            <p class="productCode"><a href="{% url 'web:pricing_detail' %}?id={{price.id }}">{{price.productCode}}</a></p>
-            <p class="productPrice international">{{price.currency}} {{price.lastPrice}}</p>
-            {% if price.change > 0 %}
-            <p class="productChange no-padding"><i class="fa fa-caret-up"></i></p>
+            <img width="25" height="20" src="{{item.flagUrl}}">
+            <p class="productCountry">{{item.country}}</p>
+            <p class="productCode"><a href="{% url 'web:pricing_detail' %}?id={{item.id}}">{{item.productCode}} {{item.keywords}}</a></p>
+            <p class="normal-price productPrice international">{{item.internationalPrice}}</p>
+            {% if item.internationalPriceChange > 0 %}
+            <p class="normal-price productChange no-padding">{{item.internationalPriceChange}}<i class="fa fa-caret-up"></i></p>
             {% endif %}
-            {% if price.change < 0 %}
-            <p class="productChange no-padding"><i class="fa fa-caret-down"></i></p>
+            {% if item.internationalPriceChange < 0 %}
+            <p class="normal-price productChange no-padding">{{item.internationalPriceChange}}<i class="fa fa-caret-down"></i></p>
             {% endif %}
-            {% if price.change == 0 %}
-            <p class="productChange no-padding"><i class="fa fa-minus"></i></p>
+            {% if item.internationalPriceChange == 0 %}
+            <p class="normal-price productChange no-padding"><i class="fa fa-minus"></i></p>
             {% endif %}
-            <p class="productPrice local">PKR {{price.lastPrice}}</p>
-            {% if price.change > 0 %}
-            <p class="productChange no-padding"><i class="fa fa-caret-up"></i></p>
+            <p class="normal-price productPrice local">{{item.localPrice}}</p>
+            {% if item.localPriceChange > 0 %}
+            <p class="normal-price productChange no-padding">{{item.localPriceChange}}<i class="fa fa-caret-up"></i></p>
             {% endif %}
-            {% if price.change < 0 %}
-            <p class="productChange no-padding"><i class="fa fa-caret-down"></i></p>
+            {% if item.localPriceChange < 0 %}
+            <p class="normal-price productChange no-padding">{{item.localPriceChange}}<i class="fa fa-caret-down"></i></p>
             {% endif %}
-            {% if price.change == 0 %}
-            <p class="productChange no-padding"><i class="fa fa-minus"></i></p>
+            {% if item.localPriceChange == 0 %}
+            <p class="normal-price productChange no-padding"><i class="fa fa-minus"></i></p>
             {% endif %}
+
+            <p class="usd_pmt-price productPrice international">{{item.internationalPrice_usd_pmt}}</p>
+            {% if item.internationalPrice_usd_pmt_change > 0 %}
+            <p class="usd_pmt-price productChange no-padding">{{item.internationalPrice_usd_pmt_change}}<i class="fa fa-caret-up"></i></p>
+            {% endif %}
+            {% if item.internationalPrice_usd_pmt_change < 0 %}
+            <p class="usd_pmt-price productChange no-padding">{{item.internationalPrice_usd_pmt_change}}<i class="fa fa-caret-down"></i></p>
+            {% endif %}
+            {% if item.internationalPrice_usd_pmt_change == 0 %}
+            <p class="usd_pmt-price productChange no-padding"><i class="fa fa-minus"></i></p>
+            {% endif %}
+            <p class="usd_pmt-price productPrice local">{{item.localPrice_usd_pmt}}</p>
+            {% if item.localPrice_usd_pmt_change > 0 %}
+            <p class="usd_pmt-price productChange no-padding">{{item.localPrice_usd_pmt_change}}<i class="fa fa-caret-up"></i></p>
+            {% endif %}
+            {% if item.localPrice_usd_pmt_change < 0 %}
+            <p class="usd_pmt-price productChange no-padding">{{item.localPrice_usd_pmt_change}}<i class="fa fa-caret-down"></i></p>
+            {% endif %}
+            {% if item.localPrice_usd_pmt_change == 0 %}
+            <p class="usd_pmt-price productChange no-padding"><i class="fa fa-minus"></i></p>
+            {% endif %}
+
+
+            <p class="pkr-pkg-price productPrice international">{{item.internationalPrice_pkr_pkg}}</p>
+            {% if item.internationalPrice_pkr_pkg_change > 0 %}
+            <p class="pkr-pkg-price productChange no-padding">{{item.internationalPrice_pkr_pkg_change}}<i class="fa fa-caret-up"></i></p>
+            {% endif %}
+            {% if item.internationalPrice_pkr_pkg_change < 0 %}
+            <p class="pkr-pkg-price productChange no-padding">{{item.internationalPrice_pkr_pkg_change}}<i class="fa fa-caret-down"></i></p>
+            {% endif %}
+            {% if item.internationalPrice_pkr_pkg_change == 0 %}
+            <p class="pkr-pkg-price productChange no-padding"><i class="fa fa-minus"></i></p>
+            {% endif %}
+            <p class="pkr-pkg-price productPrice local">{{item.localPrice_pkr_pkg}}</p>
+            {% if item.localPrice_pkr_pkg_change > 0 %}
+            <p class="pkr-pkg-price productChange no-padding">{{item.localPrice_pkr_pkg_change}}<i class="fa fa-caret-up"></i></p>
+            {% endif %}
+            {% if item.localPriceChange < 0 %}
+            <p class="pkr-pkg-price productChange no-padding">{{item.localPrice_pkr_pkg_change}}<i class="fa fa-caret-down"></i></p>
+            {% endif %}
+            {% if item.localPrice_pkr_pkg_change == 0 %}
+            <p class="pkr-pkg-price productChange no-padding"><i class="fa fa-minus"></i></p>
+            {% endif %}
+
         </span>
         {% endfor %}
     </div>
@@ -474,16 +518,55 @@
 {% block extrajs %}
 <!--<script src='{% static "js/marque.js" %}'></script>-->
 <script>
-
+    var price_in_pkr_pkg = false;
+    var price_in_usd_pmt = false;
+    $(".usd_pmt-price").addClass("display-none");
+    $(".pkr-pkg-price").addClass("display-none");
 
     $(window).load(function() {
-        console.log(screen)
         $('.marquee').marquee({
             pauseOnHover: true,
             duplicated: true,
             delayBeforeStart: 100,
             duration: 20000
         });
+
+        var pkr_pkg = document.getElementById('rs_to_kg');
+        var usd_pmt = document.getElementById('us_pmt');
+
+        pkr_pkg.onclick = function(){
+            if(price_in_pkr_pkg){
+                price_in_pkr_pkg = false;
+                $(".normal-price").removeClass("display-none");
+                $(".pkr-pkg-price").addClass("display-none");
+            }else {
+                price_in_pkr_pkg = true;
+                price_in_usd_pmt = false;
+                $(".normal-price").addClass("display-none");
+                $(".usd_pmt-price").addClass("display-none");
+                $(".pkr-pkg-price").removeClass("display-none");
+
+                $("#rs_to_kg").addClass("active");
+                $("#us_pmt").removeClass("active");
+            }
+        };
+
+        usd_pmt.onclick = function(){
+            if(price_in_usd_pmt){
+                price_in_usd_pmt = false;
+                $(".normal-price").removeClass("display-none");
+                $(".usd_pmt-price").addClass("display-none");
+            }else{
+                price_in_pkr_pkg = false;
+                price_in_usd_pmt = true;
+                $(".normal-price").addClass("display-none");
+                $(".pkr-pkg-price").addClass("display-none");
+                $(".usd_pmt-price").removeClass("display-none");
+                $("#us_pmt").addClass('active');
+                $("#rs_to_kg").removeClass('active');
+            }
+        };
+
     });
 
     $('nav').removeClass("navbar-small");
