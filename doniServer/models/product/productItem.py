@@ -27,24 +27,31 @@ class ProductItem(models.Model):
 
     @classmethod
     def get_price_ticker(cls):
-        day_before = dt.now() - timedelta(days=1)
+        price_date = dt.now()
+        day_before = price_date - timedelta(days=1)
         ticker_products = ProductItem.objects.filter(price_on_website=True).distinct()
+        price_exists_for_today = product_item.price_product_item.filter(price_time__startswith=price_date.date()).exists()
+        if not price_exists_for_today:
+            price_date = day_before
+            day_before = price_date - timedelta(days=1)
         ticker_items = []
         for product_item in ticker_products:
             day_before_local_price = product_item.price_product_item.filter(
-                price_time__startswith=day_before,
+                price_time__startswith=day_before.date(),
                 price_market__origin='PK').order_by('-price_time')
             local_price = product_item.price_product_item.filter(
-                price_time__startswith=dt.now().date(),
+                price_time__startswith=price_date.date(),
                 price_market__origin='PK').order_by('-price_time')
             day_before_int_price = product_item.price_product_item.filter(
-                price_time__startswith=day_before,
+                price_time__startswith=day_before.date(),
                 price_market__origin='PK').order_by('-price_time')
             int_price = product_item.price_product_item.filter(
-                price_time__startswith=dt.now().date(),
+                price_time__startswith=price_date.date(),
                 price_market__origin='int').order_by('-price_time')
+            day_before_local_price = None if not day_before_local_price.exists() else day_before_local_price.first()
             local_price = None if not local_price.exists() else local_price.first()
             int_price = None if not int_price.exists() else int_price.first()
+            day_before_int_price = None if not day_before_int_price.exists() else day_before_int_price.first()
             item = (product_item, int_price, local_price, day_before_int_price, day_before_local_price)
             ticker_items.append(item)
         ticker_obj = []

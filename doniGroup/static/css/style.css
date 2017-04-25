@@ -3784,6 +3784,10 @@ pre {
     background: rgba(128, 128, 128, 0.16);
 }
 
+.price-legends .metric span.active:hover{
+    background: #E20A16 !important;
+}
+
 .price-legends.no-display{
     display: none;
 }
