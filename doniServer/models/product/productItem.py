@@ -30,7 +30,7 @@ class ProductItem(models.Model):
         price_date = dt.now()
         day_before = price_date - timedelta(days=1)
         ticker_products = ProductItem.objects.filter(price_on_website=True).distinct()
-        price_exists_for_today = product_item.price_product_item.filter(price_time__startswith=price_date.date()).exists()
+        price_exists_for_today = ProductItem.objects.filter(price_product_item__price_time__startswith=price_date.date(), price_on_website=True).exists()
         if not price_exists_for_today:
             price_date = day_before
             day_before = price_date - timedelta(days=1)
