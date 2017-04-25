@@ -185,7 +185,7 @@ class ProductItem(models.Model):
                 int_prev_price = float(second_last_int_price.usd_per_pmt)
                 int_change = float(int_price_val - int_prev_price)
                 int_percentange_change = (int_change/int_prev_price)*100
-            except IndexError, AttributeError:
+            except Exception, e:
                 int_change = 'NA'
                 int_prev_price = 'NA'
                 int_percentange_change = 'NA'
@@ -204,7 +204,7 @@ class ProductItem(models.Model):
                 local_prev_price = float(second_last_local_price.rs_per_kg)
                 local_change = float(local_price_val - local_prev_price)
                 local_percentage_change = (local_change / local_prev_price) * 100
-            except IndexError, AttributeError:
+            except Exception, e:
                 local_change = 'NA'
                 local_prev_price = 'NA'
                 local_percentage_change = 'NA'
