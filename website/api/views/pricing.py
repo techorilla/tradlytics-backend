@@ -17,7 +17,6 @@ class PricingPage(View):
         price_summary = []
 
         for item in all_product_on_website:
-            print item.price_market_summary
             price_summary.append(item.price_market_summary)
 
         context = {
