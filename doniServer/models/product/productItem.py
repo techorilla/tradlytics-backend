@@ -31,6 +31,7 @@ class ProductItem(models.Model):
         day_before = price_date - timedelta(days=1)
         ticker_products = ProductItem.objects.filter(price_on_website=True).distinct()
         price_exists_for_today = ProductItem.objects.filter(price_product_item__price_time__startswith=price_date.date(), price_on_website=True).exists()
+        print price_exists_for_today
         if not price_exists_for_today:
             price_date = day_before
             day_before = price_date - timedelta(days=1)
@@ -44,11 +45,13 @@ class ProductItem(models.Model):
                 price_market__origin='PK').order_by('-price_time')
             day_before_int_price = product_item.price_product_item.filter(
                 price_time__startswith=day_before.date(),
-                price_market__origin='PK').order_by('-price_time')
+                price_market__origin='INT').order_by('-price_time')
             int_price = product_item.price_product_item.filter(
                 price_time__startswith=price_date.date(),
                 price_market__origin='int').order_by('-price_time')
+
             day_before_local_price = None if not day_before_local_price.exists() else day_before_local_price.first()
+            print day_before_local_price, day_before_int_price
             local_price = None if not local_price.exists() else local_price.first()
             int_price = None if not int_price.exists() else int_price.first()
             day_before_int_price = None if not day_before_int_price.exists() else day_before_int_price.first()
@@ -80,7 +83,10 @@ class ProductItem(models.Model):
                 item['localPrice_pkr_pkg_change'] = 0.00
 
             item['localPrice_usd_pmt'] = 'NA' if not local else 'US$ %.2f / MT' % local.usd_per_pmt
-            item['localPrice_usd_pmt_change'] = float(local.usd_per_pmt - day_before_local_price.usd_per_pmt) if day_before_local_price else 0.00
+            try:
+                item['localPrice_usd_pmt_change'] = float(local.usd_per_pmt - day_before_local_price.usd_per_pmt) if day_before_local_price else 0.00
+            except:
+                item['localPrice_usd_pmt_change'] = 0.00
             item['internationalPrice'] = 'NA' if not international else '%s %s/%s' % (
                 international.price_market.currency,
                 international.current_price,
