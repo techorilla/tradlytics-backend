@@ -73,18 +73,20 @@ class ProductItem(models.Model):
                 local.price_metric.metric)
             try:
                 item['localPriceChange'] = float(local.current_price - day_before_local_price.current_price) if day_before_local_price else 0.00
+                item['localPriceChange'] = round(item['localPriceChange'], 2)
             except:
                 item['localPriceChange'] = 0.00
-            item['localPrice_pkr_pkg'] = 'NA' if not local else 'Rs %.2f / kg' % local.rs_per_kg
-
+            item['localPrice_pkr_pkg'] = 'NA' if not local else 'Rs %s / kg' % round(local.rs_per_kg,2)
             try:
                 item['localPrice_pkr_pkg_change'] = float(local.rs_per_kg - day_before_local_price.rs_per_kg) if day_before_local_price else 0.00
+                item['localPrice_pkr_pkg_change'] = round(item['localPrice_pkr_pkg_change'], 2)
             except:
                 item['localPrice_pkr_pkg_change'] = 0.00
 
-            item['localPrice_usd_pmt'] = 'NA' if not local else 'US$ %.2f / MT' % local.usd_per_pmt
+            item['localPrice_usd_pmt'] = 'NA' if not local else 'US$ %s / MT' % round(local.usd_per_pmt, 2)
             try:
                 item['localPrice_usd_pmt_change'] = float(local.usd_per_pmt - day_before_local_price.usd_per_pmt) if day_before_local_price else 0.00
+                item['localPrice_usd_pmt_change'] = round(item['localPrice_usd_pmt_change'], 2)
             except:
                 item['localPrice_usd_pmt_change'] = 0.00
             item['internationalPrice'] = 'NA' if not international else '%s %s/%s' % (
@@ -95,6 +97,7 @@ class ProductItem(models.Model):
             item['internationalPrice_pkr_pkg'] = 'NA' if not international else 'Rs %.2f / kg' % international.rs_per_kg
             try:
                 item['internationalPrice_pkr_pkg_change'] = float(international.rs_per_kg - day_before_int_price.rs_per_kg) if day_before_int_price else 0.00
+                item['internationalPrice_pkr_pkg_change'] = round(item['internationalPrice_pkr_pkg_change'], 2)
             except:
                 item['internationalPrice_pkr_pkg_change'] = 0.00
 
@@ -102,6 +105,7 @@ class ProductItem(models.Model):
 
             try:
                 item['internationalPrice_usd_pmt_change'] = float(international.usd_per_pmt - day_before_int_price.usd_per_pmt) if day_before_int_price else 0.00
+                item['internationalPrice_usd_pmt_change'] = round(item['internationalPrice_usd_pmt_change'], 2)
             except:
                 item['internationalPrice_usd_pmt_change'] = 0.00
             ticker_obj.append(item)

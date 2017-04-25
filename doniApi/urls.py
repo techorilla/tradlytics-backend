@@ -128,8 +128,8 @@ urlpatterns = (
 
     # Product Pricing API
 
-    url(r'website/pricing/banner/$',
-        WebsitePricingAPI.as_view(),
+    url(r'^website/pricing/graph/(?P<product_item_id>[0-9]+)/(?P<start_date>\d{4}-\d{2}-\d{2})/(?P<end_date>\d{4}-\d{2}-\d{2})/$',
+        WebsitePricingGraphAPI.as_view(),
         name='Website_Pricing_API'
         ),
 

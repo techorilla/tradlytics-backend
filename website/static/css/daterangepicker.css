@@ -1,12 +1,14 @@
 #priceReportRange{
-  background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #565656;
+  background: rgba(204, 204, 204, 0.8);
+  cursor: pointer; padding: 5px 10px; border: 1px solid gray;
+  border-radius:5px;
 }
 
 .daterangepicker {
-  background: #ccc;
+  border: 1px solid gray;
+  background: rgba(204, 204, 204, 0.6);
   cursor: pointer;
   padding: 5px 50px;
-  border: 2px solid grey;
   border-radius: 5px;
   position: absolute;
   color: inherit;
@@ -24,7 +26,7 @@
   top: -7px;
   border-right: 7px solid transparent;
   border-left: 7px solid transparent;
-  border-bottom: 7px solid grey; }
+  border-bottom: 7px solid rgba(204, 204, 204, 0.6) }
 .daterangepicker:after {
   top: -6px;
   border-right: 6px solid transparent;

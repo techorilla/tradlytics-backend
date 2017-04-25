@@ -280,7 +280,7 @@ p {
     background-image: url(../img/backgrounds/bg-5.jpg);
 }
 .parallax-section-6 {
-    background-image: url(../img/backgrounds/bg-5.jpg);
+    background-image: url(../img/backgrounds/bg-5.jpg) ;
 }
 .parallax-section-7 {
     background-image: url(../img/backgrounds/bg-7.jpg);
@@ -3698,27 +3698,20 @@ pre {
     color: #c1bdbd;
 }
 
-.product-price-slide-item .productChange{
-    font-size: 10px;
-    color: #b7b2b2;
-    font-weight: bold;
-    padding-top: 0px;
-}
-
 .product-price-slide-item .productChange .fa{
     padding-left: 5px !important;
     padding-right: 10px !important;
-    font-size: 15px;
+    font-size: 20px;
 }
 
 .product-price-slide-item .productChange .fa-caret-up{
-    padding-bottom: 2px;
+    padding-top: 0px;
     color: yellowgreen;
 }
 
 .product-price-slide-item .productChange .fa-caret-down{
     color: red;
-    padding-bottom: 2px;
+    padding-top: 2px;
 }
 
 .product-price-slide-item .productChange .fa-minus{
@@ -3768,7 +3761,7 @@ pre {
     text-align: right;
 }
 
-.price-legends .metric span{
+.price-legends .metric span, .metric-selector span{
     margin-left: 10px;
     padding-left:5px;
     padding-right:5px;
@@ -3781,18 +3774,18 @@ pre {
     font-weight: bold;
 }
 
-.price-legends .metric span.active{
+.price-legends .metric span.active, .metric-selector span.active{
     background: #E20A16;
     font-size: 13px;
     font-weight: bolder;
 }
 
-.price-legends .metric span:hover{
-    background: rgba(128, 128, 128, 0.16);
+.price-legends .metric span.active:hover, .metric-selector span.active:hover{
+    background: #E20A16;
 }
 
-.price-legends .metric span.active:hover{
-    background: #E20A16 !important;
+.price-legends .metric span:hover{
+    background: rgba(128, 128, 128, 0.16);
 }
 
 .price-legends.no-display{
@@ -3801,6 +3794,28 @@ pre {
 
 .price-legends.display{
     display: block;
+}
+
+.metric-selector{
+    text-align: right;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+}
+
+.metric-selector span{
+    background: rgba(204, 204, 204, 0.6);
+}
+
+.metric-selector .active{
+    color: #fff;
+}
+
+#cover {
+    background: url(../img/assets/loader.svg) no-repeat scroll center center rgba(0, 0, 0, 0.80);;
+    position: absolute;
+    height: 100%;
+    width: 100%;
 }
 
 
