@@ -23,40 +23,40 @@
 
 
         <div class="row wow fadeInUp animated" style="visibility: visible;">
-            {% for price in priceSummary %}
-            {% if price.summary.localPrice != 'NA' or price.summary.internationalPrice != 'NA'  %}
-            <div class="col-md-6 col-sm-12 col-xs-12 cbp-item prodItem_{{ price.summary.productId }}" style="margin-right: 0px;">
+            {% for summary in priceSummary %}
+            {% if summary.localPrice != 'NA' or summary.internationalPrice != 'NA'  %}
+            <div class="col-md-6 col-sm-12 col-xs-12 cbp-item prodItem_{{ summary.productItemId }}" style="margin-right: 0px;">
                 <div class="price-box">
                     <div class="price-table">
                         <h3 class="label">
                             <img style="padding-right: 10px"
-                                 src="{{ price.product_item.product_origin.country.flag}}"
-                                 width="30" height="30">{{price.summary.productName | slice:":16"}}</h3>
+                                 src="{{ summary.originFlag }}"
+                                 width="30" height="30">{{summary.productName | slice:":16"}}</h3>
                         <div class="col-md-6">
                             <p class="price grey">
                                 <span class="time-period">International Market</span>
-                                {% if price.summary.internationalPrice != 'NA'  %}
+                                {% if summary.internationalPrice != 'NA'  %}
                                 <sup class="currency">$</sup>
-                                <span class="pricing">{{price.summary.internationalPrice}}</span>
-                                <span class="time-period">per {{price.summary.internationalMetric}}</span>
+                                <span class="pricing">{{summary.internationalPrice}}</span>
+                                <span class="time-period">per {{summary.internationalMetric}}</span>
                                 {% endif %}
-                                {% if price.summary.internationalPrice == 'NA'  %}
-                                <span class="pricing">{{price.summary.internationalPrice}}</span>
+                                {% if summary.internationalPrice == 'NA'  %}
+                                <span class="pricing">{{summary.internationalPrice}}</span>
                                 {% endif %}
                             </p>
 
                             <p class="price grey">
-                                {% if price.summary.internationalChange != 'NA'  %}
+                                {% if summary.internationalChange != 'NA'  %}
                                 <sup class="change-symbol">
-                                    {% if price.summary.internationalChange > 0  %}
+                                    {% if summary.internationalChange > 0  %}
                                     <i class="fa fa-caret-up"></i>
                                     {% endif %}
-                                    {% if price.summary.internationalChange < 0  %}
+                                    {% if summary.internationalChange < 0  %}
                                     <i class="fa fa-caret-down"></i>
                                     {% endif %}
                                 </sup>
-                                <span class="change-number"> $ {{price.summary.internationalChange}}</span>
-                                <span class="">per {{price.summary.internationalMetric}}</span>
+                                <span class="change-number"> $ {{summary.internationalChange}}</span>
+                                <span class="">per {{summary.internationalMetric}}</span>
                                 {% endif %}
                             </p>
 
@@ -64,27 +64,27 @@
                         <div class="col-md-6">
                             <p class="price grey">
                                 <span class="time-period">Pakistan Market</span>
-                                {% if price.summary.localPrice != 'NA'  %}
+                                {% if summary.localPrice != 'NA'  %}
                                 <sup class="currency">PKR</sup>
-                                <span class="pricing">{{price.summary.localPrice}}</span>
-                                <span class="time-period">per {{price.summary.localMetric}}</span>
+                                <span class="pricing">{{summary.localPrice}}</span>
+                                <span class="time-period">per {{summary.localMetric}}</span>
                                 {% endif %}
-                                {% if price.summary.localPrice == 'NA'  %}
-                                <span class="pricing">{{price.summary.localPrice}}</span>
+                                {% if summary.localPrice == 'NA'  %}
+                                <span class="pricing">{{summary.localPrice}}</span>
                                 {% endif %}
                             </p>
                             <p class="price grey">
-                                {% if price.summary.localChange != 'NA'  %}
+                                {% if summary.localChange != 'NA'  %}
                                 <sup class="change-symbol">
-                                    {% if price.summary.localChange > 0  %}
+                                    {% if summary.localChange > 0  %}
                                     <i class="fa fa-caret-up"></i>
                                     {% endif %}
-                                    {% if price.summary.localChange < 0  %}
+                                    {% if summary.localChange < 0  %}
                                     <i class="fa fa-caret-down"></i>
                                     {% endif %}
                                 </sup>
-                                <span class="change-number">PKR {{price.summary.localChange}}</span>
-                                <span class="">per {{price.summary.localMetric}}</span>
+                                <span class="change-number">PKR {{summary.localChange}}</span>
+                                <span class="">per {{summary.localMetric}}</span>
                                 {% endif %}
                             </p>
                         </div>
@@ -93,78 +93,78 @@
                             <p class="features grey">
 
                                 <span class="feature col-md-12">
-                                    {% if price.summary.weeklyInternational.high != 'NA'  %}
-                                    <span class="item col-md-4">$ {{price.summary.weeklyInternational.high}} per {{price.summary.internationalMetric}}</span>
+                                    {% if summary.weeklyInternational.high != 'NA'  %}
+                                    <span class="item col-md-4">$ {{summary.weeklyInternational.high}} per {{summary.internationalMetric}}</span>
                                     {% endif %}
-                                    {% if price.summary.weeklyInternational.high == 'NA'  %}
+                                    {% if summary.weeklyInternational.high == 'NA'  %}
                                     <span class="item col-md-4">NA</span>
                                     {% endif %}
                                     <span class="item col-md-4 heading">Weekly High</span>
-                                    {% if price.summary.weeklyLocal.high != 'NA'  %}
-                                    <span class="item col-md-4">PKR {{price.summary.weeklyLocal.high}} per {{price.summary.localMetric}}</span>
+                                    {% if summary.weeklyLocal.high != 'NA'  %}
+                                    <span class="item col-md-4">PKR {{summary.weeklyLocal.high}} per {{summary.localMetric}}</span>
                                     {% endif %}
-                                    {% if price.summary.weeklyLocal.high == 'NA'  %}
+                                    {% if summary.weeklyLocal.high == 'NA'  %}
                                     <span class="item col-md-4">NA</span>
                                     {% endif %}
                                 </span>
 
                                 <span class="feature col-md-12">
-                                    {% if price.summary.weeklyInternational.low != 'NA'  %}
-                                    <span class="item col-md-4">$ {{price.summary.weeklyInternational.low}} per {{price.summary.internationalMetric}}</span>
+                                    {% if summary.weeklyInternational.low != 'NA'  %}
+                                    <span class="item col-md-4">$ {{summary.weeklyInternational.low}} per {{summary.internationalMetric}}</span>
                                     {% endif %}
-                                    {% if price.summary.weeklyInternational.low == 'NA'  %}
+                                    {% if summary.weeklyInternational.low == 'NA'  %}
                                     <span class="item col-md-4">NA</span>
                                     {% endif %}
                                     <span class="item col-md-4 heading">Weekly Low</span>
-                                    {% if price.summary.weeklyLocal.low != 'NA'  %}
-                                    <span class="item col-md-4">PKR {{price.summary.weeklyLocal.low}} per {{price.summary.localMetric}}</span>
+                                    {% if summary.weeklyLocal.low != 'NA'  %}
+                                    <span class="item col-md-4">PKR {{summary.weeklyLocal.low}} per {{summary.localMetric}}</span>
                                     {% endif %}
-                                    {% if price.summary.weeklyLocal.low == 'NA'  %}
+                                    {% if summary.weeklyLocal.low == 'NA'  %}
                                     <span class="item col-md-4">NA</span>
                                     {% endif %}
                                 </span>
 
 
                                 <span class="feature col-md-12">
-                                    {% if price.summary.monthlyInternational.high != 'NA'  %}
-                                    <span class="item col-md-4">$ {{price.summary.monthlyInternational.high}} per {{price.summary.internationalMetric}}</span>
+                                    {% if summary.monthlyInternational.high != 'NA'  %}
+                                    <span class="item col-md-4">$ {{summary.monthlyInternational.high}} per {{summary.internationalMetric}}</span>
                                     {% endif %}
-                                    {% if price.summary.weeklyInternational.high == 'NA'  %}
+                                    {% if summary.weeklyInternational.high == 'NA'  %}
                                     <span class="item col-md-4">NA</span>
                                     {% endif %}
                                     <span class="item col-md-4 heading">Monthly High</span>
-                                    {% if price.summary.weeklyLocal.high != 'NA'  %}
-                                    <span class="item col-md-4">PKR {{price.summary.monthlyLocal.high}} per {{price.summary.localMetric}}</span>
+                                    {% if summary.weeklyLocal.high != 'NA'  %}
+                                    <span class="item col-md-4">PKR {{summary.monthlyLocal.high}} per {{summary.localMetric}}</span>
                                     {% endif %}
-                                    {% if price.summary.monthlyLocal.high == 'NA'  %}
+                                    {% if summary.monthlyLocal.high == 'NA'  %}
                                     <span class="item col-md-4">NA</span>
                                     {% endif %}
                                 </span>
 
                                 <span class="feature col-md-12">
-                                    {% if price.summary.monthlyInternational.low != 'NA'  %}
-                                    <span class="item col-md-4">$ {{price.summary.monthlyInternational.low}} per {{price.summary.internationalMetric}}</span>
+                                    {% if summary.monthlyInternational.low != 'NA'  %}
+                                    <span class="item col-md-4">$ {{summary.monthlyInternational.low}} per {{summary.internationalMetric}}</span>
                                     {% endif %}
-                                    {% if price.summary.monthlyInternational.low == 'NA'  %}
+                                    {% if summary.monthlyInternational.low == 'NA'  %}
                                     <span class="item col-md-4">NA</span>
                                     {% endif %}
                                     <span class="item col-md-4 heading">Monthly Low</span>
-                                    {% if price.summary.monthlyLocal.low != 'NA'  %}
-                                    <span class="item col-md-4">PKR {{price.summary.monthlyLocal.low}} per {{price.summary.localMetric}}</span>
+                                    {% if summary.monthlyLocal.low != 'NA'  %}
+                                    <span class="item col-md-4">PKR {{summary.monthlyLocal.low}} per {{summary.localMetric}}</span>
                                     {% endif %}
-                                    {% if price.summary.monthlyLocal.low == 'NA'  %}
+                                    {% if summary.monthlyLocal.low == 'NA'  %}
                                     <span class="item col-md-4">NA</span>
                                     {% endif %}
                                 </span>
 
 
                                 <span class="feature col-md-12">
-                                    <span class="date-item col-md-4">{{price.international_price_update_time}}</span>
+                                    <span class="date-item col-md-4">{{summary.intLastUpdated}}</span>
                                     <span class="item col-md-4">Last Updated</span>
-                                    <span class="date-item col-md-4">{{price.local_price_update_time}}</span>
+                                    <span class="date-item col-md-4">{{summary.localLastUpdated}}</span>
                                 </span>
                                 <span class="feature option-button no-border">
-                                    <a href="{% url 'web:pricing_detail' %}?id={{ price.product_item_id }}" class="btn-effect">Detail Market Prices</a>
+                                    <a href="{% url 'web:pricing_detail' %}?id={{ summary.productItemId }}" class="btn-effect">Detail Market Prices</a>
                                 </span>
                             </p>
                         </div>

@@ -31,7 +31,7 @@ class ProductItem(models.Model):
         day_before = price_date - timedelta(days=1)
         ticker_products = ProductItem.objects.filter(price_on_website=True).distinct()
         price_exists_for_today = ProductItem.objects.filter(price_product_item__price_time__startswith=price_date.date(), price_on_website=True).exists()
-        print price_exists_for_today
+
         if not price_exists_for_today:
             price_date = day_before
             day_before = price_date - timedelta(days=1)
@@ -175,92 +175,90 @@ class ProductItem(models.Model):
 
     @property
     def price_market_summary(self):
-        international = self.get_last_two_international_market_rate()
-        local = self.get_last_two_local_market_rate()
-        if international:
-            int_price_obj = international[0]
-            int_price = float(int_price_obj.get_market_current_price)
+        int_price, last_int_price  = self.get_last_two_prices_for_market('INT')
+        local_price, last_local_price = self.get_last_two_prices_for_market('PK')
+
+        if int_price:
+            int_price_val = float(int_price.usd_per_pmt)
             try:
-                second_last_int_price = international[1]
-                int_prev_price = float(second_last_int_price.get_market_current_price)
-                int_change = float(int_price - int_prev_price)
+                second_last_int_price = last_int_price
+                int_prev_price = float(second_last_int_price.usd_per_pmt)
+                int_change = float(int_price_val - int_prev_price)
                 int_percentange_change = (int_change/int_prev_price)*100
             except IndexError:
                 int_change = 'NA'
                 int_prev_price = 'NA'
                 int_percentange_change = 'NA'
+            print int_price, int_prev_price
         else:
-            int_price_obj = None
-            int_price = 'NA'
+            int_price = None
+            int_price_val = 'NA'
             int_change = 'NA'
             int_prev_price = 'NA'
             int_percentange_change = 'NA'
 
-        if local:
-            local_price_obj = local[0]
-            local_price = float(local_price_obj.get_market_current_price)
+        if local_price:
+            local_price_val = float(local_price.rs_per_kg)
             try:
-                second_last_local_price = local[1]
-                local_prev_price = float(second_last_local_price.get_market_current_price)
-                local_change = float(local_price - local_prev_price)
+                second_last_local_price = last_local_price
+                local_prev_price = float(second_last_local_price.rs_per_kg)
+                local_change = float(local_price_val - local_prev_price)
                 local_percentage_change = (local_change / local_prev_price) * 100
             except IndexError:
                 local_change = 'NA'
                 local_prev_price = 'NA'
                 local_percentage_change = 'NA'
         else:
-            local_price_obj = None
-            local_price = 'NA'
+            local_price = None
+            local_price_val = 'NA'
             local_change = 'NA'
             local_prev_price = 'NA'
             local_percentage_change = 'NA'
 
         return {
-            'intlastUpdated': int_price_obj.price_time if int_price_obj else 'NA',
-            'locallastUpdated': local_price_obj.price_time if local_price_obj else 'NA',
+            'intLastUpdated': int_price.price_time if int_price else 'NA',
+            'localLastUpdated': local_price.price_time if local_price else 'NA',
             'productId': self.product_origin.product.id,
             'productItemId': self.id,
             'productOriginName': self.product_origin.country.name,
             'originFlag': self.product_origin.country.flag,
             'productName': self.product_origin.product.name,
             'keywords': self.keyword_str,
-            'localMetric': local_price_obj.price_metric.metric if local_price_obj else 'NA',
-            'internationalMetric': int_price_obj.price_metric.metric if int_price_obj else 'NA',
-            'localCurrency': local_price_obj.price_market.currency if local_price_obj else 'NA',
-            'internationalCurrency': int_price_obj.price_market.currency if int_price_obj else 'NA',
-            'monthLocalChange': local_price_obj.get_monthly_change if local_price_obj else {
+            'localMetric': 'Kg' if local_price else 'NA',
+            'internationalMetric': 'MT' if int_price else 'NA',
+            'localCurrency': 'Rs' if local_price else 'NA',
+            'internationalCurrency': 'US$' if int_price else 'NA',
+            'monthLocalChange': local_price.get_monthly_change if local_price else {
                 'change': 'NA',
                 'percentageChange': 'NA'
             },
-            'weeklyLocal':  local_price_obj.get_weekly_high_low() if local_price_obj else {'high': 'NA', 'low': 'NA'},
-            'weeklyInternational': int_price_obj.get_weekly_high_low() if int_price_obj else {'high': 'NA', 'low': 'NA'},
-            'monthlyLocal': local_price_obj.get_monthly_high_low() if local_price_obj else {'high': 'NA', 'low': 'NA'},
-            'monthlyInternational': int_price_obj.get_monthly_high_low() if int_price_obj else {'high': 'NA', 'low': 'NA'},
-            'internationalPrice': round(int_price, 2) if int_price != 'NA' else int_price,
+            'weeklyLocal':  local_price.get_weekly_high_low() if local_price else {'high': 'NA', 'low': 'NA'},
+            'weeklyInternational': int_price.get_weekly_high_low('rs_per_kg') if int_price else {'high': 'NA', 'low': 'NA'},
+            'monthlyLocal': local_price.get_monthly_high_low('rs_per_kg') if local_price else {'high': 'NA', 'low': 'NA'},
+            'monthlyInternational': int_price.get_monthly_high_low() if int_price else {'high': 'NA', 'low': 'NA'},
+            'internationalPrice': round(int_price_val, 2) if int_price_val != 'NA' else int_price_val,
             'interationalPrevPrice': round(int_prev_price, 2) if int_prev_price !='NA' else int_prev_price,
             'internationalChange': round(int_change, 2) if int_change != 'NA' else int_change,
             'internationalPercentangeChange': round(int_percentange_change, 2) if int_percentange_change!='NA' else int_percentange_change,
-            'localPrice': round(local_price, 2) if local_price != 'NA' else local_price,
+            'localPrice': round(local_price_val, 2) if local_price_val != 'NA' else local_price_val,
             'localPrevPrice': round(local_prev_price, 2) if local_prev_price != 'NA' else local_prev_price,
             'localPercentangeChange': round(local_percentage_change, 2) if local_percentage_change != 'NA' else local_percentage_change,
             'localChange': round(local_change, 2) if local_change != 'NA' else local_change
         }
 
 
-    def get_last_two_international_market_rate(self):
-        international_market = PriceMarket.objects.get(origin='INT')
-        product_price = self.price_product_item.all().filter(price_market=international_market).order_by('price_time')[:2]
-        return product_price
+    def get_last_two_prices_for_market(self, market='INT'):
+        last_price = self.price_product_item.filter(price_market__origin=market).order_by('-price_time').first()
 
-    def get_last_two_local_market_rate(self):
-        local_market = PriceMarket.objects.get(origin='PK', currency='PKR')
-        product_price = self.price_product_item.all().filter(price_market=local_market).order_by('price_time')[:2]
-        return product_price
+        last_price_date = last_price.price_time
+        day_before_date = last_price_date - timedelta(days=1)
+        day_before_last_price = self.price_product_item.filter(price_market__origin=market) \
+            .filter(price_time__startswith=day_before_date.date()).order_by('-price_time').first()
+        return last_price, day_before_last_price
 
     @property
     def keywords_ids(self):
         keywords = self.keywords.all()
-        print keywords
         return [key.id for key in keywords]
 
     @property

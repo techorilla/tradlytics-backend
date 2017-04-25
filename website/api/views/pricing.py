@@ -10,15 +10,17 @@ class PricingPage(View):
     template_name = 'pricing.html'
 
     def get(self, request, *args, **kwargs):
-        base_url = request.META.get('HTTP_HOST')
-        last_summary_date = PriceSummary.objects.all().aggregate(Max('summary_on'))
-        last_summary_date = last_summary_date.get('summary_on__max')
-        price_summary = PriceSummary.objects.filter(summary_on=last_summary_date, product_item__price_on_website=True) \
-            .order_by('product_item__product_origin__product__name')
-        all_products = Products.objects.all()
+
+        all_product_on_website = ProductItem.objects.filter(price_on_website=True).distinct()\
+            .order_by('product_origin__product__name')
+
+        price_summary = []
+
+        for item in all_product_on_website:
+            print item.price_market_summary
+            price_summary.append(item.price_market_summary)
 
         context = {
-            'allProducts': all_products,
             'priceSummary': price_summary
         }
         return render(request, self.template_name, context)

@@ -14,6 +14,7 @@ from django.contrib.auth.models import *
 from django.conf import settings
 from doniServer.models.exchangeRate import CurrencyExchange
 from django.db.models.signals import pre_save
+from django.db.models import Max
 
 
 def fix_all_product_item():
@@ -79,29 +80,49 @@ class ProductItemPrice(models.Model):
         elif currency == 'PKR':
             return float(float(price_pmt)/float(exchange_rate*import_expense))
 
-    def get_weekly_high_low(self):
-        week_prices = ProductItemPrice.objects \
-            .filter(price_time__gte=self.week_before_date_time(weeks=1)) \
-            .filter(price_time__lte=self.price_time) \
-            .filter(price_market=self.price_market) \
-            .filter(product_item=self.product_item)
+    def get_weekly_high_low(self,  metric='usd_per_pmt'):
 
-        week_prices = [float(price.get_market_current_price) for price in week_prices]
+        ids_to_exclude = []
+        found = False
+        while found is False:
+            week_prices = ProductItemPrice.objects \
+                .filter(price_time__gte=self.month_before_date_time(months=1)) \
+                .filter(price_time__lte=self.price_time) \
+                .filter(price_market=self.price_market) \
+                .filter(product_item=self.product_item) \
+                .exclude(id__in=ids_to_exclude) \
+                .order_by('-' + metric)
+
+            week_prices_high = week_prices.first()
+            week_prices_low = week_prices.last()
+
+            found = True
+
         return {
-            'high': round(max(week_prices), 2),
-            'low': round(min(week_prices), 2)
+            'high': round(getattr(week_prices_high, metric), 2),
+            'low': round(getattr(week_prices_low, metric), 2)
         }
 
-    def get_monthly_high_low(self):
-        monthly_prices = ProductItemPrice.objects \
-            .filter(price_time__gte=self.month_before_date_time(months=1)) \
-            .filter(price_time__lte=self.price_time) \
-            .filter(price_market=self.price_market) \
-            .filter(product_item=self.product_item)
-        monthly_prices = [float(price.get_market_current_price) for price in monthly_prices]
+    def get_monthly_high_low(self, metric='usd_per_pmt'):
+        ids_to_exclude=[]
+        found = False
+        while found is False:
+            monthly_prices = ProductItemPrice.objects \
+                .filter(price_time__gte=self.month_before_date_time(months=1)) \
+                .filter(price_time__lte=self.price_time) \
+                .filter(price_market=self.price_market) \
+                .filter(product_item=self.product_item) \
+                .exclude(id__in=ids_to_exclude) \
+                .order_by('-'+metric)
+
+            monthly_prices_high = monthly_prices.first()
+            monthly_prices_low = monthly_prices.last()
+
+            found = True
+
         return {
-            'high': round(max(monthly_prices), 2),
-            'low': round(min(monthly_prices), 2)
+            'high': round(getattr(monthly_prices_high, metric), 2),
+            'low': round(getattr(monthly_prices_low, metric), 2)
         }
 
     def month_before_date_time(self, months):

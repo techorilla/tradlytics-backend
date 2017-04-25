@@ -11,17 +11,8 @@ class WebsitePricingGraphAPI(GenericAPIView):
 
     permission_classes = (AllowAny,)
     authentication_classes = (CsrfExemptSessionAuthentication,)
-    #
-    # {
-    #     "date": "2013-01-17",
-    #     "market1": 74,
-    #     "market2": 78,
-    #     "sales1": 4,
-    #     "sales2": 6
-    # }
 
     def get(self, request, *args, **kwargs):
-        print kwargs
         product_item_id = int(kwargs.get('product_item_id'))
         start_date = kwargs.get('start_date')
         end_date = kwargs.get('end_date')
