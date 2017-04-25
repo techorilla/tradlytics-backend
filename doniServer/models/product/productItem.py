@@ -51,7 +51,6 @@ class ProductItem(models.Model):
                 price_market__origin='int').order_by('-price_time')
 
             day_before_local_price = None if not day_before_local_price.exists() else day_before_local_price.first()
-            print day_before_local_price, day_before_int_price
             local_price = None if not local_price.exists() else local_price.first()
             int_price = None if not int_price.exists() else int_price.first()
             day_before_int_price = None if not day_before_int_price.exists() else day_before_int_price.first()
@@ -84,6 +83,8 @@ class ProductItem(models.Model):
                 item['localPrice_pkr_pkg_change'] = 0.00
 
             item['localPrice_usd_pmt'] = 'NA' if not local else 'US$ %s / MT' % round(local.usd_per_pmt, 2)
+
+
             try:
                 item['localPrice_usd_pmt_change'] = float(local.usd_per_pmt - day_before_local_price.usd_per_pmt) if day_before_local_price else 0.00
                 item['localPrice_usd_pmt_change'] = round(item['localPrice_usd_pmt_change'], 2)
@@ -93,7 +94,14 @@ class ProductItem(models.Model):
                 international.price_market.currency,
                 international.current_price,
                 international.price_metric.metric)
-            item['internationalPriceChange'] = float(international.current_price - day_before_int_price.current_price) if day_before_int_price else 0.00
+
+            try:
+                item['internationalPriceChange'] = float(international.current_price - day_before_int_price.current_price) if day_before_int_price else 0.00
+            except AttributeError:
+                item['internationalPriceChange'] = 0.00
+
+
+
             item['internationalPrice_pkr_pkg'] = 'NA' if not international else 'Rs %.2f / kg' % international.rs_per_kg
             try:
                 item['internationalPrice_pkr_pkg_change'] = float(international.rs_per_kg - day_before_int_price.rs_per_kg) if day_before_int_price else 0.00
