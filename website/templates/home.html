@@ -29,20 +29,20 @@
             <p class="productCode"><a href="{% url 'web:pricing_detail' %}?id={{item.id}}">{{item.productCode}} {{item.keywords}}</a></p>
             <p class="normal-price productPrice international">{{item.internationalPrice}}</p>
             {% if item.internationalPriceChange > 0 %}
-            <p class="normal-price productChange no-padding">{{item.internationalPriceChange}}<i class="fa fa-caret-up"></i></p>
+            <p class="normal-price productChange no-padding"><i class="fa fa-caret-up"></i></p>
             {% endif %}
             {% if item.internationalPriceChange < 0 %}
-            <p class="normal-price productChange no-padding">{{item.internationalPriceChange}}<i class="fa fa-caret-down"></i></p>
+            <p class="normal-price productChange no-padding"><i class="fa fa-caret-down"></i></p>
             {% endif %}
             {% if item.internationalPriceChange == 0 %}
             <p class="normal-price productChange no-padding"><i class="fa fa-minus"></i></p>
             {% endif %}
             <p class="normal-price productPrice local">{{item.localPrice}}</p>
             {% if item.localPriceChange > 0 %}
-            <p class="normal-price productChange no-padding">{{item.localPriceChange}}<i class="fa fa-caret-up"></i></p>
+            <p class="normal-price productChange no-padding"><i class="fa fa-caret-up"></i></p>
             {% endif %}
             {% if item.localPriceChange < 0 %}
-            <p class="normal-price productChange no-padding">{{item.localPriceChange}}<i class="fa fa-caret-down"></i></p>
+            <p class="normal-price productChange no-padding"><i class="fa fa-caret-down"></i></p>
             {% endif %}
             {% if item.localPriceChange == 0 %}
             <p class="normal-price productChange no-padding"><i class="fa fa-minus"></i></p>
@@ -50,20 +50,20 @@
 
             <p class="usd_pmt-price productPrice international">{{item.internationalPrice_usd_pmt}}</p>
             {% if item.internationalPrice_usd_pmt_change > 0 %}
-            <p class="usd_pmt-price productChange no-padding">{{item.internationalPrice_usd_pmt_change}}<i class="fa fa-caret-up"></i></p>
+            <p class="usd_pmt-price productChange no-padding"><i class="fa fa-caret-up"></i></p>
             {% endif %}
             {% if item.internationalPrice_usd_pmt_change < 0 %}
-            <p class="usd_pmt-price productChange no-padding">{{item.internationalPrice_usd_pmt_change}}<i class="fa fa-caret-down"></i></p>
+            <p class="usd_pmt-price productChange no-padding"><i class="fa fa-caret-down"></i></p>
             {% endif %}
             {% if item.internationalPrice_usd_pmt_change == 0 %}
             <p class="usd_pmt-price productChange no-padding"><i class="fa fa-minus"></i></p>
             {% endif %}
             <p class="usd_pmt-price productPrice local">{{item.localPrice_usd_pmt}}</p>
             {% if item.localPrice_usd_pmt_change > 0 %}
-            <p class="usd_pmt-price productChange no-padding">{{item.localPrice_usd_pmt_change}}<i class="fa fa-caret-up"></i></p>
+            <p class="usd_pmt-price productChange no-padding"><i class="fa fa-caret-up"></i></p>
             {% endif %}
             {% if item.localPrice_usd_pmt_change < 0 %}
-            <p class="usd_pmt-price productChange no-padding">{{item.localPrice_usd_pmt_change}}<i class="fa fa-caret-down"></i></p>
+            <p class="usd_pmt-price productChange no-padding"><i class="fa fa-caret-down"></i></p>
             {% endif %}
             {% if item.localPrice_usd_pmt_change == 0 %}
             <p class="usd_pmt-price productChange no-padding"><i class="fa fa-minus"></i></p>
@@ -72,20 +72,20 @@
 
             <p class="pkr-pkg-price productPrice international">{{item.internationalPrice_pkr_pkg}}</p>
             {% if item.internationalPrice_pkr_pkg_change > 0 %}
-            <p class="pkr-pkg-price productChange no-padding">{{item.internationalPrice_pkr_pkg_change}}<i class="fa fa-caret-up"></i></p>
+            <p class="pkr-pkg-price productChange no-padding"><i class="fa fa-caret-up"></i></p>
             {% endif %}
             {% if item.internationalPrice_pkr_pkg_change < 0 %}
-            <p class="pkr-pkg-price productChange no-padding">{{item.internationalPrice_pkr_pkg_change}}<i class="fa fa-caret-down"></i></p>
+            <p class="pkr-pkg-price productChange no-padding"><i class="fa fa-caret-down"></i></p>
             {% endif %}
             {% if item.internationalPrice_pkr_pkg_change == 0 %}
             <p class="pkr-pkg-price productChange no-padding"><i class="fa fa-minus"></i></p>
             {% endif %}
             <p class="pkr-pkg-price productPrice local">{{item.localPrice_pkr_pkg}}</p>
             {% if item.localPrice_pkr_pkg_change > 0 %}
-            <p class="pkr-pkg-price productChange no-padding">{{item.localPrice_pkr_pkg_change}}<i class="fa fa-caret-up"></i></p>
+            <p class="pkr-pkg-price productChange no-padding"><i class="fa fa-caret-up"></i></p>
             {% endif %}
             {% if item.localPriceChange < 0 %}
-            <p class="pkr-pkg-price productChange no-padding">{{item.localPrice_pkr_pkg_change}}<i class="fa fa-caret-down"></i></p>
+            <p class="pkr-pkg-price productChange no-padding"><i class="fa fa-caret-down"></i></p>
             {% endif %}
             {% if item.localPrice_pkr_pkg_change == 0 %}
             <p class="pkr-pkg-price productChange no-padding"><i class="fa fa-minus"></i></p>

@@ -71,7 +71,7 @@ class ProductItemPricingAPI(GenericAPIView):
         end_date = request.GET.get(u'endDate')
         start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
         end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
-        queryset = ProductItemPrice.get_all_prices(start_date, end_date)
+        queryset = ProductItemPrice.get_all_prices(start_date, end_date, request.user)
         return Response({
             'data': {'allPrices': queryset}
         }, status=status.HTTP_200_OK)
@@ -80,10 +80,15 @@ class ProductItemPricingAPI(GenericAPIView):
         return self.save_product_item_price(request.data, request.user)
 
     def delete(self, request, *args, **kwargs):
-        product_price_item_id = request.data.get('id')
-        prod_price_item = ProductItemPrice.objects.get(id=product_price_item_id)
-        prod_price_item.delete()
-        return Response({'success': True, 'message': self.messages['successDELETE']}, status=status.HTTP_200_OK)
+        try:
+            product_price_item_id = kwargs.get('product_item_price_id')
+            prod_price_item = ProductItemPrice.objects.get(id=product_price_item_id)
+            prod_price_item.delete()
+            return Response({'success': True, 'message': self.messages['successDELETE']}, status=status.HTTP_200_OK)
+        except Exception,e:
+            return Response({'success': False, 'message': str(e)})
+
+
 
 
 class PricingMarketAPI(GenericAPIView):

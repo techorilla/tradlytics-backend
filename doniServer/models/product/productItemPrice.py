@@ -15,6 +15,7 @@ from django.conf import settings
 from doniServer.models.exchangeRate import CurrencyExchange
 from django.db.models.signals import pre_save
 from django.db.models import Max
+from datetime import datetime as dt
 
 
 def fix_all_product_item():
@@ -207,12 +208,12 @@ class ProductItemPrice(models.Model):
         return price_shipment
 
     @classmethod
-    def get_all_prices(cls, start_time, end_time):
+    def get_all_prices(cls, start_time, end_time, user=None):
         price_items = cls.objects.filter(price_time__gte=start_time, price_time__lte=end_time)
-        price_items = [item.get_obj() for item in price_items]
+        price_items = [item.get_obj(user) for item in price_items]
         return price_items
 
-    def get_obj(self):
+    def get_obj(self, user=None):
         price_item = {
             'id': self.id,
             'showDetails': False,
@@ -237,6 +238,10 @@ class ProductItemPrice(models.Model):
             'createdBy': self.created_by.username if self.created_by else None,
             'createdAt': self.created_at
         }
+        if user:
+            current_time = dt.utcnow().replace(tzinfo=pytz.utc)
+            price_days_old = (current_time - self.price_time).days
+            price_item['isDeleteable'] = user.is_superuser or (price_days_old > 1)
         return price_item
 
 

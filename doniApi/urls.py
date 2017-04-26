@@ -122,6 +122,10 @@ urlpatterns = (
         ProductItemPricingAPI.as_view(),
         name='Product_Item_Pricing_API'),
 
+    url(r'pricing/product_item/(?P<product_item_price_id>[0-9]+)/$',
+        ProductItemPricingAPI.as_view(),
+        name='Product_Item_Pricing_API'),
+
     url(r'pricing/summary/$',
         PricingSummaryAPI.as_view(),
         name='Price_Summary_API'),
