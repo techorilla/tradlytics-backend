@@ -72,6 +72,7 @@ class SingleBlog(View):
     def get(self, request, *args, **kwargs):
         slug = kwargs.get('slug')
         instance = get_object_or_404(Post, slug=slug)
+        base_url = request.build_absolute_uri()
         if instance.publish > timezone.now().date() or instance.draft:
             if not request.user.is_staff or not request.user.is_superuser:
                 raise Http404
@@ -83,6 +84,7 @@ class SingleBlog(View):
         context = {
             "tags": tags,
             "instance": instance,
+            "base_url": base_url,
 
             "share_string": urllib.pathname2url(share_string),
         }

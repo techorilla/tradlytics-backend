@@ -27,7 +27,7 @@
                 <div class="col-md-8">
                     <div class="blog-post">
                         <h3 class="blog-post-title">{{ instance.title }}</h3>
-                        {#                                <p class="lead">Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
+                        <p class="lead"></p>
                         <div class="author-description">
                             <div class="author-image">
                                 <img width="60" src='{{ instance.user.profile.profile_pic.url }}' />
@@ -63,88 +63,45 @@
                         </br>
 
 
-                        {#                            <!-- Comments -->#}
-                        {#                            <div class="comments">#}
-                        {##}
-                        {#                                <h4 class="comments-title">Comments <small class="number">(4)</small></h4><hr>#}
-                        {#                                <div class="comment depth-1">#}
-                            {#                                    <a class="pull-left" href="#">#}
-                                {#                                        <img class="avatar" src="img/blog/avatar.jpg" alt="">#}
-                                {#                                    </a>#}
-                            {#                                    <div class="media-body">#}
-                                {#                                        <h4 class="media-heading">Jack</h4>#}
-                                {#                                        <p class="time">Feb 25, 2015 at 9:30 PM</p>#}
-                                {#                                        <p>Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
-                                {#                                        <a class="comment-reply pull-right" href="#"><i class="ion-reply"></i> Reply</a>#}
-                                {#                                    </div>#}
-                            {#                                </div>#}
-                        {##}
-                        {#                                <div class="comment depth-1">#}
-                            {#                                    <a class="pull-left" href="#">#}
-                                {#                                        <img class="avatar" src="img/blog/avatar.jpg" alt="">#}
-                                {#                                    </a>#}
-                            {#                                    <div class="media-body">#}
-                                {#                                        <h4 class="media-heading">John</h4>#}
-                                {#                                        <p class="time">Feb 25, 2015 at 10:30 PM</p>#}
-                                {#                                        <p>Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
-                                {#                                        <a class="comment-reply pull-right" href="#"><i class="ion-reply"></i> Reply</a>#}
-                                {#                                    </div>#}
-                            {#                                </div>#}
-                        {##}
-                        {#                                <div class="comment depth-2">#}
-                            {#                                    <a class="pull-left" href="#">#}
-                                {#                                        <img class="avatar" src="img/blog/avatar.jpg" alt="">#}
-                                {#                                    </a>#}
-                            {#                                    <div class="media-body">#}
-                                {#                                        <h4 class="media-heading">Jacky</h4>#}
-                                {#                                        <p class="time">Feb 25, 2015 at 12:00 PM</p>#}
-                                {#                                        <p>Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
-                                {#                                        <a class="comment-reply pull-right" href="#"><i class="ion-reply"></i> Reply</a>#}
-                                {#                                    </div>#}
-                            {#                                </div>#}
-                        {##}
-                        {#                                <div class="comment depth-3">#}
-                            {#                                    <a class="pull-left" href="#">#}
-                                {#                                        <img class="avatar" src="img/blog/avatar.jpg" alt="">#}
-                                {#                                    </a>#}
-                            {#                                    <div class="media-body">#}
-                                {#                                        <h4 class="media-heading">Jane</h4>#}
-                                {#                                        <p class="time">Feb 25, 2015 at 12:30 PM</p>#}
-                                {#                                        <p>Vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna. Maecenas quis justo ullamcorper, iaculis neque eget, eleifend dolor. Lorem ipsum dolor sit amet, consectetur adipisicing elit vivamus risus leo, feugiat eu nibh quis, vehicula interdum urna.</p>#}
-                                {#                                        <a class="comment-reply pull-right" href="#"><i class="ion-reply"></i> Reply</a>#}
-                                {#                                    </div>#}
-                            {#                                </div>#}
-                        {##}
-                        {#                            </div>#}
+                        <!-- Comments -->
+                        <div class="comments">
+
+                            <div class="fb-comments"
+                                 data-href="{{base_url}}"
+                                 data-numposts="10"
+                                 data-width="100%" >
+                            </div>
+
+                        </div>
 
 
                         <!-- Comment Form -->
-                        <div class="comment-form">
-                            <h4 class="comments-title">Leave a comment</h4>
+                        <!--<div class="comment-form">-->
+                        <!--<h4 class="comments-title">Leave a comment</h4>-->
 
-                            <form method="post" action="php/contact-form.php" name="contactform" id="contactform">
-                                <fieldset>
-                                    <input name="name" type="text" id="name" placeholder="Name"/>
-                                    <input name="email" type="text" id="email" placeholder="Email"/>
-                                    <input name="subject" type="text" id="subject" placeholder="Website"/>
-                                </fieldset>
-                                <fieldset>
-                                    <textarea name="comments" cols="40" rows="3" id="comments" placeholder="Comment"></textarea>
-                                </fieldset>
-                            </form>
-                            <a class="btn btn-primary btn-xs" href="#">Post Comment</a>
-                        </div>
+                        <!--<form method="post" action="php/contact-form.php" name="contactform" id="contactform">-->
+                        <!--<fieldset>-->
+                        <!--<input name="name" type="text" id="name" placeholder="Name"/>-->
+                        <!--<input name="email" type="text" id="email" placeholder="Email"/>-->
+                        <!--<input name="subject" type="text" id="subject" placeholder="Website"/>-->
+                        <!--</fieldset>-->
+                        <!--<fieldset>-->
+                        <!--<textarea name="comments" cols="40" rows="3" id="comments" placeholder="Comment"></textarea>-->
+                        <!--</fieldset>-->
+                        <!--</form>-->
+                        <!--<a class="btn btn-primary btn-xs" href="#">Post Comment</a>-->
+                        <!--</div>-->
 
                         <hr>
-                        {#                            <!-- Pager -->#}
-                        {#                            <ul class="pager">#}
-                        {#                                <li class="previous">#}
-                            {#                                    <a href="#"><i class="ion-android-arrow-back"></i></a>#}
-                            {#                                </li>#}
-                        {#                                <li class="next">#}
-                            {#                                    <a href="#"><i class="ion-android-arrow-forward"></i></a>#}
-                            {#                                </li>#}
-                        {#                            </ul>#}
+                        <!-- Pager -->
+                        <!--<ul class="pager">-->
+                            <!--<li class="previous">-->
+                                <!--<a href="#"><i class="ion-android-arrow-back"></i></a>-->
+                            <!--</li>-->
+                            <!--<li class="next">-->
+                                <!--<a href="#"><i class="ion-android-arrow-forward"></i></a>-->
+                            <!--</li>-->
+                        <!--</ul>-->
 
                     </div>
 
@@ -167,3 +124,14 @@
 </div><!-- End Site Wrapper -->
 
 {% endblock content %}
+
+{% block extrajs %}
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=1722522257998321";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+{% endblock %}
