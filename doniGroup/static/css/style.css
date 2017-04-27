@@ -538,6 +538,11 @@ p {
     right: 0;
     background-size: cover;
 }
+.hero img{
+    display: block;
+  width: auto;
+  height: 100%;
+}
 .content {
     position: relative;
     z-index: 3;
@@ -609,15 +614,24 @@ nav {
     -ms-transition: all 0.4s ease;
     transition: all 0.4s ease;
 }
-@media (min-width: 1360px and max-width: 1920px) {
+
+@media (min-width: 1360px) and (max-width: 1920px) {
     nav { max-width: 1903px; }
 }
-@media (max-width: 1360px) {
+@media (min-width: 992px) and (max-width: 1360px) {
     .navbar-default {
-        top: 0px !important;
+        top: 0px;
     }
     nav { max-width: 1343px; }
 }
+
+@media only screen and (min-width: 768px) {
+   .navbar-default {
+        top: 30px;
+    }
+}
+
+
 .navbar {
     min-height: 55px;
     border: none;
@@ -1191,7 +1205,7 @@ nav {
 }
 .about-text {
     margin-top: 20px;
-    padding-right: 60px;
+    /*padding-right: 60px;*/
 }
 #about p {
     line-height: 1.8;
