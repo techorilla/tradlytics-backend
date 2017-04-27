@@ -68,6 +68,8 @@ INSTALLED_APPS = [
     'django_crontab'
 ]
 
+
+
 # For django-countries all flag icon urls
 COUNTRIES_FLAG_URL = 'flags/1x1/{code}.svg'
 

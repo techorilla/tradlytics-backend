@@ -1,17 +1,23 @@
 {% extends "base2.html" %}
 {% load staticfiles %}
 
+{% block extrastyles %}
+<meta property="fb:app_id" content="420618861630497" />
+{% endblock %}
+
 
 {% block afterBodyJS %}
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=420618861630497";
-  fjs.parentNode.insertBefore(js, fjs);
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=420618861630497";
+    fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 {% endblock %}
+
+
 
 {% block content %}
 
@@ -58,7 +64,7 @@
                                 <a href="#"><i class="ion-pricetag"></i>{{ tag.name }}</a>
                                 {% endfor %}
                             </li>
-                            <li><a href="#"><i class="ion-chatboxes"></i> {{ instance.comments | length }} Comments</a></li>
+                            <li><a href="#"><i class="ion-chatboxes"></i> <span class="fb-comments-count" data-href="{{base_url}}"></span> Comments</a></li>
                         </ul>
                         <!--<ul class="blog-post-info">-->
                         <!--<li><a href="#"><i class="ion-clock"></i> {{ instance.publish.day }} {{ instance.publish |date:"F"  }} {{ instance.publish|date:"Y"}}</a></li>-->
@@ -108,12 +114,12 @@
                         <hr>
                         <!-- Pager -->
                         <!--<ul class="pager">-->
-                            <!--<li class="previous">-->
-                                <!--<a href="#"><i class="ion-android-arrow-back"></i></a>-->
-                            <!--</li>-->
-                            <!--<li class="next">-->
-                                <!--<a href="#"><i class="ion-android-arrow-forward"></i></a>-->
-                            <!--</li>-->
+                        <!--<li class="previous">-->
+                        <!--<a href="#"><i class="ion-android-arrow-back"></i></a>-->
+                        <!--</li>-->
+                        <!--<li class="next">-->
+                        <!--<a href="#"><i class="ion-android-arrow-forward"></i></a>-->
+                        <!--</li>-->
                         <!--</ul>-->
 
                     </div>

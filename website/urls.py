@@ -4,9 +4,12 @@ from api.views import SingleBlog, ProductPage
 from api.views import HomePage, BlogPage, SingleProductPage
 from api.views import PricingPage, PricingDetail
 from api.views import PrivacyPage
+from django.views.generic.simple import direct_to_template
 
 
 urlpatterns = [
+    (r'^robots\.txt$', direct_to_template,
+     {'template': 'robots.txt', 'mimetype': 'text/plain'}),
     url(r'^$', HomePage.as_view(), name='homePage'),
     url(r'^research/$', BlogPage.as_view(), name='blogs'),
     url(r'^products/$', ProductPage.as_view(), name='products'),
