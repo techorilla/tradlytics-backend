@@ -15,6 +15,7 @@ from doniApi.apiImports import Response, APIView, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.conf import settings
 from datetime import datetime as dt
+from pycountry import countries
 import tldextract
 
 
@@ -25,6 +26,8 @@ class GetGoogleAccessTokenAPI(APIView):
 
     permission_classes = (IsAuthenticated, )
 
+    AUTHORIZATION_SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
+    REDIRECT_PREFIX = "http://tramodity.com"
     API_ENDPOINT = "https://www.googleapis.com/analytics/v3"
     API_NAME = "analytics"
     API_VERSION = "v3"
@@ -42,7 +45,14 @@ class GetGoogleAccessTokenAPI(APIView):
             'dimensions': 'ga:country',
             'metrics': 'ga:sessions',
             'sort': '-ga:sessions'
-        }
+        },
+        'cardData':{
+            'start_date': '30daysAgo',
+            'end_date': 'today',
+            'metrics': 'ga:hits,ga:avgSessionDuration,ga:bounceRate, ga:sessions, ga:pageViews',
+            'dimensions': 'ga:date',
+        },
+
     }
 
 
@@ -60,16 +70,15 @@ class GetGoogleAccessTokenAPI(APIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        flow = self.get_tramodity_flow()
+        origin = request.META.get('HTTP_ORIGIN')
+        flow = self.get_tramodity_flow(origin)
         if data.get('code'):
             auth_code = data.get('code')
             credentials = flow.step2_exchange(auth_code)
             token_data = credentials.to_json()
-            token_data = json.loads(token_data)
             try:
                 business = request.user.profile.business
-                access_token = token_data.get('access_token')
-                service, http = self.get_service(business, access_token=access_token)
+                service, http = self.get_service(credentials=credentials)
                 profiles = self.get_profiles(service)
                 valid_profile = self.verify_account(business, profiles)
                 if valid_profile:
@@ -84,6 +93,7 @@ class GetGoogleAccessTokenAPI(APIView):
                         'message': 'You account does not contain profile for %s.' % business.bp_website
                     })
             except Exception, e:
+
                 return Response({
                     'success': False,
                     'message':  str(e)
@@ -111,11 +121,11 @@ class GetGoogleAccessTokenAPI(APIView):
         ga_token.save()
 
     @classmethod
-    def get_tramodity_flow(cls):
+    def get_tramodity_flow(cls, base_url):
         flow = client.flow_from_clientsecrets(
-            settings.GOOGLE_SERVICE_ACCOUNT_JSON,
-            scope='https://www.googleapis.com/auth/drive.metadata.readonly',
-            redirect_uri=settings.FRONT_END_HOST
+            settings.GOOGLE_ANALYTICS_CLIENT_SECRETS,
+            scope=cls.AUTHORIZATION_SCOPE,
+            redirect_uri=base_url
         )
         flow.params['access_type'] = 'offline'
         flow.params['include_granted_scopes'] = True
@@ -125,27 +135,22 @@ class GetGoogleAccessTokenAPI(APIView):
         return self.flow.step2_exchange()
 
     @classmethod
-    def get_credentials(cls, business, access_token=None):
-        if access_token is None:
-            token_data = GoogleAnalyticsToken.objects.filter(business=business).order_by("-created")[0].data
-            access_token = token_data.get(u'access_token')
-        print access_token
-        credentials = client.AccessTokenCredentials(access_token, 'my-user-agent/1.0')
-        http = httplib2.Http()
-        http = credentials.authorize(http)
-        return http, credentials
+    def get_credentials(cls, business):
+        token_data = GoogleAnalyticsToken.objects.filter(business=business).order_by("-created")[0].data
+        credentials = client.OAuth2Credentials.from_json(token_data)
+        return credentials
 
-    @classmethod
-    def get_service(cls, business, access_token=None):
-        http, credentials = cls.get_credentials(business, access_token)
-        service = build(cls.API_NAME, cls.API_VERSION, http=http)
+
+    def get_service(self, business=None, credentials=None):
+        if credentials is None:
+            credentials = self.get_credentials(business)
+        http = credentials.authorize(http=httplib2.Http())
+        service = build(self.API_NAME, self.API_VERSION, http=http)
         return service, http
 
     @classmethod
     def verify_account(cls, business, profiles):
         domain = tldextract.extract(business.bp_website).domain
-        print domain
-        print profiles
         profile_domains = [tldextract.extract(profile.get('websiteUrl')).domain for profile in profiles]
         return domain in profile_domains
 
@@ -196,6 +201,9 @@ class GetGoogleAccessTokenAPI(APIView):
 
     def prepare_data_for_dashboard(self,data):
         traffic = data.get('traffic_30')
+        country_traffic = data.get('country_traffic_total_30').get('rows')
+        card_data = data.get('cardData')
+        cards_total_data = card_data.get('totalsForAllResults')
         traffic_rows = traffic.get('rows')
         traffic_total = traffic.get('totalsForAllResults')
         traffic_total = {
@@ -203,18 +211,39 @@ class GetGoogleAccessTokenAPI(APIView):
             'ga:visits': traffic_total.get('ga:visits')
         }
 
+        cards_total_data = {
+            'newUsers': traffic_total.get('ga:newUsers'),
+            'visits': traffic_total.get('ga:visits'),
+            'avgSessionDuration': float(cards_total_data.get('ga:avgSessionDuration')),
+            'pageViews': int(cards_total_data.get('ga:pageViews')),
+            'bounceRate': float(cards_total_data.get('ga:bounceRate')),
+            'sessions': int(cards_total_data.get('ga:sessions')),
+            'hits': int(cards_total_data.get('ga:hits'))
+        }
+
+        def map_country_traffic(row):
+            row_obj = dict()
+            country = countries.get(name=row[0])
+            row_obj['code'] = country.alpha_2
+            row_obj['name'] = row[0]
+            row_obj['value'] = row[1]
+            return row_obj
+
         def map_traffic_row(row):
             row_obj = dict()
             row_obj['date'] = dt.strptime(row[0], '%Y%m%d')
-            row_obj['visits'] = row[1]
-            row_obj['newUsers'] = row[2]
+            row_obj['visits'] = int(row[1])
+            row_obj['newUsers'] = int(row[2])
             return row_obj
 
         traffic_chart_data = map(map_traffic_row, traffic_rows)
+        traffic_country_chart_data = map(map_country_traffic, country_traffic)
 
         return {
             'trafficTotal': traffic_total,
-            'trafficChartData': traffic_chart_data
+            'trafficChartData': traffic_chart_data,
+            'trafficCountryChartData': traffic_country_chart_data,
+            'cardsTotalData': cards_total_data
         }
 
 

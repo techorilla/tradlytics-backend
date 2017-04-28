@@ -12,15 +12,18 @@ class PricingSummaryAPI(GenericAPIView):
     permission_class = (IsAuthenticated, )
 
     def get(self, request, *args, **kwargs):
-        last_summary_date = PriceSummary.objects.all().aggregate(Max('summary_on'))
-        last_summary_date = last_summary_date.get('summary_on__max')
-        price_summary = PriceSummary.objects.filter(summary_on=last_summary_date)\
-            .order_by('product_item__product_origin__product__name')
+        all_product_on_website = ProductItem.objects.filter(price_on_website=True).distinct() \
+            .order_by('product_origin__product__name')
+
+        price_summary = []
+
+        for item in all_product_on_website:
+            price_summary.append(item.price_market_summary)
 
         return Response({
             'data':
                 {
-                    'priceSummary': [price.summary for price in price_summary]
+                    'priceSummary': price_summary
                 }
         }, status=status.HTTP_200_OK)
 
@@ -60,7 +63,6 @@ class ProductItemPricingAPI(GenericAPIView):
         prod_price_item.price_market = price_market
         prod_price_item.price_time = dateutil.parser.parse(price_time)
         prod_price_item.save()
-        PriceSummary.get_price_summary_for_product(product_item)
         return Response({'success': True, 'message': msg, 'obj': prod_price_item.get_obj()}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
