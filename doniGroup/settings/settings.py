@@ -107,6 +107,7 @@ djcelery.setup_loader()
 
 
 MIDDLEWARE = [
+    'doniServer.middleware.CrashLogMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'doniServer.middleware.SessionExpiry',
     'django.middleware.security.SecurityMiddleware',
@@ -222,3 +223,38 @@ CRONJOBS = [
     ('0 4 * * *', 'django.core.management.call_command', ['check_celery_status'], {}, '>> /tmp/check_celery_status.log'),
     ('0 7 * * *', 'django.core.management.call_command', ['get_current_currency_rate'], 'USD', 'PKR', '>> /tmp/get_current_currency_rate.log'),
 ]
+
+##LOGGING
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s%(msecs)d %(name)s %(thread)d %(levelname)s %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "simple": {
+            "format": "%(levelname)s %(message)s"
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+            "filename": '%s/tramodity.log' % PROJECT_ROOT,
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}
