@@ -13,7 +13,6 @@ class ManifestDashboardAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
-        raise ValueError('A very specific bad thing happened')
         start_date = request.data.get(u'startDate')
         end_date = request.data.get(u'endDate')
         selectedBuyer = request.data.get(u'selectedBuyer')
