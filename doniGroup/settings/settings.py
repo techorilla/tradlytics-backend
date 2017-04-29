@@ -247,7 +247,7 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.FileHandler",
             "formatter": "verbose",
-            "filename": '%s/tramodity.log' % PROJECT_ROOT,
+            "filename": '%s/tramodity.log' % BASE_DIR,
         },
     },
     "loggers": {
