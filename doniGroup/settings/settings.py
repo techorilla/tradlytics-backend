@@ -211,7 +211,7 @@ THUMBNAIL_PROCESSORS = (
                            'image_cropping.thumbnail_processors.crop_corners',
                        ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
-GOOGLE_ANALYTICS_CLIENT_SECRETS = '%s/doniServer/accounts/googleAnalytics/client_secret.json' % BASE_DIR
+GOOGLE_ANALYTICS_CLIENT_SECRETS = '%s/doniServer/accounts/googleAnalytics/client_secret.json' % DJANGO_ROOT
 GOOGLE_API_KEY = 'AIzaSyBo_6vyHY2wE1G3wlY0PfH6_oW-leyCbWk'
 
 ## Google Analytics
