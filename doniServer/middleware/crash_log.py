@@ -22,8 +22,12 @@ class CrashLogMiddleware(MiddlewareMixin):
             log['request_path'] = request.path
             log['request_path_info'] = request.path_info
             log['request_get_params'] = request.GET
-            log['username'] = request.user.username
-            log['business'] = request.user.profile.business.bp_name
+            if request.user.is_anonymous():
+                log['username'] = request.user.username
+                log['business'] = request.user.profile.business.bp_name
+            else:
+                log['username'] = 'Anonymous User'
+                log['business'] = 'Anonymous Business'
             log['request_post_params'] = request.POST
             log['message'] = exception.message
             ex_type, ex, tb = sys.exc_info()

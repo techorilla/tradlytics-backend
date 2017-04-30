@@ -6,8 +6,9 @@ from doniGroup.authentication import CsrfExemptSessionAuthentication
 from django.conf import settings
 
 
+
 def contact_us_from_website(website_url, name, email, subject, message):
-    business = BpBasic.get_business_using_website(website_url)
+    business = BpBasic.get_admin_business() if settings.DEBUG else BpBasic.get_business_using_website(website_url)
     contact_us = ContactUs(name=name, email=email, message=message, subject=subject)
     contact_us.business = business
     contact_us.save()
@@ -37,10 +38,10 @@ class ContactUsAPI(APIView):
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
     def post(self, request, *args, **kwargs):
-        base_url = request.META.get('HTTP_HOST')
+        base_url = request.META.get('HTTP_HOST') if not settings.DEBUG else 'http://localhost:8000'
         data = request.data
-        base_url_2 = 'donigroup.com'
-        contact_us_from_website(base_url_2, data.get('name'), data.get('email'), \
+
+        contact_us_from_website(base_url, data.get('name'), data.get('email'), \
                                 data.get('subject'), data.get('comments'))
         validated_error = validated_contact_us(data.get('name'), data.get('email'), \
                                 data.get('subject'), data.get('comments'))
