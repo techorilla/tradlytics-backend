@@ -198,7 +198,11 @@ CONTACT_US_EMAIL_TEMPLATE = '%s/emailApp/templates/contact_us.tpl' % PROJECT_ROO
 BASE_EMAIL_TEMPLATE = '%s/emailApp/templates/base_email.tpl' % PROJECT_ROOT
 EMAIL_ASSETS = "%s/emailApp/static/img/assets/" % DJANGO_ROOT
 
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'immadimtiaz@gmail.com'
 EMAIL_INFO = ['immadimtiaz@gmail.com']
 
 

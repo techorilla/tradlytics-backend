@@ -7,5 +7,6 @@ media/
 # CODE SPECIFIC #
 #################
 doniGroup/env.py
+doniGroup/settings/constants.py
 
 tramodity.log
