@@ -1,6 +1,7 @@
 from utils import *
 from datetime import datetime
 import dateutil.parser
+from .cache import cache_results
 
 
 def convert_string_to_utc_time(time_string):

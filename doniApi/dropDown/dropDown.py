@@ -10,6 +10,7 @@ from doniCore import Utilities
 from dateutil.relativedelta import relativedelta
 from datetime import datetime as dt
 import dateutil.parser
+from doniCore import cache_results
 
 
 class SimpleDropDownAPI(GenericAPIView):
@@ -85,9 +86,13 @@ class SimpleDropDownAPI(GenericAPIView):
 class BusinessDropDownAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
+    @cache_results
+    def get_all_business_drop_down(self, type):
+        return BpBasic.get_drop_down_obj(type)
+
     def get(self, request, *args, **kwargs):
         type = request.GET.get('type')
-        all_business = BpBasic.get_drop_down_obj(type)
+        all_business = self.get_all_business_drop_down(type)
         return Response({
             'list': all_business
         }, status=status.HTTP_200_OK)
@@ -96,7 +101,8 @@ class BusinessDropDownAPI(GenericAPIView):
 class CountryAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, *args, **kwargs):
+    @cache_results
+    def get_all_countries(self):
         from django_countries import countries
         all_countries = list(countries)
         all_countries = [{
@@ -104,7 +110,10 @@ class CountryAPI(GenericAPIView):
                              'code': c[0],
                              'image': settings.COUNTRIES_FLAG_URL.replace('{code}', str(c[0].lower()))
                          } for c in all_countries]
-        return Response({'list': all_countries}, status=status.HTTP_200_OK)
+        return all_countries
+
+    def get(self, request, *args, **kwargs):
+        return Response({'list': self.get_all_countries()}, status=status.HTTP_200_OK)
 
 
 class RegionAPI(GenericAPIView):
@@ -146,8 +155,12 @@ class ProductDDAPI(GenericAPIView):
     model = Products
     permission_classes = (IsAuthenticated,)
 
+    @cache_results
+    def get_product_drop_down(self):
+        return self.model.get_dropdown()
+
     def get(self, request, *args, **kwrgs):
-        return Response({'list': self.model.get_dropdown()}, status=status.HTTP_200_OK)
+        return Response({'list': self.get_product_drop_down()}, status=status.HTTP_200_OK)
 
 
 class ProductOriginDDAPI(GenericAPIView):

@@ -28,8 +28,12 @@ class BpBasic(models.Model):
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='bp_basic_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='bp_basic_updated_by')
 
+
     class Meta:
         db_table = 'bp_basic'
+
+    def __unicode__(self):
+        return self.bp_name.replace(' ', '_')
 
     @property
     def primary_contact(self):

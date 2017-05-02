@@ -5,6 +5,7 @@ from doniCore.utils import Utilities
 import os, json
 from datetime import datetime as dt
 from django_countries.fields import Country
+from doniCore.cache import cache
 
 
 class ProducOriginAPI(GenericAPIView):
@@ -109,7 +110,7 @@ class ProductsAPI(GenericAPIView):
             product.category = ProductCategory.objects.get(id=int(product_category_id))
             product.product_code = product_code
             product.save()
-
+            cache.delete('get_product_drop_down')
             return Response({
                 'success': True,
                 'message': success_message,
@@ -131,6 +132,7 @@ class ProductsAPI(GenericAPIView):
                 product_id = int(product_id)
                 product = Products.objects.get(id=product_id)
                 product.delete()
+                cache.delete('get_product_drop_down')
                 return Response({
                     'id': product_id,
                     'success': True,

@@ -87,20 +87,7 @@ CKEDITOR_UPLOAD_PATH = os.path.join(PROJECT_ROOT, "website", 'static', 'blog'),
 JSON_EDITOR_JS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/4.2.1/jsoneditor.js'
 JSON_EDITOR_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/4.2.1/jsoneditor.css'
 
-'''
-Celery Related Variables
-'''
-# CELERY BROKER IP
-BROKER_INTERNAL_IP = '127.0.0.1'
-# Broker settings.
-BROKER_PORT = 6379
-BROKER_URL = "redis://%s:%s//" % (BROKER_INTERNAL_IP, BROKER_PORT)
-# Using the database to store task state and results.
-CELERY_RESULT_BACKEND = "redis://%s:%s/" % (BROKER_INTERNAL_IP, BROKER_PORT)
-CELERY_RESULT_DBURI = "redis://%s:%s/0" % (BROKER_INTERNAL_IP, BROKER_PORT)
-CELERYD_MAX_TASKS_PER_CHILD = 4
-CELERY_REDIRECT_STDOUTS_LEVEL = 'ERROR'
-CELERY_TRACK_STARTED = True
+
 
 djcelery.setup_loader()
 
@@ -258,3 +245,24 @@ LOGGING = {
         },
     },
 }
+
+
+
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+'''
+Celery Related Variables
+'''
+# CELERY BROKER IP
+BROKER_INTERNAL_IP = '127.0.0.1'
+# Broker settings.
+BROKER_PORT = 6379
+BROKER_URL = "redis://%s:%s//" % (BROKER_INTERNAL_IP, BROKER_PORT)
+# Using the database to store task state and results.
+CELERY_RESULT_BACKEND = "redis://%s:%s/" % (BROKER_INTERNAL_IP, BROKER_PORT)
+CELERY_RESULT_DBURI = "redis://%s:%s/0" % (BROKER_INTERNAL_IP, BROKER_PORT)
+CELERYD_MAX_TASKS_PER_CHILD = 4
+CELERY_REDIRECT_STDOUTS_LEVEL = 'ERROR'
+CELERY_TRACK_STARTED = True

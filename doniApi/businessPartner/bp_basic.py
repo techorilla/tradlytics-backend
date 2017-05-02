@@ -4,25 +4,34 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from doniServer.models import BpBasic, BusinessType
 import json, os
 from datetime import datetime as dt
+from doniCore import cache_results
+from doniCore.cache import cache
 
 
 class BusinessListAPI(GenericAPIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        business = Utilities.get_user_business(user)
-        base_url = request.META.get('HTTP_HOST')
+    @cache_results
+    def get_business_list(self, business, base_url):
         all_business = BpBasic.objects.filter(created_by__profile__business=business).exclude(bp_id=business.bp_id)
         all_business = map(lambda business: business.get_list_obj(base_url), all_business)
+        return all_business
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        base_url = request.META.get('HTTP_HOST')
+        business = Utilities.get_user_business(user)
+        all_business = self.get_business_list(business, base_url)
         return Response({'businessList': all_business}, status=status.HTTP_200_OK)
+
 
 
 class BpBasicAPI(GenericAPIView):
 
     permission_classes = (IsAuthenticated,)
     messages = dict()
+    cache_methods = ['get_business_list']
     messages['errorPOST'] = 'Business was not created due to some error on server.'
     messages['successPOST'] = 'Business created successfully.'
     messages['successPUT'] = 'Business basic information updated successfully.'
@@ -33,6 +42,18 @@ class BpBasicAPI(GenericAPIView):
         business = BpBasic.objects.get(bp_id=bp_id)
         base_url = request.META.get('HTTP_HOST')
         return Response({'business': business.get_obj(base_url)})
+
+    def delete_cache(self, business, base_url):
+        for method in self.cache_methods:
+            key_str = list()
+            key_str.append(method)
+            key_str.append(business.__unicode__())
+            key_str.append(base_url)
+            key = '_'.join(key_str)
+            cache.delete(key)
+        cache.delete('get_all_business_drop_down_Seller')
+        cache.delete('get_all_business_drop_down_Buyer')
+
 
     def post(self, request, *args, **kwargs):
         try:
@@ -51,6 +72,9 @@ class BpBasicAPI(GenericAPIView):
             for type in business_type:
                 business.bp_types.add(type)
             business.save()
+            base_url = request.META.get('HTTP_HOST')
+            user_business = request.user.profile.business
+            self.delete_cache(user_business, base_url)
             return Response({
                 'success': True,
                 'bpId': business.bp_id,
@@ -94,7 +118,8 @@ class BpBasicAPI(GenericAPIView):
                 if not business.bp_types.filter(id=type.id).exists():
                     business.bp_types.add(type)
             business.save()
-
+            base_url = request.META.get('HTTP_HOST')
+            self.delete_cache(user_business, base_url)
             return Response({
                 'success': True,
                 'bpId': business.bp_id,
