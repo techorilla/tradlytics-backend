@@ -7,14 +7,17 @@ from .priceMarket import PriceMarket
 from django.utils import timezone
 from django.contrib import admin
 from datetime import datetime as dt, timedelta
+from jsonfield import JSONField
 
 
 
 class ProductItem(models.Model):
+
     keywords = models.ManyToManyField(ProductKeyword, related_name='product_items')
     product_origin = models.ForeignKey(ProductOrigin, null=True, blank=False, related_name='origin_product_item')
     price_on_website = models.BooleanField(default=False)
     import_expense = models.FloatField(default=1.07)
+    specification = JSONField(null=True)
     database_ids = models.CharField(max_length=250, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
@@ -267,6 +270,19 @@ class ProductItem(models.Model):
         keywords = [str(key.keyword) for key in keywords]
         return ', '.join(keywords)
 
+    def get_default_specification(self):
+        return {
+            'moisture': 0,
+            'purity': 0,
+            'foreignMatter': 0,
+            'brokenSplits': 0,
+            'damaged': 0,
+            'greenDamaged': 0,
+            'weevilied': 0,
+            'otherColor': 0,
+            'wrinkled': 0
+        }
+
     def get_obj(self):
         return {
             'id': self.id,
@@ -274,6 +290,7 @@ class ProductItem(models.Model):
             'productId': self.product_origin.product.id,
             'productName': self.product_origin.product.name,
             'databaseIds': self.database_ids,
+            'specification': self.specification if self.specification is not None else self.get_default_specification(),
             'priceOnWebsite': self.price_on_website,
             'origin': self.product_origin.country.code.upper(),
             'productOriginName': self.product_origin.country.name,

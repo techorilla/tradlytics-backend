@@ -11,6 +11,14 @@ urlpatterns = (
 
     # Business Partner Related API
 
+    url(r'^commission_type/$',
+        CommissionTypeAPI.as_view(),
+        name='Commission Type'),
+
+    url(r'^packaging/$',
+        PackagingAPI.as_view(),
+        name='Business Partner Basic'),
+
     url(r'^business_type/$',
         BusinessTypeAPI.as_view(),
         name='Business Partner Basic'),

@@ -42,12 +42,15 @@ class ProductItemAPI(GenericAPIView):
             origin = data.get('origin')
             product_id = int(data.get('productId'))
             database_ids = data.get('databaseIds')
+            specification = data.get('specification')
+            print 'specification',specification
             product_origin = ProductOrigin.objects.filter(country=Country(code=origin.upper()))\
                 .get(product__id=product_id)
             keywords = ProductKeyword.objects.filter(id__in=keywords_id)
 
             if update:
                 product_item.import_expense = import_expense
+                product_item.specification = specification
                 product_item.updated_by = user
                 product_item.product_origin = product_origin
                 product_item.database_ids = database_ids
@@ -66,6 +69,7 @@ class ProductItemAPI(GenericAPIView):
                 product_item.import_expense = import_expense
                 product_item.product_origin = product_origin
                 product_item.database_ids = database_ids
+                product_item.specification = specification
                 product_item.created_by = user
                 product_item.save()
                 for keyword in keywords:
@@ -81,6 +85,7 @@ class ProductItemAPI(GenericAPIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         data = request.data
+
         return self.save_product_item(data, user)
 
     def put(self, request, *args, **kwargs):

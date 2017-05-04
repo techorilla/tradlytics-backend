@@ -207,6 +207,11 @@ class CurrencyDDAPI(GenericAPIView):
                       } for currency in currencies]
         return Response({'list': currencies}, status=status.HTTP_200_OK)
 
+class CommissionTypeAPI(SimpleDropDownAPI):
+    model = CommissionType
+
+class PackagingAPI(SimpleDropDownAPI):
+    model = Packaging
 
 class BusinessTypeAPI(SimpleDropDownAPI):
     model = BusinessType
