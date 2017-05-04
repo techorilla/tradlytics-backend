@@ -8,6 +8,7 @@ from django.db import connection
 from django.contrib import admin
 from django.db.models import Prefetch
 from django.db.models import F
+import pytz
 
 
 class ManifestItem(models.Model):
@@ -32,8 +33,8 @@ class ManifestItem(models.Model):
     @classmethod
     def get_manifest_items(cls, start_time, end_time):
         cur = connection.cursor()
-        start_time = start_time.strftime("%Y-%m-%d 00:00:00")
-        end_time = end_time.strftime("%Y-%m-%d 23:59:59")
+        start_time = start_time.astimezone(pytz.utc).strftime("%Y-%m-%d 00:00:00")
+        end_time = end_time.astimezone(pytz.utc).strftime("%Y-%m-%d 23:59:59")
         cur.callproc('manifest_item_list', [start_time, end_time, ])
         field_names = [i[0] for i in cur.description]
         manifest_items = cur.fetchall()

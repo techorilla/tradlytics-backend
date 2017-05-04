@@ -37,7 +37,8 @@ ALLOWED_HOSTS = [
     'donigroup.com',
     'localhost',
     '127.0.0.1',
-    'app.tramodity.com'
+    'app.tramodity.com',
+    '54.202.234.113'
 ]
 
 # Application definition
