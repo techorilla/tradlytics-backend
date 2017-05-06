@@ -2,7 +2,10 @@ from doniApi.apiImports import Response, GenericAPIView, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from doniServer.models.businessPartner.bpBank import BpBank, BpBasic
 from doniServer.models.manifest import ManifestItem
-from doniServer.models.product import Products, PriceMetric
+from django.db.models import Count
+from django.db.models.aggregates import Max
+
+from doniServer.models.product import Products, PriceMetric, ProductItemPrice
 from datetime import datetime as dt, timedelta
 import pycountry
 from doniServer.models import CurrencyExchange
@@ -38,16 +41,57 @@ class MainDashboardAPI(GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         today = dt.now()
+        start_time = today - timedelta(hours=24)
+        end_time = today
         user = request.user
         business = user.profile.business
         business_location = business.locations.get(is_primary=True)
 
         # USD Exchange Data
-
         usd_currency_data = self.get_currency_exchange_data(in_currency='USD', out_currency='PKR')
 
+        # Get Price Updates Number
+        price_update_count = ProductItemPrice.objects.filter(created_at__gte=start_time, created_at__lte=end_time).count()
+        if price_update_count:
+            price_update_last_time = ProductItemPrice.objects.filter(created_at__gte=start_time, created_at__lte=end_time)\
+                .value('created_at').order_by('-created_at').first()
+            price_update_last_time = price_update_last_time.get('created_at')
+        else:
+            price_update_last_time = 'NA'
+
+        # Get Manifest Updates Number
+
+        manifest_update_count = ManifestItem.objects.filter(created_at__gte=start_time, created_at__lte=end_time).count()
+
+        if manifest_update_count:
+            top_three_contributors = ManifestItem.objects\
+                .filter(created_at__gte=start_time, created_at__lte=end_time)\
+                .values('created_by__username', '')\
+                .annotate(total=Count('created_by__username'))\
+                .order_by('-total')[:3]
+
+            for contrib in top_three_contributors:
+                manifest_contributer = dict()
+                manifest_contributer['username'] = contrib['created_by__username']
+                manifest_contributer['updates'] = contrib['total']
+                last_update = ManifestItem.objects.filter(created_by__username=manifest_contributer['username'])\
+                    .order_by('-created_at').values('created_at').first()
+                manifest_contributer['lastUpdate'] = last_update.get('created_at')
+                manifest_top_three_contributors.append(manifest_contributer)
+        else:
+            manifest_top_three_contributors = []
+
+
         return Response({'data': {
-            'usdExchange': usd_currency_data
+            'usdExchange': usd_currency_data,
+            'priceUpdate':{
+                'count': price_update_count,
+                'lastUpdate': price_update_last_time
+            },
+            'manifestUpdate':{
+                'count':manifest_update_count,
+                'topThreeContributors': manifest_top_three_contributors
+            }
         }}, status=status.HTTP_200_OK)
 
 
