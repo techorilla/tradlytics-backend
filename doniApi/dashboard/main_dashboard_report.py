@@ -54,7 +54,7 @@ class MainDashboardAPI(GenericAPIView):
         price_update_count = ProductItemPrice.objects.filter(created_at__gte=start_time, created_at__lte=end_time).count()
         if price_update_count:
             price_update_last_time = ProductItemPrice.objects.filter(created_at__gte=start_time, created_at__lte=end_time)\
-                .value('created_at').order_by('-created_at').first()
+                .values('created_at').order_by('-created_at').first()
             price_update_last_time = price_update_last_time.get('created_at')
         else:
             price_update_last_time = 'NA'
