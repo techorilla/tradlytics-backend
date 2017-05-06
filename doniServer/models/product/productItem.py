@@ -8,6 +8,8 @@ from django.utils import timezone
 from django.contrib import admin
 from datetime import datetime as dt, timedelta
 from jsonfield import JSONField
+from .productSpecification import ProductsSpecification
+import json
 
 
 
@@ -26,6 +28,10 @@ class ProductItem(models.Model):
 
     class Meta:
         ordering = ('id',)
+
+
+    def __unicode__(self):
+        return '%s:%s:%s'%(self.product_origin.product.name, self.product_origin.country, self.product_origin.product.category.name)
 
 
     @classmethod
@@ -270,18 +276,22 @@ class ProductItem(models.Model):
         keywords = [str(key.keyword) for key in keywords]
         return ', '.join(keywords)
 
-    def get_default_specification(self):
-        return {
-            'moisture': 0,
-            'purity': 0,
-            'foreignMatter': 0,
-            'brokenSplits': 0,
-            'damaged': 0,
-            'greenDamaged': 0,
-            'weevilied': 0,
-            'otherColor': 0,
-            'wrinkled': 0
-        }
+    def get_specification(self):
+        try:
+            specs_config = self.product_origin.product.category.specification.specs
+            item_specs = self.specification if self.specification else []
+            for spec in specs_config:
+                spec_item = [item for item in item_specs
+                             if item.get(u'name','').lower() == spec.get(u'name', '').lower()]
+                if spec_item:
+                    spec_item = spec_item[0]
+                    spec[u'value'] = spec_item.get(u'value') if spec_item else None
+                else:
+                    spec[u'value'] = None
+            return specs_config
+        except ProductsSpecification.DoesNotExist:
+            return []
+
 
     def get_obj(self):
         return {
@@ -290,7 +300,7 @@ class ProductItem(models.Model):
             'productId': self.product_origin.product.id,
             'productName': self.product_origin.product.name,
             'databaseIds': self.database_ids,
-            'specification': self.specification if self.specification is not None else self.get_default_specification(),
+            'specification': self.get_specification(),
             'priceOnWebsite': self.price_on_website,
             'origin': self.product_origin.country.code.upper(),
             'productOriginName': self.product_origin.country.name,

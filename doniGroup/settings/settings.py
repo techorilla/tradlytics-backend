@@ -209,7 +209,7 @@ GOOGLE_ANALYTICS_DOMAIN = 'tramodity.com'
 
 CRONJOBS = [
     ('0 4 * * *', 'django.core.management.call_command', ['check_celery_status'], {}, '>> /tmp/check_celery_status.log'),
-    ('0 7 * * *', 'django.core.management.call_command', ['get_current_currency_rate'], 'USD', 'PKR', '>> /tmp/get_current_currency_rate.log'),
+    ('0 7 * * *', 'django.core.management.call_command', ['get_current_currency_rate', 'USD', 'PKR'], {}, '>> /tmp/get_current_currency_rate.log'),
 ]
 
 ##LOGGING

@@ -139,9 +139,13 @@ urlpatterns = (
 
     # Product Keyword API
 
-    url(r'product/category',
+    url(r'product/category/$',
         ProductsCategoryAPI.as_view(),
         name='Product_Category_API'),
+
+    url(r'product/category/specification/$',
+        ProductSpecificationAPI.as_view(),
+        name='Product Specification API'),
 
     url(r'product/keywords/$',
         ProductsKeywordAPI.as_view(),

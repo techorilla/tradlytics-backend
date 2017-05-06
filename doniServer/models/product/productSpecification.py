@@ -13,6 +13,7 @@ class ProductsSpecification(models.Model):
         ProductCategory,
         null=True,
         default=None,
+        related_name='specification'
     )
     # moisture = models.FloatField(default=None, null=True)
     # purity = models.FloatField(default=None, null=True)
