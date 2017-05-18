@@ -31,6 +31,15 @@ class ProductItemPriceOnWebsiteAPI(GenericAPIView):
                 'message': str(e)
             }, status=status.HTTP_200_OK)
 
+class ProductItemSpecificationAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+    def get(self, request, *args, **kwargs):
+        product_item_id = request.GET.get('productItemId')
+        product_item = ProductItem.objects.get(id=product_item_id)
+        return Response({
+            'specification': product_item.get_specification(),
+            'success': True,
+        })
 
 
 class ProductItemAPI(GenericAPIView):

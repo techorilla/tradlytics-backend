@@ -73,9 +73,29 @@ urlpatterns = (
 
     # Transaction Related API
 
+    url(r'transactions/list/$',
+        TransactionListAPI.as_view(),
+        name='Transaction List'),
+
+    url(r'transactions/basic/$',
+        TransactionBasicAPI.as_view(),
+        name='Transaction Basic'),
+
     url(r'transactions/basic/(?P<tr_id>[a-zA-Z0-9.@_-]+)/$',
         TransactionBasicAPI.as_view(),
         name='Transaction Basic'),
+
+    url(r'transactions/note/(?P<tr_id>[a-zA-Z0-9.@_-]+)/(?P<note_id>[a-zA-Z0-9.@_-]+)/$',
+        TransactionNoteAPI.as_view(),
+        name='Transaction Basic'),
+
+    url(r'transactions/note/$',
+        TransactionNoteAPI.as_view(),
+        name='Transaction Notes'),
+
+    url(r'transactions/note/(?P<tr_id>[a-zA-Z0-9.@_-]+)/$',
+        TransactionNoteAPI.as_view(),
+        name='Transaction Notes'),
 
     url(r'transactions/commission/(?P<tr_id>[a-zA-Z0-9.@_-]+)/$',
         TransactionCommissionAPI.as_view(),
@@ -89,9 +109,7 @@ urlpatterns = (
         TransactionNoteAPI.as_view(),
         name='Transaction Documents'),
 
-    url(r'transactions/note/(?P<tr_id>[a-zA-Z0-9.@_-]+)/$',
-        TransactionBasicAPI.as_view(),
-        name='Transaction Notes'),
+
 
     url(r'transactions/secondary/(?P<tr_id>[a-zA-Z0-9.@_-]+)/$',
         TransactionSecondaryAPI.as_view(),
@@ -182,6 +200,11 @@ urlpatterns = (
     url(r'^product_item/$',
         ProductItemAPI.as_view(),
         name='Products_Item_API'),
+
+    url(r'^product_item/specs/$',
+        ProductItemSpecificationAPI.as_view(),
+        name='Product_Specification_API'
+        ),
 
     url(r'^product_item/price_on_website/$',
         ProductItemPriceOnWebsiteAPI.as_view(),
