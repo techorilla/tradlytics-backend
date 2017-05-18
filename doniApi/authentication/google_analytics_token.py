@@ -223,11 +223,12 @@ class GetGoogleAccessTokenAPI(APIView):
 
         def map_country_traffic(row):
             row_obj = dict()
-            country = countries.get(name=row[0])
-            row_obj['code'] = country.alpha_2
-            row_obj['name'] = row[0]
-            row_obj['value'] = row[1]
-            return row_obj
+            if row[0] != u'(not set)':
+                country = countries.get(name=row[0])
+                row_obj['code'] = country.alpha_2
+                row_obj['name'] = row[0]
+                row_obj['value'] = row[1]
+                return row_obj
 
         def map_traffic_row(row):
             row_obj = dict()
