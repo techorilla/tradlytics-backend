@@ -75,7 +75,7 @@ class Products(models.Model):
         product_items = []
         product_origin = self.countries.all()
         for product in product_origin:
-            product_items = product_items + product.get_product_items
+            product_items = product_items + product.product_items
         return product_items
 
     @classmethod

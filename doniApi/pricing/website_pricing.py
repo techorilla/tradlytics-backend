@@ -46,12 +46,14 @@ class WebsitePricingGraphAPI(GenericAPIView):
                 graph_item['intUsdPmt'] = None
 
             try:
-                import_volume = ManifestItem.objects.filter(product=product)\
-                    .filter(date__startswith=start_date)\
-                    .aggregate(Sum('quantity'))
 
+                import_volume = ManifestItem.objects.filter(product=product)\
+                    .filter(date__startswith=start_date.date())\
+                    .aggregate(Sum('quantity'))
+                print import_volume.get('quantity__sum'), start_date
                 graph_item['importVolume'] = import_volume.get('quantity__sum')
-            except:
+            except Exception, e:
+                print e
                 pass
 
 

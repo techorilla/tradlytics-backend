@@ -540,8 +540,8 @@ p {
 }
 .hero img{
     display: block;
-  width: auto;
-  height: 100%;
+    width: auto;
+    height: 100%;
 }
 .content {
     position: relative;
@@ -626,7 +626,7 @@ nav {
 }
 
 @media only screen and (min-width: 768px) {
-   .navbar-default {
+    .navbar-default {
         top: 30px;
     }
 }
@@ -1260,6 +1260,7 @@ nav {
 }
 .progress-bars p {
     line-height: .5;
+
 }
 #skills .progress-bars p {
     color: #dedede;
@@ -3331,7 +3332,7 @@ ul.caret-list li:before {
     margin-bottom: 80px;
 }
 .blog-post-title {
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
     letter-spacing: 1px;
     font-size: 30px;
 }
@@ -3831,6 +3832,51 @@ pre {
     height: 100%;
     width: 100%;
 }
+
+.amcharts-chart-div a {display:none !important;}
+
+
+.productItemCard {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.productItemCard .card{
+    border-top: 2px solid #1c1c1c;
+}
+
+.productItemCard .card .details .flag{
+    position: absolute;
+    right: 30px;
+    top: 30px;
+}
+
+.productItemCard .card .details .name{
+    color: #1c1c1c;
+    padding-top: 10xp;
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 20px;
+
+}
+
+.productItemCard .card .details .keywords{
+    margin-left: 10px;
+    color: #e20a16;
+}
+
+.productItemCard .card .report-button{
+    text-align: center;
+}
+
+.productItemCard .card .report-button a{
+    background: #e20a16;
+    border: 2px solid #e20a16;
+}
+
+
 
 
 

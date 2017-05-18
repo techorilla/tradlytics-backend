@@ -293,6 +293,24 @@ class ProductItem(models.Model):
         except ProductsSpecification.DoesNotExist:
             return []
 
+    @property
+    def specs(self):
+        try:
+            specs_config = self.product_origin.product.category.specification.specs
+            item_specs = self.specification if self.specification else []
+            for spec in specs_config:
+                spec_item = [item for item in item_specs
+                             if item.get(u'name','').lower() == spec.get(u'name', '').lower()]
+                if spec_item:
+
+                    spec_item = spec_item[0]
+                    spec[u'value'] = spec_item.get(u'value') if spec_item else None
+                else:
+                    spec[u'value'] = None
+            return specs_config
+        except ProductsSpecification.DoesNotExist:
+            return []
+
 
     def get_obj(self):
         return {
