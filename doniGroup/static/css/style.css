@@ -3876,6 +3876,21 @@ pre {
     border: 2px solid #e20a16;
 }
 
+.user-img{
+    position: relative;
+    overflow: hidden;
+    height: 321px;
+    border-radius: 266px;
+    width: 80%;
+    margin-left: auto;
+}
+
+.text-align-center{
+    text-align: center;
+    width: 80%;
+    margin-left: auto;
+}
+
 
 
 

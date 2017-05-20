@@ -82,9 +82,9 @@
      Owl Slider callings
      ---------------------*/
     $("#quote-slider").owlCarousel({
-        autoPlay : false,
+        autoPlay : true,
         singleItem : true,
-        pagination: false,
+        pagination: true,
         navigation: false
     });
     $("#owl-testimonials").owlCarousel({
