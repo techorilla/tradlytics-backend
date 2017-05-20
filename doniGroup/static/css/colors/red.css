@@ -1,8 +1,8 @@
 ::-moz-selection {
-    background: rgba(51, 122, 183, 0.08);;
+    background: rgba(178, 166, 166, 0.78);
 }
 ::selection {
-	background: rgba(51, 122, 183, 0.08);
+	background: rgba(178, 166, 166, 0.78);
 }
 
 
