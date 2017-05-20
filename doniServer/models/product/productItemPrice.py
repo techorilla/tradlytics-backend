@@ -87,7 +87,7 @@ class ProductItemPrice(models.Model):
         found = False
         while found is False:
             week_prices = ProductItemPrice.objects \
-                .filter(price_time__gte=self.month_before_date_time(months=1)) \
+                .filter(price_time__gte=self.week_before_date_time(weeks=1)) \
                 .filter(price_time__lte=self.price_time) \
                 .filter(price_market=self.price_market) \
                 .filter(product_item=self.product_item) \

@@ -4,6 +4,7 @@ from doniServer.models import Products, ProductCategory, ProductItem, PriceSumma
 from django.db.models import Max
 from datetime import datetime as dt
 from datetime import timedelta
+from django.conf import settings
 
 
 class PricingPage(View):
@@ -35,7 +36,13 @@ class PricingDetail(View):
         product_id = query = request.GET.get("id")
         base_url = request.META.get('HTTP_HOST')
         product_item = ProductItem.objects.get(id=product_id)
+        flag_url = settings.COUNTRIES_FLAG_URL
+
+        flag_url = flag_url.replace('{code}', product_item.product_origin.country.__str__().lower())
+
         context = {
-            'productItem': product_item
+
+            'productItem': product_item,
+            'productItemFlagURl': product_item.product_origin.country.flag
         }
         return render(request, self.template_name, context)

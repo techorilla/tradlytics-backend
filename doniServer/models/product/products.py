@@ -72,6 +72,12 @@ class Products(models.Model):
         product_item_count = len(self.product_items)
         return (manifest_count == 0) and (product_item_count == 0)
 
+    @property
+    def related_product_names(self):
+        related_product_names = self.related_products.all().values('name')
+        related_product_names = [prod.get('name') for prod in related_product_names]
+        return ', '.join(related_product_names)
+
 
     @property
     def related_product_ids(self):

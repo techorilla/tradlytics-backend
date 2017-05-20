@@ -14,6 +14,9 @@
 <section id="price-list" class="parallax-section-6" style="height:auto; background-position: 50% -117px;">
     <div class="col-md-12 text-center wow fadeInUp">
         <h3 class="section-title">
+            <img style="padding-right: 10px"
+                                 src="{{productItemFlagURl }}"
+                                 width="60" height="60">
 
             {{productItem.product_origin.product.name}}</h3>
         <p class="subheading">{{productItem.keyword_str}}</p>
@@ -46,6 +49,12 @@
         </div>
 
         <div style="width:100%; height:400px;" id="chartdiv"></div>
+
+        <div style="font-size: 10px;">
+            <div>The following products impact the price of {{productItem.product_origin.product.name}} and are part of import volume.</div>
+            <div style="color:#E20A16;">{{productItem.product_origin.product.related_product_names}}</div>
+        </div>
+
     </div>
 </section>
 

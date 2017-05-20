@@ -55,7 +55,6 @@ class WebsitePricingGraphAPI(GenericAPIView):
                 import_volume = ManifestItem.objects.filter(product__id__in=all_manifest_product_id)\
                     .filter(date__startswith=start_date.date())\
                     .aggregate(Sum('quantity'))
-                print import_volume.get('quantity__sum'), start_date
                 graph_item['importVolume'] = import_volume.get('quantity__sum')
             except Exception, e:
                 print e
