@@ -10,14 +10,13 @@ def get_image_path(instance, filename):
 
 
 class Vessel(models.Model):
-    image = models.ImageField(upload_to=get_image_path, blank=True, null=True)
     imo_number = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=300, null=True)
     broken = models.BooleanField(default=False)
     first_name = models.CharField(max_length=300)
     nationality = models.CharField(max_length=200)
     owner = models.CharField(max_length=300)
-    operator = models.ForeignKey(BpBasic, null=True)
+    operator = models.CharField(max_length=300, null=True)
     completion_year = models.CharField(max_length=100)
     shipyard = models.CharField(max_length=300)
     hull_number = models.CharField(max_length=100, null=True)

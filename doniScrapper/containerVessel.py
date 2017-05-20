@@ -41,7 +41,7 @@ class VesselScrapper(object):
             vessel.imo_number = information[0].text.strip().split(':')[1]
             vessel.broken = is_boken
             vessel.first_name = information[1].text.strip().split(':')[1]
-            nationality = information[2].text.strip().split(':')[1]
+            vessel.nationality = information[2].text.strip().split(':')[1]
             vessel.owner = information[3].text.strip().split(':')[1]
             operator = information[4].text.strip().split(':')[1]
             operator = operator.strip()
@@ -65,10 +65,4 @@ class VesselScrapper(object):
             vessel.dead_weight_ton = information[18].text.strip().split(':')[1]
             vessel.gross_tonnage_ton = information[19].text.strip().split(':')[1]
             vessel.handling_gear = information[20].text.strip().split(':')[1]
-            images = soup.find_all('img', src=re.compile(r'photo_'))
-            if len(images) > 0:
-                image = images[0]
-                image_url = self.URL % image['src']
-            else:
-                image_url = None
         return

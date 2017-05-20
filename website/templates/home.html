@@ -278,38 +278,15 @@
             </div>
 
             <div class="row text-center wow fadeInUp">
-
+                {% for service in services %}
                 <div class="col-md-3 col-sm-6 service">
-                    <span class="icon-notebook size-6x"></span>
+                    <span class="icon-{{service.icon_class}} size-6x"></span>
                     <div class="service-info">
-                        <h4>Brokerage</h4>
-                        <p class="service-description">We get our buyers the right deal in market.<br> Track shipments and make sure the quality of product is as par the contract.</p>
+                        <h4>{{service.heading}}</h4>
+                        <p class="service-description">{{service.content}}</p>
                     </div>
                 </div>
-
-                <div class="col-md-3 col-sm-6 service">
-                    <span class="icon-globe size-6x"></span>
-                    <div class="service-info">
-                        <h4>Global Market Research</h4>
-                        <p class="service-description">Vivamus a placerat ante. Duis vulputate nibh sit amet augue vehicula, mattis<br> viverra purus tristique.</p>
-                    </div>
-                </div>
-
-                <div class="col-md-3 col-sm-6 service">
-                    <span class="icon-graph size-6x"></span>
-                    <div class="service-info">
-                        <h4>Real-time Commodity Pricing</h4>
-                        <p class="service-description">Vivamus a placerat ante. Duis vulputate nibh sit amet augue vehicula, mattis<br> viverra purus tristique.</p>
-                    </div>
-                </div>
-
-                <div class="col-md-3 col-sm-6 service">
-                    <span class="icon-puzzle size-6x"></span>
-                    <div class="service-info">
-                        <h4>Consultancy</h4>
-                        <p class="service-description">Vivamus a placerat ante. Duis vulputate nibh sit amet augue vehicula, mattis<br> viverra purus tristique.</p>
-                    </div>
-                </div>
+                {% endfor %}
 
             </div>
 
