@@ -185,6 +185,10 @@ urlpatterns = (
         ProductsAPI.as_view(),
         name='Products'),
 
+    url(r'product/product_tags/$',
+        ProductTagsAPI.as_view(),
+        name='Product_Tags'),
+
     url(r'product/website_status/$',
         ProductOnWebsiteAPI.as_view(),
         name='Products_Website_Status'),

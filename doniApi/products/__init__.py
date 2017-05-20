@@ -1,5 +1,5 @@
 from .productKeywords import ProductsKeywordAPI
-from .products import ProductsAPI, ProducOriginAPI, ProductOnWebsiteAPI
+from .products import ProductsAPI, ProducOriginAPI, ProductOnWebsiteAPI, ProductTagsAPI
 from .productSpecification import ProductSpecificationAPI
 from .productCategory import ProductsCategoryAPI
 from .productItem import ProductItemAPI, ProductItemPriceOnWebsiteAPI, ProductItemSpecificationAPI

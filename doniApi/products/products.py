@@ -43,12 +43,35 @@ class ProducOriginAPI(GenericAPIView):
         }, status=status.HTTP_200_OK)
 
 
+class ProductTagsAPI(GenericAPIView):
+
+    def get(self, request, *args, **kwargs):
+        product_id = request.GET.get('productId')
+        query = request.GET.get('query')
+        product_tags = None
+        if product_id:
+            product_tags = Products.objects.exclude(id=int(product_id))\
+                .filter(name__icontains=query)\
+                .values('id','name',  'category__name').order_by('name')
+        else:
+            product_tags = Products.objects.filter(name__icontains=query) \
+                .values('id','name', 'category__name').order_by('name')
+        print product_tags
+        product_tags = [{
+                            'id': tag.get('id'),
+                            'name':tag.get('name'),
+                            'category': tag.get('category__name')
+                        }for tag in product_tags]
+
+        return Response(product_tags, status=status.HTTP_200_OK)
+
+
+
 class ProductOnWebsiteAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, *args, **kwargs):
         try:
-            print request.data
             product_id = request.data.get('productId')
             status = request.data.get('status')
             product = Products.objects.get(id=product_id)
@@ -77,6 +100,20 @@ class ProductsAPI(GenericAPIView):
         all_products = [product.get_obj(base_url) for product in all_products]
         return Response({'allProducts': all_products}, status=status.HTTP_200_OK)
 
+    def save_related_products(self, product, related_product=[]):
+        related_product_id = [int(prod.get(u'id')) for prod in related_product]
+        product_removed = product.related_products.exclude(id__in=related_product_id)
+        related_product = Products.objects.filter(id__in=related_product_id)
+        ## Removing removed related products
+        for prod in product_removed:
+            product.related_products.remove(prod)
+        ## Adding new related products
+        for prod in related_product:
+            if not product.related_products.filter(id=prod.id).exists():
+                product.related_products.add(prod)
+        product.save()
+
+
     def save_product(self, request):
         try:
             user = request.user
@@ -88,6 +125,8 @@ class ProductsAPI(GenericAPIView):
             product_description = product_data.get('description')
             product_category_id = product_data.get('categoryId')
             product_code = product_data.get('productCode')
+            related_product = product_data.get('relatedProduct')
+
             if product_id:
                 success_message = self.messages['successPUT']
                 error_message = self.messages['errorPUT']
@@ -110,6 +149,7 @@ class ProductsAPI(GenericAPIView):
             product.category = ProductCategory.objects.get(id=int(product_category_id))
             product.product_code = product_code
             product.save()
+            self.save_related_products(product, related_product)
             cache.delete('get_product_drop_down')
             return Response({
                 'success': True,

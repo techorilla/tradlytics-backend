@@ -23,6 +23,7 @@ class Products(models.Model):
     on_website = models.BooleanField(default=False)
     product_code = models.CharField(max_length=10, null=True, unique=True)
     category = models.ForeignKey(ProductCategory, null=True, blank=True, related_name='products')
+    related_products = models.ManyToManyField('self', blank=True, null=True, related_name='related_products')
     business = models.ForeignKey(BpBasic, default=BpBasic.get_admin_business().bp_id)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
@@ -35,10 +36,18 @@ class Products(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_tag(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'category': self.category.name
+        }
+
     def get_obj(self, base_url):
         return {
             'id': self.id,
             'info':{
+                'relatedProduct': [prod.get_tag() for prod in self.related_products.all()],
                 'onWebsite': self.on_website,
                 'id': self.id,
                 'name': self.name,
@@ -50,7 +59,7 @@ class Products(models.Model):
             },
             'isDeletable': self.is_deletable,
             'origins': self.product_origins,
-            'productItems': self.product_items,
+            'productItems': self.product_items_obj,
             'updatedBy': self.updated_by.username if self.updated_by else None,
             'updatedAt': self.updated_at,
             'createdBy': self.created_by.username,
@@ -65,10 +74,24 @@ class Products(models.Model):
 
 
     @property
+    def related_product_ids(self):
+        related_product_ids = self.related_products.all().values('id')
+        return [prod.get('id') for prod in related_product_ids]
+
+    @property
     def product_origins(self):
         origins = self.countries.all()
         origins = [origin.country.code for origin in origins]
         return origins
+
+    @property
+    def product_items_obj(self):
+        product_items = []
+        product_origin = self.countries.all()
+        for product in product_origin:
+            product_items = product_items + product.get_product_items
+        return product_items
+
 
     @property
     def product_items(self):

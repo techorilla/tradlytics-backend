@@ -22,6 +22,11 @@ class WebsitePricingGraphAPI(GenericAPIView):
         graph_data = []
         product_item = ProductItem.objects.get(id=product_item_id)
         product = product_item.product_origin.product
+
+        all_manifest_product_id = list()
+        all_manifest_product_id.append(int(product.id))
+        all_manifest_product_id = all_manifest_product_id + product.related_product_ids
+
         while start_date <= end_date:
             graph_item = dict()
             graph_item['date'] = start_date.strftime('%Y-%m-%d')
@@ -45,9 +50,9 @@ class WebsitePricingGraphAPI(GenericAPIView):
                 graph_item['intPkrPkg'] = None
                 graph_item['intUsdPmt'] = None
 
+            # Manifest Data
             try:
-
-                import_volume = ManifestItem.objects.filter(product=product)\
+                import_volume = ManifestItem.objects.filter(product__id__in=all_manifest_product_id)\
                     .filter(date__startswith=start_date.date())\
                     .aggregate(Sum('quantity'))
                 print import_volume.get('quantity__sum'), start_date
@@ -60,7 +65,7 @@ class WebsitePricingGraphAPI(GenericAPIView):
             graph_data.append(graph_item)
             start_date = start_date + timedelta(days=1)
 
-        total_import = ManifestItem.objects.filter(product=product) \
+        total_import = ManifestItem.objects.filter(product__id__in=all_manifest_product_id) \
             .filter(date__lte=end_date).filter(date__gte=start_date_2) \
             .aggregate(Sum('quantity'))
 
