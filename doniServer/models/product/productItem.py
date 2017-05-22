@@ -44,14 +44,19 @@ class ProductItem(models.Model):
         while not price_exists_for_today:
             price_exists_for_today = ProductItem.objects\
                 .filter(price_product_item__price_time__startswith=price_date.date(), price_on_website=True).exists()
+            if price_exists_for_today:
+                day_before = price_date - timedelta(days=1)
+                break
             price_date = price_date - timedelta(days=1)
-            day_before = price_date - timedelta(days=1)
+
 
         price_exists_for_day_before = False
 
         while not price_exists_for_day_before:
             price_exists_for_day_before = ProductItem.objects \
                 .filter(price_product_item__price_time__startswith=day_before.date(), price_on_website=True).exists()
+            if price_exists_for_day_before:
+                break
             day_before = day_before - timedelta(days=1)
 
         ticker_items = []
