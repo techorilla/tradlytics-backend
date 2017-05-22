@@ -12,8 +12,10 @@ class HomePage(View):
 
         slides = HomeSlider.objects.all()
         services = HomeServices.objects.all()
+        ticker_item, price_date = ProductItem.get_price_ticker()
         context = {
-            'ticker_items': ProductItem.get_price_ticker(),
+            'ticker_items': ticker_item,
+            'price_date': price_date,
             'slides': slides,
             'services': services
         }

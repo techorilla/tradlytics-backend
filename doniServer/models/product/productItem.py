@@ -39,11 +39,21 @@ class ProductItem(models.Model):
         price_date = dt.now()
         day_before = price_date - timedelta(days=1)
         ticker_products = ProductItem.objects.filter(price_on_website=True).distinct()
-        price_exists_for_today = ProductItem.objects.filter(price_product_item__price_time__startswith=price_date.date(), price_on_website=True).exists()
+        price_exists_for_today = False
 
-        if not price_exists_for_today:
-            price_date = day_before
+        while not price_exists_for_today:
+            price_exists_for_today = ProductItem.objects\
+                .filter(price_product_item__price_time__startswith=price_date.date(), price_on_website=True).exists()
+            price_date = price_date - timedelta(days=1)
             day_before = price_date - timedelta(days=1)
+
+        price_exists_for_day_before = False
+
+        while not price_exists_for_day_before:
+            price_exists_for_day_before = ProductItem.objects \
+                .filter(price_product_item__price_time__startswith=day_before.date(), price_on_website=True).exists()
+            day_before = day_before - timedelta(days=1)
+
         ticker_items = []
         for product_item in ticker_products:
             day_before_local_price = product_item.price_product_item.filter(
@@ -126,7 +136,7 @@ class ProductItem(models.Model):
             except:
                 item['internationalPrice_usd_pmt_change'] = 0.00
             ticker_obj.append(item)
-        return ticker_obj
+        return ticker_obj, price_date
 
 
 
