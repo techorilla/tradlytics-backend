@@ -267,6 +267,7 @@ p {
 .parallax-section-1 {
     background-image: url(../img/backgrounds/bg-1.jpg);
 }
+
 .parallax-section-2 {
     background-image: url(../img/backgrounds/bg-2.jpg);
 }
@@ -286,7 +287,16 @@ p {
     background-image: url(../img/backgrounds/bg-7.jpg);
 }
 .parallax-section-8 {
-    background-image: url(../img/backgrounds/bg-8.jpg);
+    background-image: url(../img/backgrounds/about-us.jpg);
+}
+
+#about {
+    color: #ffffff !important;
+    background-image: url(../img/backgrounds/about-us.jpg);
+    background-position: 50% 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 /*----- Home Sections -----*/
