@@ -187,7 +187,7 @@
                     "valueField": "importVolume",
                     "clustered": false,
                     "columnWidth": 0.5,
-                    "legendValueText": "[[value]]FCL",
+                    "legendValueText": "[[value]] FCL",
                     "balloonText": "[[title]]<br /><b style='font-size: 130%'>[[value]] FCL</b>"
                 },
                 {
@@ -201,11 +201,11 @@
                     "lineThickness": 3,
                     "lineColor": "#2C9BFF",
                     "type": "smoothedLine",
-                    "title": "International Price",
+                    "title": "International",
                     "useLineColorForBulletBorder": true,
                     "valueField": "int"+state,
                     "legendValueText": currency +" [[value]] " + metric,
-                    "balloonText": "[[title]]<br /><b style='font-size: 130%'>"+ currency +"[[value]]"+ metric +"</b>"
+                    "balloonText": "[[title]]<br /><b style='font-size: 130%'>"+ currency +" [[value]] "+ metric +"</b>"
                 },
                 {
                     "id": "g2",
@@ -218,11 +218,11 @@
                     "lineThickness": 3,
                     "lineColor": "#0aec92",
                     "type": "smoothedLine",
-                    "title": "Local Price",
+                    "title": "Local",
                     "useLineColorForBulletBorder": true,
                     "valueField": "local"+state,
-                    "legendValueText": currency +" [[value]] " + metric,
-                    "balloonText": "[[title]]<br /><b style='font-size: 130%'>"+ currency +"[[value]]"+ metric +"</b>"
+                    "legendValueText": currency +" [[value]] " + metric ,
+                    "balloonText": "[[title]]<br /><b style='font-size: 130%'>"+ currency +" [[value]] "+ metric +"</b>"
                 }
             ];
             return graphs;
