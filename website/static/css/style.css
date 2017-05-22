@@ -291,7 +291,6 @@ p {
 }
 
 #about {
-    color: #ffffff !important;
     background-image: url(../img/backgrounds/about-us.jpg);
     background-position: 50% 0;
     background-size: cover;
