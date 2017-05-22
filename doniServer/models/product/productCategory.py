@@ -15,7 +15,7 @@ class ProductCategory(models.Model):
 
     @classmethod
     def get_category_for_website(cls):
-        categories = cls.objects.filter(products__on_website=True)
+        categories = cls.objects.filter(products__on_website=True).distinct()
         return [cat.get_category_list() for cat in categories]
 
     @property

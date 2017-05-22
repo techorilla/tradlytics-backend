@@ -13,12 +13,15 @@ class WebsitePricingGraphAPI(GenericAPIView):
     authentication_classes = (CsrfExemptSessionAuthentication,)
 
     def get(self, request, *args, **kwargs):
+        date_limit = '2017-04-01'
         product_item_id = int(kwargs.get('product_item_id'))
         start_date = kwargs.get('start_date')
         end_date = kwargs.get('end_date')
-        start_date = dt.strptime(start_date, '%Y-%m-%d')
+        start_date = dt.strptime(start_date, '%Y-%m-%d') if not (str(start_date) < date_limit) else  dt.strptime(date_limit, '%Y-%m-%d')
         start_date_2 = start_date
         end_date = dt.strptime(end_date, '%Y-%m-%d')
+
+
         graph_data = []
         product_item = ProductItem.objects.get(id=product_item_id)
         product = product_item.product_origin.product
