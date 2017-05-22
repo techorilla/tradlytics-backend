@@ -10,6 +10,7 @@ from datetime import datetime as dt, timedelta
 from jsonfield import JSONField
 from .productSpecification import ProductsSpecification
 import json
+import dateutil.parser
 
 
 
@@ -43,6 +44,8 @@ class ProductItem(models.Model):
         last_update = ProductItem.objects\
                 .filter(price_on_website=True).values('price_product_item__price_time').order_by('-price_product_item__price_time').first()
         last_update =  last_update.get('price_product_item__price_time')
+        last_update =  dateutil.parser.parse(str(last_update).replace('"', ''))
+
         price_exists_for_today = False
 
         while not price_exists_for_today:

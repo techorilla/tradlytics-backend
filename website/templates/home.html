@@ -1,4 +1,5 @@
 {% extends "base2.html" %}
+{% load tz %}
 {% load staticfiles %}
 {% block content %}
 
@@ -15,7 +16,7 @@
 
             <div class="legends">
                 <div style="font-size: 9px; padding-top: 5px; padding-left: 10px;" class="last-updated">
-                    Last Updated {{price_date}}
+                    Last Updated {{price_date}} PKT
                 </div>
             </div>
         </div>
