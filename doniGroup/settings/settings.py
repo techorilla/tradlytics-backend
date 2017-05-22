@@ -34,6 +34,7 @@ SECRET_KEY = '=^5p6c(@(e#^w!v_0cvwnfh11bwng6@dltr!z-ujdifxrm5eh3'
 
 ALLOWED_HOSTS = [
     'tramodity.com',
+    'www.donigroup.com',
     'donigroup.com',
     'localhost',
     '127.0.0.1',
