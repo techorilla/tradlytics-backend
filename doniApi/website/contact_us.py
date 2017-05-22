@@ -61,7 +61,7 @@ class ContactUsAPI(APIView):
                 'message': data.get('comments')
             }, '[Website] %s contacted from Doni & Company' % data.get('name'), send_to_email=settings.EMAIL_INFO)
 
-            return Response({'success': True, 'message': 'We have recieved your message.'}, status=status.HTTP_200_OK)
+            return Response({'success': True, 'message': 'We have received your message.'}, status=status.HTTP_200_OK)
         else:
             return validated_error
 
