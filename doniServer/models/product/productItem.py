@@ -40,6 +40,9 @@ class ProductItem(models.Model):
         price_date = dt.now()
         day_before = price_date - timedelta(days=1)
         ticker_products = ProductItem.objects.filter(price_on_website=True).order_by('price_on_website_order').order_by('price_on_website_order').distinct()
+        last_update = ProductItem.objects\
+                .filter(price_on_website=True).values('price_product_item__price_time').order_by('-price_product_item__price_time').first()
+        last_update =  last_update.get('price_product_item__price_time')
         price_exists_for_today = False
 
         while not price_exists_for_today:
@@ -142,7 +145,7 @@ class ProductItem(models.Model):
             except:
                 item['internationalPrice_usd_pmt_change'] = 0.00
             ticker_obj.append(item)
-        return ticker_obj, price_date
+        return ticker_obj, last_update
 
 
 

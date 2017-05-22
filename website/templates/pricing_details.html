@@ -123,7 +123,7 @@
                     }
                 }, {
                     "id": "v2",
-                    "title": "International Price",
+                    "title": "Price",
                     "gridAlpha": 0,
                     "position": "right",
                     "autoGridCount": false
@@ -204,8 +204,8 @@
                     "title": "International",
                     "useLineColorForBulletBorder": true,
                     "valueField": "int"+state,
-                    "legendValueText": currency +" [[value]] " + metric,
-                    "balloonText": "[[title]]<br /><b style='font-size: 130%'>"+ currency +" [[value]] "+ metric +"</b>"
+                    "legendValueText": currency +"[[value]]" + metric,
+                    "balloonText": "[[title]]<br /><b style='font-size: 130%'>"+ currency +"[[value]]"+ metric +"</b>"
                 },
                 {
                     "id": "g2",
@@ -221,8 +221,8 @@
                     "title": "Local",
                     "useLineColorForBulletBorder": true,
                     "valueField": "local"+state,
-                    "legendValueText": currency +" [[value]] " + metric ,
-                    "balloonText": "[[title]]<br /><b style='font-size: 130%'>"+ currency +" [[value]] "+ metric +"</b>"
+                    "legendValueText": currency +"[[value]]" + metric,
+                    "balloonText": "[[title]]<br /><b style='font-size: 130%'>"+ currency +"[[value]]"+ metric +"</b>"
                 }
             ];
             return graphs;
