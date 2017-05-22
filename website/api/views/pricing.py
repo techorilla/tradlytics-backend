@@ -12,8 +12,8 @@ class PricingPage(View):
 
     def get(self, request, *args, **kwargs):
 
-        all_product_on_website = ProductItem.objects.filter(price_on_website=True).distinct()\
-            .order_by('product_origin__product__name')
+        all_product_on_website = ProductItem.objects.filter(price_on_website=True).distinct() \
+            .order_by('price_on_website_order')
 
         price_summary = []
 

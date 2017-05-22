@@ -18,6 +18,7 @@ class ProductItem(models.Model):
     keywords = models.ManyToManyField(ProductKeyword, related_name='product_items')
     product_origin = models.ForeignKey(ProductOrigin, null=True, blank=False, related_name='origin_product_item')
     price_on_website = models.BooleanField(default=False)
+    price_on_website_order = models.IntegerField(default=100, null=False)
     import_expense = models.FloatField(default=1.07)
     specification = JSONField(null=True)
     database_ids = models.CharField(max_length=250, null=True)
@@ -38,7 +39,7 @@ class ProductItem(models.Model):
     def get_price_ticker(cls):
         price_date = dt.now()
         day_before = price_date - timedelta(days=1)
-        ticker_products = ProductItem.objects.filter(price_on_website=True).distinct()
+        ticker_products = ProductItem.objects.filter(price_on_website=True).order_by('price_on_website_order').order_by('price_on_website_order').distinct()
         price_exists_for_today = False
 
         while not price_exists_for_today:
