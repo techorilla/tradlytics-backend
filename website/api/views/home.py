@@ -9,7 +9,6 @@ class HomePage(View):
     template_name = 'home.html'
 
     def get(self, request, *args, **kwargs):
-        print request.META
         slides = HomeSlider.objects.all()
         services = HomeServices.objects.all()
         ticker_item, price_date = ProductItem.get_price_ticker()
