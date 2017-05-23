@@ -248,7 +248,7 @@ p {
 /*----- Backgrounds ------*/
 
 #contact{
-    background-image: url(../img/backgrounds/field-background.png);
+    background-image: url(../img/backgrounds/contact-us.jpg);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: bottom;
@@ -306,7 +306,9 @@ p {
 .parallax-section-4,
 .parallax-section-5,
 .parallax-section-7,
-.parallax-section-8 {
+.parallax-section-8,
+#contact
+{
     background-position: 50% 0;
     background-size: cover;
     background-repeat: no-repeat;
@@ -343,6 +345,7 @@ p {
         height: 400px;
     }
 }
+.contact-container:after,
 #home-parallax-fullscreen:after,
 .parallax-section-1:after,
 .parallax-section-2:after,
@@ -1487,7 +1490,7 @@ nav {
     text-transform: uppercase;
     letter-spacing: 1px;
     margin: 0;
-    color: #fff;
+    color: #000000;
     border-left: none;
     text-align: center;
 }
@@ -2224,6 +2227,7 @@ blockquote strong {
     padding-bottom: 80px;
 }
 #contact .section-title {
+    color: #ffffff;
     font-size: 55px;
     text-transform: uppercase;
     line-height: 55px;
@@ -2381,6 +2385,7 @@ acronym {
 
 /*----- Google maps -----*/
 #map {
+    border-radius: 10px;
     height:480px;
     width:100%;
 }
@@ -3282,8 +3287,8 @@ ul.caret-list li:before {
     transition: all 0.5s;
 }
 .owl-theme .owl-controls .owl-page.active span {
-    border-color: #f0f0f0;
-    background-color: transparent;
+    border-color: #E20A16;
+    background-color: #bbb;
 }
 .owl-carousel{
     overflow: hidden;
