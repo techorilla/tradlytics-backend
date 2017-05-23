@@ -12,18 +12,118 @@
 
 <div id="cover"></div>
 <section id="price-list" class="parallax-section-6" style="height:auto; background-position: 50% -117px;">
-    <div class="col-md-12 text-center wow fadeInUp">
-        <h3 class="section-title">
-            <img style="padding-right: 10px"
-                                 src="{{productItemFlagURl }}"
-                                 width="60" height="60">
+    <div class="container">
 
-            {{productItem.product_origin.product.name}}</h3>
-        <p class="subheading">{{productItem.keyword_str}}</p>
+        <!--{% if prePreviousProduct %}-->
+        <!--<div class="col-md-4 text-center wow fadeInUp">-->
+        <!--<div class="product-container effect8">-->
+        <!--<h3 class="section-title">-->
+        <!--<img style="padding-right: 10px"-->
+        <!--src="{{prePreviousProduct.product_origin.country.flag}}"-->
+        <!--width="60" height="60">-->
+
+        <!--{{prePreviousProduct.product_origin.product.name}}</h3>-->
+        <!--{% if prePreviousProduct.keyword_str != '' %}-->
+        <!--<p class="subheading">{{prePreviousProduct.keyword_str}}</p>-->
+        <!--{% endif %}-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--{% endif %}-->
+
+        <!--{% if previousProduct %}-->
+        <!--<div class="col-md-4 text-center wow fadeInUp">-->
+        <!--<div class="product-container effect8">-->
+        <!--<h3 class="section-title">-->
+        <!--<img style="padding-right: 10px"-->
+        <!--src="{{previousProduct.product_origin.country.flag}}"-->
+        <!--width="60" height="60">-->
+
+        <!--{{previousProduct.product_origin.product.name}}</h3>-->
+        <!--{% if previousProduct.keyword_str != '' %}-->
+        <!--<p class="subheading">{{previousProduct.keyword_str}}</p>-->
+        <!--{% endif %}-->
+
+        <!--</div>-->
+        <!--</div>-->
+        <!--{% endif %}-->
+
+        <div class="col-md-12 text-center wow fadeInUp">
+
+            <div class="active effect8">
+                <h3 class="section-title">
+                    <img style="padding-right: 10px"
+                         src="{{productItem.product_origin.country.flag}}"
+                         width="60" height="60">
+
+                    {{productItem.product_origin.product.name}}</h3>
+                {% if productItem.keyword_str != '' %}
+                <p class="subheading">{{productItem.keyword_str}}</p>
+                {% endif %}
+
+            </div>
+
+
+
+        </div>
+
+        <!--{% if nextProduct %}-->
+        <!--<div class="col-md-4 text-center wow fadeInUp">-->
+        <!--<div class="product-container effect8">-->
+        <!--<h3 class="section-title">-->
+        <!--<img style="padding-right: 10px"-->
+        <!--src="{{nextProduct.product_origin.country.flag}}"-->
+        <!--width="60" height="60">-->
+
+        <!--{{nextProduct.product_origin.product.name}}</h3>-->
+        <!--{% if nextProduct.keyword_str != '' %}-->
+        <!--<p class="subheading">{{nextProduct.keyword_str}}</p>-->
+        <!--{% endif %}-->
+        <!--</div>-->
+
+        <!--</div>-->
+        <!--{% endif %}-->
+
+        <!--{% if nextNextProduct %}-->
+
+        <!--<div class="col-md-4 text-center wow fadeInUp">-->
+        <!--<div class="product-container effect8">-->
+        <!--<h3 class="section-title">-->
+        <!--<img style="padding-right: 10px"-->
+        <!--src="{{nextNextProduct.product_origin.country.flag}}"-->
+        <!--width="60" height="60">-->
+
+        <!--{{nextNextProduct.product_origin.product.name}}</h3>-->
+        <!--{% if nextNextProduct.keyword_str != '' %}-->
+        <!--<p class="subheading">{{nextNextProduct.keyword_str}}</p>-->
+        <!--{% endif %}-->
+        <!--</div>-->
+        <!--</div>-->
+
+        <!--{% endif %}-->
+
     </div>
 
+    <br/>
+
     <div class="container" style="height:100%">
-        <div class="col-md-offset-8 col-md-4">
+        <div class="col-md-4">
+            <ul class="nav nav-tabs nav-tabs-center pull-left">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" >Change Product <b class="caret"></b></a>
+                    <ul class="dropdown-menu" id="allProductsList" style="width: 98.5%">
+                        {% for product in productList %}
+                        <li>
+                            <a href="{% url 'web:pricing_detail' %}?id={{ product.id }}"><img style=""
+                                 src="{{ product.product_origin.country.flag }}"
+                                 width="20" height="20"> &nbsp;&nbsp;&nbsp;{{product.product_origin.product.name}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-offset-4 col-md-4">
+
+
             <div class="metric-selector">
                 <span id="PkrPkg">Rs/kg</span> <span id="UsdPmt">US$/MT</span>
             </div>
@@ -50,10 +150,14 @@
 
         <div style="width:100%; height:400px;" id="chartdiv"></div>
 
+        {% if productItem.product_origin.product.related_product_names != '' %}
+
         <div style="font-size: 10px;">
             <div>The following products impact the price of {{productItem.product_origin.product.name}} and are part of import volume.</div>
             <div style="color:#E20A16;">{{productItem.product_origin.product.related_product_names}}</div>
         </div>
+
+        {% endif %}
 
     </div>
 </section>
@@ -74,12 +178,18 @@
 <script src='{% static "js/daterangepicker.js" %}'></script>
 
 <script>
+
     $(function() {
         var allData = {};
         var usdPmtId = 'UsdPmt';
         var pkrPkgId = 'PkrPkg';
         var usdPmt = document.getElementById(usdPmtId);
         var pkrPkg = document.getElementById(pkrPkgId);
+
+
+
+
+
 
         usdPmt.onclick = function(){
             $('#'+usdPmtId).addClass("active");
@@ -91,6 +201,8 @@
             $('#'+usdPmtId).removeClass("active");
             make_charts(getGraphs(pkrPkgId), allData.graphData)
         };
+
+
 
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -237,7 +349,7 @@
                 url: window.location.origin+"/api/website/pricing/graph/"+productItemId+"/"+startDate+"/"+endDate+'/',
                 type: 'GET',
                 success: function(res) {
-                     $('#cover').fadeOut(1000);
+                    $('#cover').fadeOut(1000);
                     allData = res;
                     $('#'+pkrPkgId).addClass("active");
                     document.getElementById('totalImport').innerText= (res.totalImport) ? res.totalImport+' FCL' : 'NA';
@@ -273,6 +385,8 @@
         });
 
     });
+
+
 </script>
 
 <script>

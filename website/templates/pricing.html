@@ -32,6 +32,14 @@
                             <img style="padding-right: 10px"
                                  src="{{ summary.originFlag }}"
                                  width="30" height="30">{{summary.productName | slice:":16"}}</h3>
+                        <div class="col-md-12">
+                            <span class="feature option-button no-border">
+                                    <a href="{% url 'web:pricing_detail' %}?id={{ summary.productItemId }}"
+                                       style="color: #fff; font-weight: bold; font-weight: bold !important;"
+                                       class="btn-effect red-background">View Price Charts</a>
+                                </span>
+                        </div>
+
                         <div class="col-md-6">
                             <p class="price grey">
                                 <span class="time-period">International Market</span>
@@ -163,9 +171,7 @@
                                     <span class="item col-md-4">Last Updated</span>
                                     <span class="date-item col-md-4">{{summary.localLastUpdated}}</span>
                                 </span>
-                                <span class="feature option-button no-border">
-                                    <a href="{% url 'web:pricing_detail' %}?id={{ summary.productItemId }}" class="btn-effect">Detail Market Prices</a>
-                                </span>
+
                             </p>
                         </div>
 

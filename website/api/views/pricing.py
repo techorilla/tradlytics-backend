@@ -36,12 +36,21 @@ class PricingDetail(View):
         product_id = query = request.GET.get("id")
         base_url = request.META.get('HTTP_HOST')
         product_item = ProductItem.objects.get(id=product_id)
-        flag_url = settings.COUNTRIES_FLAG_URL
+        order = product_item.price_on_website_order
 
-        flag_url = flag_url.replace('{code}', product_item.product_origin.country.__str__().lower())
+        prod_list = ProductItem.objects.filter(price_on_website=True).exclude(id=product_id).distinct() \
+            .order_by('price_on_website_order')
+
+
+
+
+
+
+
 
         context = {
-
+            'productList': prod_list,
+            'priceSummary': product_item.price_market_summary,
             'productItem': product_item,
             'productItemFlagURl': product_item.product_origin.country.flag
         }
