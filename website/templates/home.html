@@ -393,7 +393,7 @@
     </section>
 
     <!-- Start Quote Section -->
-    <section id="quote" class="parallax-section-3">
+    <section id="quote" class="">
         <div class="container">
             <div class="row wow fadeInUp">
 
@@ -449,10 +449,10 @@
     <!-- End Quote Section -->
 
     <!-- Start Contact Form Section -->
-    <section id="contact">
+    <section id="contact" class="contact-container">
         <div class="container">
             <div class="row">
-                <h2 class="section-title wow fadeInUp">LET’S WORK TOGETHER.</h2>
+                <h2 class="section-title wow fadeInUp" style="color: #ffffff !important;">LET’S WORK TOGETHER</h2>
                 <div class="col-md-6">
                     <!-- Start Google Map Section -->
                     <div id="map"></div>
@@ -583,7 +583,7 @@
         $('#map')
                 .gmap3({
                     center: center,
-                    styles: [ { stylers: [ { "saturation":-90 }, { "lightness": 0 }, { "gamma": 0.0 }]},],
+//                    styles: [ { stylers: [ { "saturation":-90 }, { "lightness": 0 }, { "gamma": 0.0 }]},],
                     zoom: 16,
                     scrollwheel:false,
                     draggable: true,
