@@ -1299,6 +1299,7 @@ nav {
 #team {
     padding-top: 80px;
     padding-bottom: 65px;
+    background: rgb(239, 239, 239);
 }
 .team-member {
     padding: 10px;
