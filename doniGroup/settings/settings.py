@@ -206,7 +206,7 @@ GOOGLE_API_KEY = 'AIzaSyBo_6vyHY2wE1G3wlY0PfH6_oW-leyCbWk'
 ## Google Analytics
 GOOGLE_ANALYTICS_PROFILE_ID = '147714020'
 GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-97177253-1'
-GOOGLE_ANALYTICS_DOMAIN = 'tramodity.com'
+GOOGLE_ANALYTICS_DOMAIN = ['donigroup.com']
 
 CRONJOBS = [
     ('0 4 * * *', 'django.core.management.call_command', ['check_celery_status'], {}, '>> /tmp/check_celery_status.log'),
