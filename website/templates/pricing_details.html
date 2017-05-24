@@ -114,8 +114,8 @@
                         {% for product in productList %}
                         <li>
                             <a href="{% url 'web:pricing_detail' %}?id={{ product.id }}"><img style=""
-                                 src="{{ product.product_origin.country.flag }}"
-                                 width="20" height="20"> &nbsp;&nbsp;&nbsp;{{product.product_origin.product.name}}</a></li>
+                                                                                              src="{{ product.product_origin.country.flag }}"
+                                                                                              width="20" height="20"> &nbsp;&nbsp;&nbsp;{{product.product_origin.product.name}}</a></li>
                         {% endfor %}
                     </ul>
                 </li>
@@ -148,18 +148,34 @@
             <!--</div>-->
         </div>
 
-        <div style="width:100%; height:400px;" id="chartdiv"></div>
+        <div class="col-md-12" style="width:100%; height:400px;" id="chartdiv"></div>
+
+        <div class="col-md-12">
+            <h4>Import Volume Distribution</h4>
+            <div class="col-md-6">
+                <div style="width:100%; height:400px;" id="provinceDistribution"></div>
+            </div>
+
+            <div class="col-md-6">
+                <div  style="width:100%; height:400px;" id="cityDistribution"></div>
+            </div>
+
+        </div>
 
         {% if productItem.product_origin.product.related_product_names != '' %}
 
-        <div style="font-size: 10px;">
+        <div class="col-md-12" style="font-size: 10px;">
             <div>The following products impact the price of {{productItem.product_origin.product.name}} and are part of import volume.</div>
             <div style="color:#E20A16;">{{productItem.product_origin.product.related_product_names}}</div>
         </div>
 
         {% endif %}
 
+
+
     </div>
+
+
 </section>
 
 {% endblock content %}
@@ -170,6 +186,7 @@
 
 
 <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+<script src="https://www.amcharts.com/lib/3/pie.js"></script>
 <script src="https://www.amcharts.com/lib/3/serial.js"></script>
 <script src="https://www.amcharts.com/lib/3/amstock.js"></script>
 <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
@@ -181,15 +198,11 @@
 
     $(function() {
         var allData = {};
+         $('#cover').fadeIn();
         var usdPmtId = 'UsdPmt';
         var pkrPkgId = 'PkrPkg';
         var usdPmt = document.getElementById(usdPmtId);
         var pkrPkg = document.getElementById(pkrPkgId);
-
-
-
-
-
 
         usdPmt.onclick = function(){
             $('#'+usdPmtId).addClass("active");
@@ -219,7 +232,56 @@
             get_graph_data(start.format(dateAPIFormat), end.format(dateAPIFormat));
         }
 
+        function makePieChart(pieDataProvince, pieDataCity){
+            var pieChart = AmCharts.makeChart( "provinceDistribution", {
+                "type": "pie",
+                "theme": "light",
+                "dataProvider": pieDataProvince,
+                "innerRadius": 80,
+                "valueField": "import",
+                "titleField": "state",
+                "outlineAlpha": 0.4,
+                "depth3D": 25,
+                "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> FCL</span>",
+                "angle": 36,
+                "export": {
+                    "enabled": true
+                },
+                "titles": [
+                    {
+                        "text": "Provice Distribution",
+                        "size": 15
+                    }
+                ]
+
+            } );
+
+            var cityPieChart = AmCharts.makeChart( "cityDistribution", {
+                "type": "pie",
+                "theme": "light",
+                "dataProvider": pieDataCity,
+                "innerRadius": 80,
+                "valueField": "quantity",
+                "titleField": "city",
+                "outlineAlpha": 0.4,
+                "depth3D": 25,
+                "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> FCL</span>",
+                "angle": 36,
+                "export": {
+                    "enabled": true
+                },
+                 "titles": [
+                    {
+                        "text": "City Distribution",
+                        "size": 15
+                    }
+                ]
+
+            } );
+        }
+
         function make_charts(graphs, graphData){
+
             var chart = AmCharts.makeChart("chartdiv", {
                 "type": "serial",
                 "theme": "light",
@@ -343,6 +405,7 @@
 
 
         function get_graph_data(startDate, endDate){
+            $('html,body').scrollTop(0);
             $('#cover').fadeIn();
             var productItemId = getUrlParameter('id');
             $.ajax({
@@ -354,6 +417,7 @@
                     $('#'+pkrPkgId).addClass("active");
                     document.getElementById('totalImport').innerText= (res.totalImport) ? res.totalImport+' FCL' : 'NA';
                     make_charts(getGraphs('PkrPkg'), res.graphData);
+                    makePieChart(res.volumeSummary.stateImport, res.volumeSummary.cityImport);
                 }
             });
         }

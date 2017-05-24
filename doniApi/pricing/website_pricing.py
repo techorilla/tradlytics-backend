@@ -67,15 +67,45 @@ class WebsitePricingGraphAPI(GenericAPIView):
             graph_data.append(graph_item)
             start_date = start_date + timedelta(days=1)
 
-        total_import = ManifestItem.objects.filter(product__id__in=all_manifest_product_id) \
-            .filter(date__lte=end_date).filter(date__gte=start_date_2) \
-            .aggregate(Sum('quantity'))
+        ## Manifest Query Set
+
+        all_manifest_query_set = ManifestItem.objects.filter(product__id__in=all_manifest_product_id) \
+            .filter(date__lte=end_date).filter(date__gte=start_date_2)
+
+        total_import = all_manifest_query_set.aggregate(Sum('quantity'))
 
 
-        ProductItemPrice.objects.filter(product_item__id=product_item_id).filter()
+
+        ## Pakistan Market Import Volume Distribution
+
+        state_import = dict()
+        city_import = dict()
+
+        for item in all_manifest_query_set:
+
+
+            if item.buyer.primary_state not in state_import.keys():
+                state_import[item.buyer.primary_state] = 0
+            state_import[item.buyer.primary_state] = state_import[item.buyer.primary_state] + item.quantity
+
+            if item.buyer.primary_city not in city_import.keys():
+                city_import[item.buyer.primary_city] = {
+                    'state': item.buyer.primary_state,
+                    'quantity': 0
+                }
+            city_import[item.buyer.primary_city]['quantity'] = city_import[item.buyer.primary_city]['quantity'] + item.quantity
+
+        city_import_data = []
+        for key, data in city_import.items():
+            data.update({'city': key})
+            city_import_data.append(data)
 
 
         return Response({
+            'volumeSummary': {
+                'stateImport': [{'state': imports[0], 'import': imports[1]} for imports in state_import.items()],
+                'cityImport': city_import_data
+            },
             'totalImport': total_import.get('quantity__sum'),
             'graphData': graph_data
         }, status=status.HTTP_200_OK)
