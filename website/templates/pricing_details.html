@@ -237,7 +237,6 @@
                 "type": "pie",
                 "theme": "light",
                 "dataProvider": pieDataProvince,
-                "innerRadius": 80,
                 "valueField": "import",
                 "titleField": "state",
                 "outlineAlpha": 0.4,
@@ -249,8 +248,10 @@
                 },
                 "titles": [
                     {
-                        "text": "Province Distribution",
-                        "size": 15
+                        "text": "By Province",
+                        "size": 15,
+                        "bold": true,
+                        "margin": 10
                     }
                 ]
 
@@ -260,11 +261,11 @@
                 "type": "pie",
                 "theme": "light",
                 "dataProvider": pieDataCity,
-                "innerRadius": 80,
                 "valueField": "quantity",
                 "titleField": "city",
                 "outlineAlpha": 0.4,
                 "depth3D": 25,
+                "marginTop": -10,
                 "balloonText": "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> FCL</span>",
                 "angle": 36,
                 "export": {
@@ -272,8 +273,10 @@
                 },
                  "titles": [
                     {
-                        "text": "City Distribution",
-                        "size": 15
+                        "text": "By City",
+                        "size": 15,
+                        "bold": true,
+                        "margin": 5
                     }
                 ]
 

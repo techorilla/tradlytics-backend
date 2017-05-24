@@ -119,6 +119,7 @@ class BpBasicAPI(GenericAPIView):
                     business.bp_types.add(type)
             business.save()
             base_url = request.META.get('HTTP_HOST')
+            user_business = request.user.profile.business
             self.delete_cache(user_business, base_url)
             return Response({
                 'success': True,
