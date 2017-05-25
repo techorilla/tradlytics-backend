@@ -40,7 +40,7 @@
                                 </span>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-6 col-xs-6">
                             <p class="price grey">
                                 <span class="time-period">International Market</span>
                                 {% if summary.internationalPrice != 'NA'  %}
@@ -69,7 +69,7 @@
                             </p>
 
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 col-xs-6">
                             <p class="price grey">
                                 <span class="time-period">Pakistan Market</span>
                                 {% if summary.localPrice != 'NA'  %}
@@ -102,74 +102,74 @@
 
                                 <span class="feature col-md-12">
                                     {% if summary.weeklyInternational.high != 'NA'  %}
-                                    <span class="item col-md-4">$ {{summary.weeklyInternational.high}} per {{summary.internationalMetric}}</span>
+                                    <span class="item col-md-4 col-xs-4">$ {{summary.weeklyInternational.high}} per {{summary.internationalMetric}}</span>
                                     {% endif %}
                                     {% if summary.weeklyInternational.high == 'NA'  %}
-                                    <span class="item col-md-4">NA</span>
+                                    <span class="item col-md-4 col-xs-4">NA</span>
                                     {% endif %}
-                                    <span class="item col-md-4 heading">Weekly High</span>
+                                    <span class="item col-md-4 col-xs-4 heading">Weekly High</span>
                                     {% if summary.weeklyLocal.high != 'NA'  %}
-                                    <span class="item col-md-4">PKR {{summary.weeklyLocal.high}} per {{summary.localMetric}}</span>
+                                    <span class="item col-md-4 col-xs-4">PKR {{summary.weeklyLocal.high}} per {{summary.localMetric}}</span>
                                     {% endif %}
                                     {% if summary.weeklyLocal.high == 'NA'  %}
-                                    <span class="item col-md-4">NA</span>
+                                    <span class="item col-md-4 col-xs-4">NA</span>
                                     {% endif %}
                                 </span>
 
                                 <span class="feature col-md-12">
                                     {% if summary.weeklyInternational.low != 'NA'  %}
-                                    <span class="item col-md-4">$ {{summary.weeklyInternational.low}} per {{summary.internationalMetric}}</span>
+                                    <span class="item col-md-4 col-xs-4">$ {{summary.weeklyInternational.low}} per {{summary.internationalMetric}}</span>
                                     {% endif %}
                                     {% if summary.weeklyInternational.low == 'NA'  %}
-                                    <span class="item col-md-4">NA</span>
+                                    <span class="item col-md-4 col-xs-4">NA</span>
                                     {% endif %}
-                                    <span class="item col-md-4 heading">Weekly Low</span>
+                                    <span class="item col-md-4 col-xs-4 heading">Weekly Low</span>
                                     {% if summary.weeklyLocal.low != 'NA'  %}
-                                    <span class="item col-md-4">PKR {{summary.weeklyLocal.low}} per {{summary.localMetric}}</span>
+                                    <span class="item col-md-4 col-xs-4">PKR {{summary.weeklyLocal.low}} per {{summary.localMetric}}</span>
                                     {% endif %}
                                     {% if summary.weeklyLocal.low == 'NA'  %}
-                                    <span class="item col-md-4">NA</span>
+                                    <span class="item col-md-4 col-xs-4">NA</span>
                                     {% endif %}
                                 </span>
 
 
                                 <span class="feature col-md-12">
                                     {% if summary.monthlyInternational.high != 'NA'  %}
-                                    <span class="item col-md-4">$ {{summary.monthlyInternational.high}} per {{summary.internationalMetric}}</span>
+                                    <span class="item col-md-4 col-xs-4">$ {{summary.monthlyInternational.high}} per {{summary.internationalMetric}}</span>
                                     {% endif %}
                                     {% if summary.weeklyInternational.high == 'NA'  %}
-                                    <span class="item col-md-4">NA</span>
+                                    <span class="item col-md-4 col-xs-4">NA</span>
                                     {% endif %}
-                                    <span class="item col-md-4 heading">Monthly High</span>
+                                    <span class="item col-md-4 col-xs-4 heading">Monthly High</span>
                                     {% if summary.weeklyLocal.high != 'NA'  %}
-                                    <span class="item col-md-4">PKR {{summary.monthlyLocal.high}} per {{summary.localMetric}}</span>
+                                    <span class="item col-md-4 col-xs-4">PKR {{summary.monthlyLocal.high}} per {{summary.localMetric}}</span>
                                     {% endif %}
                                     {% if summary.monthlyLocal.high == 'NA'  %}
-                                    <span class="item col-md-4">NA</span>
+                                    <span class="item col-md-4 col-xs-4">NA</span>
                                     {% endif %}
                                 </span>
 
                                 <span class="feature col-md-12">
                                     {% if summary.monthlyInternational.low != 'NA'  %}
-                                    <span class="item col-md-4">$ {{summary.monthlyInternational.low}} per {{summary.internationalMetric}}</span>
+                                    <span class="item col-md-4 col-xs-4">$ {{summary.monthlyInternational.low}} per {{summary.internationalMetric}}</span>
                                     {% endif %}
                                     {% if summary.monthlyInternational.low == 'NA'  %}
-                                    <span class="item col-md-4">NA</span>
+                                    <span class="item col-md-4 col-xs-4">NA</span>
                                     {% endif %}
-                                    <span class="item col-md-4 heading">Monthly Low</span>
+                                    <span class="item col-md-4 col-xs-4 heading">Monthly Low</span>
                                     {% if summary.monthlyLocal.low != 'NA'  %}
-                                    <span class="item col-md-4">PKR {{summary.monthlyLocal.low}} per {{summary.localMetric}}</span>
+                                    <span class="item col-md-4 col-xs-4">PKR {{summary.monthlyLocal.low}} per {{summary.localMetric}}</span>
                                     {% endif %}
                                     {% if summary.monthlyLocal.low == 'NA'  %}
-                                    <span class="item col-md-4">NA</span>
+                                    <span class="item col-md-4 col-xs-4">NA</span>
                                     {% endif %}
                                 </span>
 
 
                                 <span class="feature col-md-12">
-                                    <span class="date-item col-md-4">{{summary.intLastUpdated}}</span>
-                                    <span class="item col-md-4">Last Updated</span>
-                                    <span class="date-item col-md-4">{{summary.localLastUpdated}}</span>
+                                    <span class="date-item col-md-4 col-xs-4">{{summary.intLastUpdated}}</span>
+                                    <span class="item col-md-4 col-xs-4">Last Updated</span>
+                                    <span class="date-item col-md-4 col-xs-4">{{summary.localLastUpdated}}</span>
                                 </span>
 
                             </p>

@@ -1,35 +1,35 @@
 @charset "utf-8";
 /*-----------------------------------------------------------------------------
 
-Table of Contents:
+    Table of Contents:
 
- 1) General
- 2) Typography
- 3) Backgrounds
- 4) Home Sections
- 5) Home Revolution Slider Section
- 6) Header
- 7) Features Section
- 8) About Section
- 9) Team Section
-10) Skills Section
-11) Fun Facts Section
-12) Quote Section
-13) Portfolio Section
-14) Get Connected Section
-15) Services Section
-16) Call to Action 1
-17) Price List Section
-18) Clients Section
-19) Testimonials Section
-20) Contact Form Section
-21) Google Map Section
-22) Video Popup Section
-23) Footer 1
-24) Subscribe Form - Twitter Feed
-25) Shortcodes
+     1) General
+     2) Typography
+     3) Backgrounds
+     4) Home Sections
+     5) Home Revolution Slider Section
+     6) Header
+     7) Features Section
+     8) About Section
+     9) Team Section
+    10) Skills Section
+    11) Fun Facts Section
+    12) Quote Section
+    13) Portfolio Section
+    14) Get Connected Section
+    15) Services Section
+    16) Call to Action 1
+    17) Price List Section
+    18) Clients Section
+    19) Testimonials Section
+    20) Contact Form Section
+    21) Google Map Section
+    22) Video Popup Section
+    23) Footer 1
+    24) Subscribe Form - Twitter Feed
+    25) Shortcodes
 
-------------------------------------------------------------------------------*/
+    ------------------------------------------------------------------------------*/
 
 /*----- Stylesheets -----*/
 @import "bootstrap.min.css";
@@ -1802,17 +1802,17 @@ blockquote strong {
 .project-widget p {
     color: #7a7a7a!important;
 }
-/* 
-.cbp-l-grid-fullScreen {
-    visibility: visible;
-    overflow: visible;
-}
-@media (min-width:992px) {
+/*
     .cbp-l-grid-fullScreen {
-        margin-top: 200px;
+        visibility: visible;
+        overflow: visible;
     }
-}
-*/
+    @media (min-width:992px) {
+        .cbp-l-grid-fullScreen {
+            margin-top: 200px;
+        }
+    }
+    */
 
 /*----- Get Connected -----*/
 #get-connected {
@@ -1998,6 +1998,104 @@ blockquote strong {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+@media only screen
+and (min-device-width : 375px)
+and (max-device-width : 667px) {
+    .price-table .price .time-period {
+        font-size: 8px;
+    }
+    .price-table .features .feature {
+        border-top: none;
+    }
+    .price-table .price .currency {
+
+        font-size: 10px;
+    }
+    .price-table .feature .heading{
+        font-size: 10px !important;
+    }
+    .price-table .features .feature {
+        display: block;
+        -moz-box-sizing: content-box;
+        box-sizing: content-box;
+        padding: 0px !important;
+        line-height: 1.5em;
+    }
+    .price-table .price .pricing{
+        font-size: 40px;
+    }
+
+    .price-table .feature .item{
+        font-size: 9px !important;
+    }
+
+    .price-table .feature .date-item{
+        font-size: 7px !important;
+        padding-bottom: 10px;
+    }
+    .price-table .price {
+        padding: 8px 0 !important;
+    }
+    .change-symbol {
+        top: 73px !important;
+        left: 127px !important;
+    }
+}
+
+@media only screen
+and (min-device-width : 414px)
+and (max-device-width : 736px) {
+    .price-table .price {
+        padding: 8px 0 !important;
+    }
+    .price-table .price .pricing{
+        font-size: 40px;
+    }
+
+    .change-symbol {
+        top: 73px !important;
+        left: 127px !important;
+
+    }
+
+    .price-table .features .feature {
+        border-top: none;
+    }
+    .price-table .price .time-period {
+        font-size: 9px;
+    }
+    .price-table .price .currency {
+
+        font-size: 10px;
+    }
+    .price-table .feature .heading{
+
+        font-size: 10px !important;
+    }
+    .price-table .features .feature {
+        display: block;
+        -moz-box-sizing: content-box;
+        box-sizing: content-box;
+        padding: 0px !important;
+        line-height: 1.5em;
+    }
+
+
+
+    .price-table .feature .item{
+        font-size: 9px !important;
+    }
+
+    .price-table .feature .date-item{
+        font-size: 7px !important;
+        padding-bottom: 10px;
+    }
+
+
+}
+
+
 .btn-effect:focus {
     color: #fff;
 }
