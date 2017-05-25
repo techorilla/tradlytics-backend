@@ -263,9 +263,9 @@ class ProductItem(models.Model):
                 'change': 'NA',
                 'percentageChange': 'NA'
             },
-            'weeklyLocal':  local_price.get_weekly_high_low('rs_per_kg') if local_price else {'high': 'NA', 'low': 'NA'},
+            'weeklyLocal':  local_price.get_weekly_high_low(metric='rs_per_kg') if local_price else {'high': 'NA', 'low': 'NA'},
             'weeklyInternational': int_price.get_weekly_high_low() if int_price else {'high': 'NA', 'low': 'NA'},
-            'monthlyLocal': local_price.get_monthly_high_low('rs_per_kg') if local_price else {'high': 'NA', 'low': 'NA'},
+            'monthlyLocal': local_price.get_monthly_high_low(metric='rs_per_kg') if local_price else {'high': 'NA', 'low': 'NA'},
             'monthlyInternational': int_price.get_monthly_high_low() if int_price else {'high': 'NA', 'low': 'NA'},
             'internationalPrice': round(int_price_val, 2) if int_price_val != 'NA' else int_price_val,
             'interationalPrevPrice': round(int_prev_price, 2) if int_prev_price !='NA' else int_prev_price,
