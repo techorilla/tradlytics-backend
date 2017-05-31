@@ -4078,7 +4078,7 @@ pre {
 
 .product-price-thing .change{
     position: absolute;
-    top: 0px;
+    top: -50px;
     left: 20px;
     font-size: 30px;
 }
