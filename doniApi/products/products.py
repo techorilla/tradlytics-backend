@@ -134,8 +134,11 @@ class ProductsAPI(GenericAPIView):
                 product.updated_by = user
                 product.updated_at = dt.now()
                 if product.image and product_image:
-                    path = Utilities.get_media_directory() + '/' + str(product.image)
-                    os.remove(path)
+                    try:
+                        path = Utilities.get_media_directory() + '/' + str(product.image)
+                        os.remove(path)
+                    except:
+                        pass
             else:
                 success_message = self.messages['successPOST']
                 error_message = self.messages['errorPOST']
