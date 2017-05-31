@@ -160,7 +160,7 @@ class Products(models.Model):
             'description': self.description,
             'image': self.get_product_image(base_url),
             'category': category,
-            'most_traded': 'most_traded',
+            'most_traded': most_traded,
         }
 
     def get_product_single_website(self, base_url):
