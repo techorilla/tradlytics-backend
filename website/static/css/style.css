@@ -4058,22 +4058,24 @@ pre {
     top: 60px;
     text-align: center;
     font-size: 12px;
+    font-weight: 800;
 
 }
 
 .product-price-thing .price{
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
 }
 
 .product-price-thing .int{
-    color: #2C9BFF;
     font-weight: bold;
+    color: #fff;
+
 }
 
 .product-price-thing .local{
-    color: #0aec92;
     font-weight: bold;
+    color: #fff;
 }
 
 .product-price-thing .change{

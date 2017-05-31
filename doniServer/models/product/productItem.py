@@ -247,8 +247,8 @@ class ProductItem(models.Model):
             local_percentage_change = 'NA'
 
         return {
-            'intLastUpdated': int_price.price_time if int_price else 'NA',
-            'localLastUpdated': local_price.price_time if local_price else 'NA',
+            'intLastUpdated': int_price.price_time + timedelta(hours=5) if int_price  else 'NA',
+            'localLastUpdated': local_price.price_time  + timedelta(hours=5) if local_price else 'NA',
             'productId': self.product_origin.product.id,
             'productItemId': self.id,
             'productOriginName': self.product_origin.country.name,

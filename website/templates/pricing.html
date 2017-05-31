@@ -45,7 +45,7 @@
                                 <span class="time-period">International Market</span>
                                 {% if summary.internationalPrice != 'NA'  %}
                                 <sup class="currency">$</sup>
-                                <span class="pricing">{{summary.internationalPrice}}</span>
+                                <span class="pricing">{{summary.internationalPrice |floatformat:2}}</span>
                                 <span class="time-period">per {{summary.internationalMetric}}</span>
                                 {% endif %}
                                 {% if summary.internationalPrice == 'NA'  %}
@@ -63,7 +63,7 @@
                                     <i class="fa fa-caret-down"></i>
                                     {% endif %}
                                 </sup>
-                                <span class="change-number"> $ {{summary.internationalChange}}</span>
+                                <span class="change-number"> $ {{summary.internationalChange |floatformat:2}}</span>
                                 <span class="">per {{summary.internationalMetric}}</span>
                                 {% endif %}
                             </p>
@@ -74,7 +74,7 @@
                                 <span class="time-period">Pakistan Market</span>
                                 {% if summary.localPrice != 'NA'  %}
                                 <sup class="currency">PKR</sup>
-                                <span class="pricing">{{summary.localPrice}}</span>
+                                <span class="pricing">{{summary.localPrice |floatformat:2}}</span>
                                 <span class="time-period">per {{summary.localMetric}}</span>
                                 {% endif %}
                                 {% if summary.localPrice == 'NA'  %}
@@ -91,7 +91,7 @@
                                     <i class="fa fa-caret-down"></i>
                                     {% endif %}
                                 </sup>
-                                <span class="change-number">PKR {{summary.localChange}}</span>
+                                <span class="change-number">PKR {{summary.localChange |floatformat:2}}</span>
                                 <span class="">per {{summary.localMetric}}</span>
                                 {% endif %}
                             </p>
@@ -167,9 +167,9 @@
 
 
                                 <span class="feature col-md-12">
-                                    <span class="date-item col-md-4 col-xs-4">{{summary.intLastUpdated}}</span>
+                                    <span class="date-item col-md-4 col-xs-4">{{summary.intLastUpdated}} PST</span>
                                     <span class="item col-md-4 col-xs-4">Last Updated</span>
-                                    <span class="date-item col-md-4 col-xs-4">{{summary.localLastUpdated}}</span>
+                                    <span class="date-item col-md-4 col-xs-4">{{summary.localLastUpdated}} PST</span>
                                 </span>
 
                             </p>
