@@ -31,11 +31,11 @@
                 </div>
 
                 <div id="filters-container-fullwidth" class="cbp-l-filters-alignCenter wow fadeInUp animated" style="visibility: visible;">
-                    <div data-filter=".most_traded" class="cbp-filter-item cbp-filter-item-active">Most Traded
+                    <div id="most_traded_btn" data-filter=".most_traded" class="cbp-filter-item ">Most Traded
                         <div class="cbp-filter-counter">{{ most_traded_count }}</div>
                     </div>
 
-                    <div data-filter="*" class="cbp-filter-item">All
+                    <div data-filter="*" class="cbp-filter-item cbp-filter-item-active">All
                         <div class="cbp-filter-counter">{{ products | length }}</div>
                     </div>
                     {% for cat in categories %}
@@ -86,3 +86,12 @@
     </div>
 
 {% endblock content %}
+
+
+{% block extrajs %}
+
+<script>
+    document.getElementById("most_traded_btn").click();
+</script>
+
+{%  endblock %}
