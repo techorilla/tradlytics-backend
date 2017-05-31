@@ -147,11 +147,17 @@ class Products(models.Model):
 
     def get_product_website_list_obj(self, base_url, website=False):
         most_traded = ''
+        most_traded_product = None
         category = self.category if website else self.category.name if self.category else None
         product_origin = self.countries.all()
+
         for origin in product_origin:
-            count = origin.origin_product_item.filter(price_on_website=True).count()
+            most_traded_query = origin.origin_product_item.filter(price_on_website=True)
+            count = most_traded_query.count()
+
+
             if count > 0:
+                most_traded_product = most_traded_query.order_by('price_on_website_order').first()
                 most_traded = 'most_traded'
                 break
         return {
@@ -161,6 +167,7 @@ class Products(models.Model):
             'image': self.get_product_image(base_url),
             'category': category,
             'most_traded': most_traded,
+            'most_traded_product': most_traded_product
         }
 
     def get_product_single_website(self, base_url):

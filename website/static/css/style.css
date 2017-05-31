@@ -4053,6 +4053,44 @@ pre {
     margin: 0;
 }
 
+.product-price-thing{
+    position: absolute;
+    top: 60px;
+    text-align: center;
+    font-size: 12px;
+
+}
+
+.product-price-thing .price{
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.product-price-thing .int{
+    color: #2C9BFF;
+    font-weight: bold;
+}
+
+.product-price-thing .local{
+    color: #0aec92;
+    font-weight: bold;
+}
+
+.product-price-thing .change{
+    position: absolute;
+    top: 0px;
+    left: 20px;
+    font-size: 30px;
+}
+
+.product-price-thing .fa-caret-down{
+    color: red;
+}
+
+.product-price-thing .fa-caret-up{
+    color: greenyellow;
+}
+
 
 
 

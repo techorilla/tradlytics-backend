@@ -280,11 +280,12 @@ class ProductItem(models.Model):
 
     def get_last_two_prices_for_market(self, market='INT'):
         last_price = self.price_product_item.filter(price_market__origin=market).order_by('-price_time').first()
-
-        last_price_date = last_price.price_time
-        day_before_date = last_price_date - timedelta(days=1)
-        day_before_last_price = self.price_product_item.filter(price_market__origin=market) \
-            .filter(price_time__startswith=day_before_date.date()).order_by('-price_time').first()
+        day_before_last_price = None
+        if last_price:
+            last_price_date = last_price.price_time
+            day_before_date = last_price_date - timedelta(days=1)
+            day_before_last_price = self.price_product_item.filter(price_market__origin=market) \
+                .filter(price_time__startswith=day_before_date.date()).order_by('-price_time').first()
         return last_price, day_before_last_price
 
     @property
