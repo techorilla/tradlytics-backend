@@ -11,6 +11,7 @@ class TrFiles(models.Model):
     )
     file_id = models.AutoField(primary_key=True)
     file = models.BinaryField()
+    extension = models.CharField(max_length=10, null=True)
 
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None)
@@ -18,4 +19,4 @@ class TrFiles(models.Model):
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='tr_file_updated_by')
 
     class Meta:
-        db_table = 'tr_notes'
+        db_table = 'tr_files'

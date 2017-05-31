@@ -1,6 +1,6 @@
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
-from doniServer.models import Products, ProductCategory
+from doniServer.models import Products, ProductCategory, ProductItem
 
 
 class ProductPage(View):
@@ -9,7 +9,9 @@ class ProductPage(View):
     def get(self, request, *args, **kwargs):
         base_url = request.META.get('HTTP_HOST')
         all_products = Products.get_products_for_website(base_url)
+        most_traded_count = ProductItem.objects.filter(price_on_website=True).count()
         context = {
+            'most_traded_count': most_traded_count,
             'products': all_products,
             'categories': ProductCategory.get_category_for_website()
         }

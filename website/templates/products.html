@@ -31,7 +31,11 @@
                 </div>
 
                 <div id="filters-container-fullwidth" class="cbp-l-filters-alignCenter wow fadeInUp animated" style="visibility: visible;">
-                    <div data-filter="*" class="cbp-filter-item-active cbp-filter-item">All
+                    <div data-filter=".most_traded" class="cbp-filter-item cbp-filter-item-active">Most Traded
+                        <div class="cbp-filter-counter">{{ cat.count }}</div>
+                    </div>
+
+                    <div data-filter="*" class="cbp-filter-item">All
                         <div class="cbp-filter-counter">{{ products | length }}</div>
                     </div>
                     {% for cat in categories %}
@@ -44,7 +48,7 @@
                 <div id="grid-container-fullwidth" class="cbp-l-grid-fullScreen">
                     <ul>
                         {% for product in products %}
-                            <li class="cbp-item effect effects {{ product.category.category_class }}">
+                            <li class="cbp-item effect effects {{ product.category.category_class }} {{product.most_traded}}">
                                 <div class="img">
                                     <img style="height:400px" src="{{ product.image }}" class="img-responsive" alt="" />
                                     <div class="product-overlay" style="">
@@ -54,8 +58,8 @@
                                                 <a style="color: #ffffff;" href="">{{ product.name }}</a>
                                             </li>
                                             <li class="cbp-l-caption-desc" style="font-size:16px; color: #ffffff;">{{ product.category.name}}</li>
-{#                                            <li class="cbp-l-icon"><a href="img/portfolio/fullsize/1.jpg" class="cbp-lightbox" data-title="Dashboard<br>by Wunderwelt"><i class="icon-magnifier"></i></a></li>#}
-{#                                            <li class="cbp-l-icon"><a href="projects/project1.html" class="cbp-singlePage"><i class="icon-link"></i></a></li>#}
+                                            <!--<li class="cbp-l-icon"><a href="img/portfolio/fullsize/1.jpg" class="cbp-lightbox" data-title="Dashboard<br>by Wunderwelt"><i class="icon-magnifier"></i></a></li>-->
+                                           <!--<li class="cbp-l-icon"><a href="projects/project1.html" class="cbp-singlePage"><i class="icon-link"></i></a></li>-->
                                         </ul>
                                     </div>
                                 </div>

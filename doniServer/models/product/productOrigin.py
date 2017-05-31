@@ -19,6 +19,11 @@ class ProductOrigin(models.Model):
         return list(self.origin_product_item.all())
 
     @property
+    def get_product_items_price_on_web(self):
+        product_items=self.origin_product_item.filter(price_on_website=True).order_by('price_on_website_order')
+        return product_items
+
+    @property
     def get_product_items(self):
         product_items = self.origin_product_item.all()
         return [item.get_dropdown() for item in product_items]

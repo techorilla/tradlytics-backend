@@ -16,7 +16,7 @@ class TransactionListAPI(GenericAPIView):
         start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
         end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
         all_transactions = Transaction.objects.filter(date__gte=start_date.date(), date__lte=end_date.date())\
-            .filter(created_by__profile__business=business)
+            .filter(created_by__profile__business=business).order_by('-date')
         all_transactions = [trade.get_list_object() for trade in all_transactions]
         return Response({
             'success': True,
@@ -32,8 +32,11 @@ class TransactionBasicAPI(GenericAPIView):
     messages['successPUT'] = 'Transaction File %s updated successfully.'
 
     def get(self, request, *args, **kwargs):
-
-        return Response()
+        transation_id = request.GET.get('tr_id')
+        transaction = Transaction.objects.get(tr_id=transaction)
+        return Response({
+            'transaction': []
+        }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -119,6 +122,7 @@ class TransactionBasicAPI(GenericAPIView):
             commission.save()
 
             return Response({
+                'tradeId': transaction.tr_id,
                 'success': True,
                 'message': success_message % transaction.file_id
             }, status=status.HTTP_200_OK)
