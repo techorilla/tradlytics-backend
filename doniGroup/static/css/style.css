@@ -376,7 +376,7 @@ p {
 .tp-banner li:after {
     content: "";
     position: absolute;
-    background: url(../img/assets/gridtile.png) repeat;
+    background: url(../img/assets/dot-pattern.png) repeat;
     top: 0;
     left: 0;
     bottom: 0;
