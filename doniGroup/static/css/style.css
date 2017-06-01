@@ -116,12 +116,12 @@ h4 small, h5 small, h6 small {
     color: #1c1c1c;
 }
 h4 {
-    font-size: 16px;
+    font-size: 18px;
     letter-spacing: 1px;
 }
 p {
     color: #000000;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 20px;
     font-weight: 400;
 }
@@ -135,7 +135,7 @@ p {
 
 
 .subheading {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 20px;
     font-weight: 400;
     margin-bottom: 42px;
@@ -160,7 +160,7 @@ p {
     margin-top: 0;
     margin-bottom: 22px;
     font-family: 'Montserrat',sans-serif;
-    font-size: 28px;
+    font-size: 30px;
 }
 .project-title {
     text-transform: uppercase;
@@ -169,23 +169,23 @@ p {
     margin-top: 30px;
     margin-bottom: 10px;
     font-family: 'Montserrat',sans-serif;
-    font-size: 48px;
+    font-size: 50px;
 }
 @media (max-width:600px) {
     .project-title {
-        font-size: 22px;
+        font-size: 24px;
     }
 }
 .project-subtitle {
     margin-bottom: 50px;
-    font-size: 12px;
+    font-size: 14px;
 }
 .uppercase {
     text-transform: uppercase;
 }
 .p-info {
     line-height: 1.8;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 /* Preloader */
@@ -209,26 +209,26 @@ p {
 /*----- Typography -----*/
 @media (min-width: 992px) {
     h1 {
-        font-size: 62px;
+        font-size: 66px;
         letter-spacing: 0px;
     }
     h1 small {
-        font-size: 62px;
+        font-size: 66px;
         letter-spacing: 0px;
     }
     .lead {
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 400;
         color: #7a7a7a;
         margin-bottom: 50px;
     }
     h2 {
-        font-size: 48px;
+        font-size: 50px;
         letter-spacing: 0px;
 
     }
     h2 small {
-        font-size: 48px;
+        font-size: 50px;
         letter-spacing: 0px;
     }
 }
@@ -448,7 +448,7 @@ p {
         font-size: 72px;
     }
     .font-size-20px{
-        font-size: 20px !important;
+        font-size: 18px !important;
         text-align: center;
     }
 }
@@ -457,7 +457,7 @@ p {
         font-size: 55px;
     }
     .font-size-20px{
-        font-size: 20px !important;
+        font-size: 18px !important;
         text-align: center;
     }
 }
