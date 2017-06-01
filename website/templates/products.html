@@ -26,7 +26,7 @@
         <div class="container">
 
             <div class="col-md-12 text-center">
-                {#                    <h3 class="section-title wow fadeInUp animated" style="visibility: visible;">Products</h3>#}
+                <h3 class="section-title wow fadeInUp animated" style="visibility: visible;">Products</h3>
                 <!--<p class="subheading wow fadeInUp animated" style="visibility: visible;">Creating products and services that <span class="highlight">transform brands</span>.</p>-->
             </div>
 
@@ -132,10 +132,6 @@
             </div>
 
 
-            {#                <div class="cbp-l-loadMore-button">#}
-            {#                    <a href="projects/loadMore.html" class="cbp-l-loadMore-button-link wow fadeInUp animated" style="visibility: visible;">SHOW ME MORE</a>#}
-            {#                    <!-- Portfolio AJAX load more button will be functional only on your server. Upload to your server when testing. -->#}
-            {#                </div>#}
         </div>
     </section>
 
@@ -154,7 +150,11 @@
 {% block extrajs %}
 
 <script>
-    document.getElementById("most_traded_btn").click();
+    window.onload = function(){
+        console.log('hello');
+        document.getElementById("most_traded_btn").click();
+    };
+
 </script>
 
 {%  endblock %}

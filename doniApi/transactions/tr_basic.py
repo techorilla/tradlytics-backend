@@ -32,10 +32,14 @@ class TransactionBasicAPI(GenericAPIView):
     messages['successPUT'] = 'Transaction File %s updated successfully.'
 
     def get(self, request, *args, **kwargs):
-        transation_id = request.GET.get('tr_id')
-        transaction = Transaction.objects.get(tr_id=transaction)
+        transaction_id = request.GET.get('tradeId')
+        transaction = Transaction.objects.get(tr_id=transaction_id)
+        notes = transaction.notes.all().order_by('-created_at')
+        notes = [note.get_obj() for note in notes]
         return Response({
-            'transaction': []
+            'transaction': {
+                'notes': notes
+            }
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
