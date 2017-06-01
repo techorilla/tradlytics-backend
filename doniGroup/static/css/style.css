@@ -48,10 +48,11 @@
 /*----- General ----*/
 html,
 body {
+
     height: 100%;
     min-height: 100%;
 }
-html { -webkit-font-smoothing: antialiased; }
+html { -webkit-font-smoothing: antialiased;  }
 body {
     font-family: "Montserrat ", sans-serif;
     font-weight: 400;
@@ -115,12 +116,12 @@ h4 small, h5 small, h6 small {
     color: #1c1c1c;
 }
 h4 {
-    font-size: 18px;
+    font-size: 16px;
     letter-spacing: 1px;
 }
 p {
     color: #000000;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 20px;
     font-weight: 400;
 }
@@ -134,7 +135,7 @@ p {
 
 
 .subheading {
-    font-size: 14px;
+    font-size: 12px;
     line-height: 20px;
     font-weight: 400;
     margin-bottom: 42px;
@@ -159,7 +160,7 @@ p {
     margin-top: 0;
     margin-bottom: 22px;
     font-family: 'Montserrat',sans-serif;
-    font-size: 30px;
+    font-size: 28px;
 }
 .project-title {
     text-transform: uppercase;
@@ -168,23 +169,23 @@ p {
     margin-top: 30px;
     margin-bottom: 10px;
     font-family: 'Montserrat',sans-serif;
-    font-size: 50px;
+    font-size: 48px;
 }
 @media (max-width:600px) {
     .project-title {
-        font-size: 24px;
+        font-size: 22px;
     }
 }
 .project-subtitle {
     margin-bottom: 50px;
-    font-size: 14px;
+    font-size: 12px;
 }
 .uppercase {
     text-transform: uppercase;
 }
 .p-info {
     line-height: 1.8;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 /* Preloader */
@@ -208,26 +209,26 @@ p {
 /*----- Typography -----*/
 @media (min-width: 992px) {
     h1 {
-        font-size: 66px;
+        font-size: 62px;
         letter-spacing: 0px;
     }
     h1 small {
-        font-size: 66px;
+        font-size: 62px;
         letter-spacing: 0px;
     }
     .lead {
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 400;
         color: #7a7a7a;
         margin-bottom: 50px;
     }
     h2 {
-        font-size: 50px;
+        font-size: 48px;
         letter-spacing: 0px;
 
     }
     h2 small {
-        font-size: 50px;
+        font-size: 48px;
         letter-spacing: 0px;
     }
 }
