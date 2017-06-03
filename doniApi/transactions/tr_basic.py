@@ -58,7 +58,7 @@ class TransactionBasicAPI(GenericAPIView):
                     'sellerCountry': seller_country,
                     'sellerCountryFlag': seller_country_flag,
                     'sellerPrimaryContact': transaction.seller.primary_contact,
-
+                    'contractNo': transaction.contract_id,
                     'fileNo': transaction.file_id,
                     'price': transaction.price,
 

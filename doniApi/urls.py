@@ -105,8 +105,12 @@ urlpatterns = (
         TransactionContractAPI.as_view(),
         name='Transaction Contract'),
 
-    url(r'transactions/document/(?P<tr_id>[a-zA-Z0-9.@_-]+)/$',
-        TransactionNoteAPI.as_view(),
+    url(r'transactions/document/$',
+        TransactionDocumentAPI.as_view(),
+        name='Transaction Documents'),
+
+    url(r'transactions/document/(?P<document_id>[a-zA-Z0-9.@_-]+)/$',
+        TransactionDocumentAPI.as_view(),
         name='Transaction Documents'),
 
 
