@@ -15,7 +15,7 @@ class TransactionListAPI(GenericAPIView):
         end_date = request.GET.get(u'endDate')
         start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
         end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
-        all_transactions = Transaction.objects.filter(date__gte=start_date.date(), date__lte=end_date.date())\
+        all_transactions = Transaction.objects.filter(date__gte=start_date.date(), date__lte=end_date.date()) \
             .filter(created_by__profile__business=business).order_by('-date')
         all_transactions = [trade.get_list_object() for trade in all_transactions]
         return Response({
@@ -32,12 +32,49 @@ class TransactionBasicAPI(GenericAPIView):
     messages['successPUT'] = 'Transaction File %s updated successfully.'
 
     def get(self, request, *args, **kwargs):
+        base_url = request.META.get('HTTP_HOST')
+        user = request.user
         transaction_id = request.GET.get('tradeId')
         transaction = Transaction.objects.get(tr_id=transaction_id)
         notes = transaction.notes.all().order_by('-created_at')
-        notes = [note.get_obj() for note in notes]
+        notes = [note.get_obj(base_url, user) for note in notes]
+
+        seller_country, seller_country_code, seller_country_flag = transaction.seller.primary_origin
+        buyer_country, buyer_country_code, buyer_country_flag = transaction.buyer.primary_origin
+        cont_buyer_country, cont_buyer_country_code, cont_buyer_country_flag = transaction.contractual_buyer.primary_origin
         return Response({
             'transaction': {
+                'basic': {
+                    'date': transaction.date,
+
+                    'buyerId': transaction.buyer.bp_id,
+                    'buyerName': transaction.buyer.bp_name,
+                    'buyerCountry': buyer_country,
+                    'buyerCountryFlag': buyer_country_flag,
+                    'buyerPrimaryContact': transaction.buyer.primary_contact,
+
+                    'sellerId': transaction.seller.bp_id,
+                    'sellerName': transaction.seller.bp_name,
+                    'sellerCountry': seller_country,
+                    'sellerCountryFlag': seller_country_flag,
+                    'sellerPrimaryContact': transaction.seller.primary_contact,
+
+                    'fileNo': transaction.file_id,
+                    'price': transaction.price,
+
+                    'productName': transaction.product_item.product_origin.product.name,
+                    'productItemId': transaction.product_item.id,
+                    'productOriginName': transaction.product_item.product_origin.country.name,
+                    'productOriginFlag': transaction.product_item.product_origin.country.flag,
+                    'quantity': transaction.quantity,
+
+                    'shipmentEnd': transaction.shipment_end,
+                    'shipmentStart': transaction.shipment_start,
+                    'expectedCommission': transaction.commission.net_commission
+
+
+
+                },
                 'notes': notes
             }
         }, status=status.HTTP_200_OK)
