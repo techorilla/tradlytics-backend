@@ -12,7 +12,7 @@ SEA_PORT_PDF = '/dataSheets/seaports.pdf'
 def save_all_ports():
 
 
-    text = textract.process(settings.PROJECT_ROOT+SEA_PORT_PDF, method='pdftotext' )
+    text = textract.process(settings.DJANGO_ROOT+SEA_PORT_PDF, method='pdftotext' )
     text_start = text[458:]
     port_details = text_start.split('\n')
     port_details = [detail for detail in port_details if detail != '']
