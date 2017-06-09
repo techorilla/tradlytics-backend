@@ -4,7 +4,6 @@ from authentication import *
 from businessPartner import BpBasic, BpProducts, BpEmail, BpBank, BpContactNumber, BpContact, BpLocation
 from shipment import *
 from origins import *
-from ports import *
 from product import *
 from transactions import *
 from blogs import *

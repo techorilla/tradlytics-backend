@@ -5,6 +5,8 @@ from django_countries.fields import CountryField
 from .products import Products
 
 
+
+
 class ProductOrigin(models.Model):
     country = CountryField(blank_label='(select country)', null=False)
     product = models.ForeignKey(Products, null=False, related_name='countries')

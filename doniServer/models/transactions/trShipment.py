@@ -3,7 +3,8 @@ from datetime import date
 from django.contrib.auth.models import User
 from .trBasic import Transaction
 from ..businessPartner import BpBasic
-from ..ports import Port
+from ..shipment import ShippingPort
+
 from django.utils import timezone
 
 
@@ -33,8 +34,8 @@ class TrShipment(models.Model):
     quantity = models.FloatField(null=True)
     vessel_no = models.CharField(max_length=50)
     shipper_id = models.ForeignKey(BpBasic, null=True, related_name='tr_shipment_shipper')
-    port_loading = models.ForeignKey(Port, null=True, related_name='tr_shipment_port_loading')
-    port_destination = models.ForeignKey(Port, null=True, related_name='tr_shipment_port_destination')
+    port_loading = models.ForeignKey(ShippingPort, null=True, related_name='tr_shipment_port_loading')
+    port_destination = models.ForeignKey(ShippingPort, null=True, related_name='tr_shipment_port_destination')
     ship_line_details = models.TextField()
     chk_reason = models.BooleanField(default=False)
     chk_ship_ext = models.BooleanField(default=False)

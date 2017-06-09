@@ -36,8 +36,25 @@ class TransactionBasicAPI(GenericAPIView):
         user = request.user
         transaction_id = request.GET.get('tradeId')
         transaction = Transaction.objects.get(tr_id=transaction_id)
+        # Transaction Notes
         notes = transaction.notes.all().order_by('-created_at')
         notes = [note.get_obj(base_url, user) for note in notes]
+
+        # Transaction Files
+        files = transaction.files.values('file_name', 'extension', 'created_at', 'created_by__username', 'file_id') \
+            .order_by('-created_at')
+
+        files = [ {
+                      'fileId': f.get('file_id'),
+                      'fileName': f.get('file_name'),
+                      'uploadedBy': f.get('created_by__username'),
+                      'uploadedAt': f.get('created_at'),
+                      'extension': f.get('extension'),
+                  } for f in files]
+
+
+
+
 
         seller_country, seller_country_code, seller_country_flag = transaction.seller.primary_origin
         buyer_country, buyer_country_code, buyer_country_flag = transaction.buyer.primary_origin
@@ -75,6 +92,7 @@ class TransactionBasicAPI(GenericAPIView):
 
 
                 },
+                'files': files,
                 'notes': notes
             }
         }, status=status.HTTP_200_OK)

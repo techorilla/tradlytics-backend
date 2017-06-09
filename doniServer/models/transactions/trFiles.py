@@ -7,7 +7,8 @@ from django.utils import timezone
 class TrFiles(models.Model):
     transaction = models.ForeignKey(
         Transaction,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='files'
     )
     file_id = models.AutoField(primary_key=True)
     file_name = models.CharField(max_length=400, null=True)
