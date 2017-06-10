@@ -476,7 +476,9 @@ p {
         text-align: center;
     }
 }
-
+.home-logo{
+    top: 180px;
+}
 @media (max-width:667px) {
   .home-logo{
     top: 54px !important;
