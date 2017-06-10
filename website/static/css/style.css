@@ -477,7 +477,7 @@ p {
     }
 }
 .home-logo{
-    top: 180px;
+    top: 150px;
 }
 @media (max-width:667px) {
   .home-logo{
