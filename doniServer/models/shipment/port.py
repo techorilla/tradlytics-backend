@@ -16,6 +16,17 @@ class ShippingPort(models.Model):
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='ship_port_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='ship_port_updated_by')
 
+    def get_obj(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'loCode': self.lo_code,
+            'contactNo': self.contact_no,
+            'website': self.website,
+            'country': self.country,
+            'addedBy': self.created_by.username
+        }
+
     def __unicode__(self):
         return '%s:%s:%s'%(self.country, self.name, self.lo_code)
 

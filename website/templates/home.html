@@ -3,10 +3,15 @@
 {% load staticfiles %}
 {% block content %}
 
+<div class="row visible-xs" style="position: absolute; top:28%; z-index:100; text-align: center; width:100%; left:4%;">
+    <img height="100" width="200" src='{% static "img/assets/doni_and_company_white.png" %}' alt="Doni & Company" ></div>
+
+</div>
+
 
 <div class="row price-bar">
     <div class="col-lg-12 price-legends">
-        <div class="col-lg-7  col-sm-12">
+        <div class="col-lg-6 col-xs-12  col-sm-12">
             <div class="legends">
                 <div class="int">International Price</div>
             </div>
@@ -14,13 +19,13 @@
                 <div class="local">Local Price</div>
             </div>
 
-            <div class="legends">
+            <div class="legends hidden-xs ">
                 <div style="font-size: 9px; padding-top: 5px; padding-left: 10px;" class="last-updated">
-                    Last Updated {{price_date}} PST
+                    Updated {{price_date}} PST
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-sm-12">
+        <div class="col-lg-3  col-xs-12 col-sm-12">
             <div class="metric">
                 Convert All Prices To
                 <span id="rs_to_kg">Rs/kg</span>
@@ -31,7 +36,7 @@
     <div class="marquee col-lg-12" data-gap='10'>
         {% for item in ticker_items %}
         <span class="product-price-slide-item">
-            <img width="25" height="20" src="{{item.flagUrl}}">
+            <img width="22" height="20" src="{{item.flagUrl}}">
             <p class="productCountry">{{item.country}}</p>
             <p class="productCode"><a href="{% url 'web:pricing_detail' %}?id={{item.id}}">{{item.productCode}} {{item.keywords}}</a></p>
             <p class="normal-price productPrice international">{{item.internationalPrice}}</p>
@@ -116,6 +121,7 @@
                         data-delay="5000"  data-saveperformance="on" data-title="Doni & Company">
                         <img src='{{ slide.image.url }}'
                              alt="slidebg1" data-bgposition="center top" data-bgfit="cover" data-bgrepeat="no-repeat">
+
 
                         <!-- Home Heading -->
                         <div class="tp-caption sft"
