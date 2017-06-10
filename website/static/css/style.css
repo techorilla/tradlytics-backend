@@ -476,7 +476,19 @@ p {
         text-align: center;
     }
 }
+
+@media (max-width:667px) {
+  .home-logo{
+    top: 54px !important;
+  }
+
+}
+
 @media (max-width:500px) {
+    .home-logo{
+        top: 180px !important;
+    }
+
     .tp-banner .btn {
         display: none;
     }

@@ -3,7 +3,7 @@
 {% load staticfiles %}
 {% block content %}
 
-<div class="row visible-xs" style="position: absolute; top:28%; z-index:100; text-align: center; width:100%; left:4%;">
+<div class="visible-xs home-logo" style="position: absolute; z-index:100; text-align: center; width:100%;">
     <img height="100" width="200" src='{% static "img/assets/doni_and_company_white.png" %}' alt="Doni & Company" ></div>
 
 </div>
@@ -523,7 +523,7 @@
         $('.marquee').marquee({
             pauseOnHover: true,
             duplicated: true,
-            delayBeforeStart: 10,
+            delayBeforeStart: 1,
             duration: 20000
         });
 
