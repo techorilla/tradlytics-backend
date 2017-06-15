@@ -24,7 +24,7 @@ class Products(models.Model):
     product_code = models.CharField(max_length=10, null=True, unique=True)
     category = models.ForeignKey(ProductCategory, null=True, blank=True, related_name='products')
     related_products = models.ManyToManyField('self', blank=True, null=True, related_name='related_products')
-    business = models.ForeignKey(BpBasic, default=None)
+    business = models.ForeignKey(BpBasic, default=BpBasic.get_admin_business().bp_id)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='product_created_by')

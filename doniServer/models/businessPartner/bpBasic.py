@@ -166,10 +166,10 @@ class BpBasic(models.Model):
             pre = 'http://'
         return pre + base_url + '/media/' + str(self.bp_logo) if self.bp_logo else None
 
-    # @classmethod
-    # def get_admin_business(cls):
-    #     business_admin = cls.objects.get(bp_admin=True)
-    #     return business_admin
+    @classmethod
+    def get_admin_business(cls):
+        business_admin = cls.objects.get(bp_admin=True)
+        return business_admin
 
     @classmethod
     def get_business_using_website(cls, url):
