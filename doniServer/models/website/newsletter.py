@@ -7,7 +7,7 @@ class NewsLetter(models.Model):
     id = models.AutoField(primary_key=True)
     email = models.CharField(max_length=250)
     is_subscribed = models.BooleanField(default=True)
-    business = models.ForeignKey(BpBasic, default=BpBasic.get_admin_business().bp_id)
+    business = models.ForeignKey(BpBasic, default=None)
     received_at = models.DateTimeField(default=timezone.now)
 
     def __unicode__(self):

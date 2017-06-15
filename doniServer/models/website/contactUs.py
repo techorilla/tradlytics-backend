@@ -9,7 +9,7 @@ class ContactUs(models.Model):
     email = models.CharField(max_length=250)
     subject = models.TextField(max_length=250)
     message = models.TextField(max_length=250)
-    business = models.ForeignKey(BpBasic, default=BpBasic.get_admin_business().bp_id)
+    business = models.ForeignKey(BpBasic, default=None)
     received_at = models.DateTimeField(default=timezone.now)
 
     def __unicode__(self):
