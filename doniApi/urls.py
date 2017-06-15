@@ -161,6 +161,20 @@ urlpatterns = (
         name='Website_Pricing_API'
         ),
 
+    # Shipping API
+
+    url('shipping/ports/list/$',
+        ShippingPortListAPI.as_view(),
+        name='Shipping Ports List API'),
+
+    url('shipping/ports/$',
+        ShippingPortAPI.as_view(),
+        name='Shipping Ports API'),
+
+    url('shipping/ports/(?P<port_id>[0-9]+)/$',
+        ShippingPortAPI.as_view(),
+        name='Shipping Ports API'),
+
     # Product Keyword API
 
     url(r'product/category/$',

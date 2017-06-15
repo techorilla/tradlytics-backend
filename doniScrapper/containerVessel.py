@@ -26,7 +26,11 @@ class VesselScrapper(object):
                 vessel_name = re.sub(r'\(.*\)', '', a.findChild().text.strip()).strip()
                 vessel_link = self.URL % a['href']
                 vessel_broken = '(Broken' in a.findChild().text.strip()
-                self.get_save_single_vessel_detail(vessel_name, vessel_broken, vessel_link)
+                imo_number = vessel_link.split('.')
+                imo_number = imo_number[1].split('_')[1]
+                already_exist = Vessel.objects.filter(imo_number=imo_number).exists()
+                if not already_exist:
+                    self.get_save_single_vessel_detail(vessel_name, vessel_broken, vessel_link)
         return all_vessels
 
     def get_save_single_vessel_detail(self, vessel_name, is_boken, vessel_url):
@@ -38,17 +42,15 @@ class VesselScrapper(object):
             table = soup.find('table', style="width: 100%; text-align: left;")
             information = table.find_all('td')
             vessel.created_by = User.objects.get(username='immadimtiaz')
-            vessel.imo_number = information[0].text.strip().split(':')[1]
+            vessel.imo_number = information[0].text.strip().split(':')[1].strip()
             vessel.broken = is_boken
             vessel.first_name = information[1].text.strip().split(':')[1]
             vessel.nationality = information[2].text.strip().split(':')[1]
             vessel.owner = information[3].text.strip().split(':')[1]
             operator = information[4].text.strip().split(':')[1]
             operator = operator.strip()
-            try:
-                operator = BpBasic.objects.get(bp_name=operator)
-            except BpBasic.DoesNotExist:
-                self.SHIPPING_COMPANY_NOT_FOUND.append(operator)
+
+            vessel.operator = operator
             vessel.completion_year = information[5].text.strip().split(':')[1]
             vessel.shipyard = information[6].text.strip().split(':')[1]
             vessel.hull_number = information[7].text.strip().split(':')[1]
@@ -65,4 +67,6 @@ class VesselScrapper(object):
             vessel.dead_weight_ton = information[18].text.strip().split(':')[1]
             vessel.gross_tonnage_ton = information[19].text.strip().split(':')[1]
             vessel.handling_gear = information[20].text.strip().split(':')[1]
+
+            vessel.save()
         return

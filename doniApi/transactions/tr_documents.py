@@ -1,13 +1,21 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from doniServer.models import TrFiles, Transaction
 from rest_framework.permissions import IsAuthenticated, AllowAny
-import base64
+import base64, binascii
+from django.http import HttpResponse
+
+
 class TransactionDocumentAPI(GenericAPIView):
     # permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        print 'hello'
-        return Response()
+        doc_id = kwargs.get('document_id')
+        doc = TrFiles.objects.get(file_id=doc_id)
+        binary_doc = doc.file
+        content_disposition = 'attachment; filename=%s'%doc.file_name
+        response = HttpResponse(binascii.a2b_qp(binary_doc), content_type='application/octet-stream')
+        response['Content-Disposition'] = content_disposition
+        return response
 
     def post(self, request, *args, **kwargs):
         data =  request.data

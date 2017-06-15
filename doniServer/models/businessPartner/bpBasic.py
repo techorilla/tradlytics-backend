@@ -22,6 +22,7 @@ class BpBasic(models.Model):
     bp_website = models.CharField(max_length=255, null=False, blank=False)
     bp_credibility_index = models.IntegerField(default=1)
     bp_types = models.ManyToManyField(BusinessType, related_name='business')
+    bp_database_id = models.CharField(max_length=5, null=True)
     bp_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
