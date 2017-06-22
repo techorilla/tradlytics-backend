@@ -13,16 +13,22 @@ class BusinessListAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     @cache_results
-    def get_business_list(self, business, base_url):
-        all_business = BpBasic.objects.filter(created_by__profile__business=business).exclude(bp_id=business.bp_id)
+    def get_business_list(self, business, base_url, alpha='A'):
+        all_business_query = BpBasic.objects.filter(created_by__profile__business=business)
+        all_business = all_business_query.filter(bp_name__startswith=alpha).order_by('bp_name').exclude(bp_id=business.bp_id)
         all_business = map(lambda business: business.get_list_obj(base_url), all_business)
-        return all_business
+        all_business_count = all_business_query.count()
+        return {
+            'list':all_business,
+            'count':all_business_count
+        }
 
     def get(self, request, *args, **kwargs):
         user = request.user
+        alpha = request.GET.get('alpha')
         base_url = request.META.get('HTTP_HOST')
         business = Utilities.get_user_business(user)
-        all_business = self.get_business_list(business, base_url)
+        all_business = self.get_business_list(business, base_url, alpha)
         return Response({'businessList': all_business}, status=status.HTTP_200_OK)
 
 
@@ -67,6 +73,7 @@ class BpBasicAPI(GenericAPIView):
             business.bp_name = business_data.get('name')
             business.bp_ntn = business_data.get('ntn')
             business.bp_website = business_data.get('website')
+            business.bp_database_id = business_data.get('databaseId')
             business.created_by = request.user
             business.save()
             for type in business_type:
@@ -91,6 +98,7 @@ class BpBasicAPI(GenericAPIView):
         try:
 
             logo = request.FILES.get('logo')
+            print logo
             business_data = request.data.get('data')
             business_data = json.loads(business_data)
             business_id = business_data.get('bpId')
@@ -104,6 +112,7 @@ class BpBasicAPI(GenericAPIView):
             business.bp_ntn = business_data.get('ntn')
             business.bp_website = business_data.get('website')
             business.updated_by = request.user
+            business.bp_logo = logo
             business.updated_at = dt.now()
             business.save()
 
