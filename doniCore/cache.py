@@ -250,3 +250,6 @@ def cache_results(func):
             cache.set(redis_key, result)
             return result
     return inner
+
+
+doni_redis = MIQRedis()

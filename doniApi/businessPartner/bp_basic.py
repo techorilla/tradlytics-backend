@@ -5,7 +5,9 @@ from doniServer.models import BpBasic, BusinessType
 import json, os
 from datetime import datetime as dt
 from doniCore import cache_results
-from doniCore.cache import cache
+from doniCore.cache import cache, doni_redis
+from django.conf import settings
+
 
 
 class BusinessListAPI(GenericAPIView):
@@ -51,14 +53,18 @@ class BpBasicAPI(GenericAPIView):
 
     def delete_cache(self, business, base_url):
         for method in self.cache_methods:
-            key_str = list()
-            key_str.append(method)
-            key_str.append(business.__unicode__())
-            key_str.append(base_url)
-            key = '_'.join(key_str)
-            cache.delete(key)
+             key_str = list()
+             key_str.append(method)
+             key_str.append(business.__unicode__())
+             key_str.append(settings.APP_DOMAIN)
+             key = '_'.join(key_str)
+             cache.delete(key)
+             print 'deleting cache key %s'%key
+
         cache.delete('get_all_business_drop_down_Seller')
+        print 'Cache key: get_all_business_drop_down_Seller'
         cache.delete('get_all_business_drop_down_Buyer')
+        print 'Cache key: get_all_business_drop_down_Buyer'
 
 
     def post(self, request, *args, **kwargs):

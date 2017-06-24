@@ -42,6 +42,8 @@ ALLOWED_HOSTS = [
     '54.202.234.113'
 ]
 
+APP_DOMAIN = 'tramodity.com'
+
 # Application definition
 
 INSTALLED_APPS = [
