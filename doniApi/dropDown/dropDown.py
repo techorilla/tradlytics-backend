@@ -102,18 +102,23 @@ class CountryAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     @cache_results
-    def get_all_countries(self):
+    def get_all_countries(self, tab_filter=False):
         from django_countries import countries
+        not_entered = [{
+            'name': 'Not Entered',
+            'code': 'NotEntered',
+        }]
         all_countries = list(countries)
         all_countries = [{
                              'name': c[1],
                              'code': c[0],
                              'image': settings.COUNTRIES_FLAG_URL.replace('{code}', str(c[0].lower()))
                          } for c in all_countries]
-        return all_countries
+        return all_countries if not tab_filter else all_countries+not_entered
 
     def get(self, request, *args, **kwargs):
-        return Response({'list': self.get_all_countries()}, status=status.HTTP_200_OK)
+        tab_filter = request.GET.get('tabFilter')
+        return Response({'list': self.get_all_countries(tab_filter)}, status=status.HTTP_200_OK)
 
 
 class RegionAPI(GenericAPIView):

@@ -16,8 +16,9 @@ class BusinessListAPI(GenericAPIView):
 
     @cache_results
     def get_business_list(self, business, base_url, alpha='A'):
-        all_business_query = BpBasic.objects.filter(created_by__profile__business=business)
-        all_business = all_business_query.filter(bp_name__startswith=alpha).order_by('bp_name').exclude(bp_id=business.bp_id)
+        all_business_query = BpBasic.objects
+        all_business = all_business_query.filter(bp_name__istartswith=alpha).order_by('bp_name')
+            # .exclude(bp_id=business.bp_id)
         all_business = map(lambda business: business.get_list_obj(base_url), all_business)
         all_business_count = all_business_query.count()
         return {
@@ -51,12 +52,13 @@ class BpBasicAPI(GenericAPIView):
         base_url = request.META.get('HTTP_HOST')
         return Response({'business': business.get_obj(base_url)})
 
-    def delete_cache(self, business, base_url):
+    def delete_cache(self, business, base_url, business_name):
         for method in self.cache_methods:
              key_str = list()
              key_str.append(method)
              key_str.append(business.__unicode__())
              key_str.append(settings.APP_DOMAIN)
+             key_str.append(business_name[0].upper())
              key = '_'.join(key_str)
              cache.delete(key)
              print 'deleting cache key %s'%key
@@ -87,7 +89,7 @@ class BpBasicAPI(GenericAPIView):
             business.save()
             base_url = request.META.get('HTTP_HOST')
             user_business = request.user.profile.business
-            self.delete_cache(user_business, base_url)
+            self.delete_cache(user_business, base_url, business.bp_name)
             return Response({
                 'success': True,
                 'bpId': business.bp_id,
@@ -110,15 +112,16 @@ class BpBasicAPI(GenericAPIView):
             business_id = business_data.get('bpId')
             business_type_id = business_data.get('bpType')
             business = BpBasic.objects.get(bp_id=business_id)
-            if business.bp_logo and logo:
-                path = Utilities.get_media_directory()+'/'+str(business.bp_logo)
-                os.remove(path)
+            if logo:
+                if business.bp_logo:
+                    path = Utilities.get_media_directory()+'/'+str(business.bp_logo)
+                    os.remove(path)
                 business.bp_logo = logo
             business.bp_name = business_data.get('name')
             business.bp_ntn = business_data.get('ntn')
             business.bp_website = business_data.get('website')
             business.updated_by = request.user
-            business.bp_logo = logo
+
             business.updated_at = dt.now()
             business.save()
 
@@ -135,7 +138,7 @@ class BpBasicAPI(GenericAPIView):
             business.save()
             base_url = request.META.get('HTTP_HOST')
             user_business = request.user.profile.business
-            self.delete_cache(user_business, base_url)
+            self.delete_cache(user_business, base_url, business.bp_name )
             return Response({
                 'success': True,
                 'bpId': business.bp_id,
@@ -149,7 +152,22 @@ class BpBasicAPI(GenericAPIView):
             })
 
     def delete(self, request, *args, **kwargs):
+        bp_id = kwargs.get('bp_id')
+        base_url = request.META.get('HTTP_HOST')
+        business = BpBasic.objects.get(bp_id=bp_id)
+        if business.is_delete_able:
+            business.delete()
+            user_business = request.user.profile.business
+            self.delete_cache(user_business, base_url, business.bp_name)
+            return Response({
+                'success': True,
+                'message': '%s delete successfully'%business.bp_name
+            }, status = status.HTTP_200_OK)
 
-        return Response()
+        else:
+            return Response({
+                'success': False,
+                'message': 'Can not delete %s as it either has transactions or manifest items associated with it.'
+            })
 
 

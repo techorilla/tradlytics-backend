@@ -355,6 +355,18 @@ class ProductItem(models.Model):
             'createdAt': self.created_at
         }
 
+    def get_description_obj(self, base_url):
+        return {
+            'image': self.product_origin.product.get_product_image(base_url),
+            'name': self.product_origin.product.name,
+            'id': self.id,
+            'country': self.product_origin.country.name,
+            'countryFlag': self.product_origin.country.flag
+        }
+
+
+
+
 
 class ProductItemAdmin(admin.ModelAdmin):
     model = Products

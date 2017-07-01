@@ -55,6 +55,10 @@ urlpatterns = (
         BpBasicAPI.as_view(),
         name='Business Partner Basic'),
 
+    url(r'business/basic/(?P<bp_id>[a-zA-Z0-9.@_-]+)/$',
+        BpBasicAPI.as_view(),
+        name='Business Partner Basic'),
+
     url('business/location/$',
         BpLocationAPI.as_view(),
         name='Business Location API'),

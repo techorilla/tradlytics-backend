@@ -37,6 +37,24 @@ class BpBasic(models.Model):
         return self.bp_name.replace(' ', '_')
 
     @property
+    def is_delete_able(self):
+        manifest_items = self.buyer.count()
+        trade_book_items = self.tr_basic_buyer.count()
+        if manifest_items or trade_book_items:
+            return False
+        else:
+            return True
+
+
+    def get_business_logo(self, base_url):
+        if settings.IS_HTTPS:
+            pre = 'https://'
+        else:
+            pre = 'http://'
+        return pre+base_url+'/media/'+str(self.bp_logo) if self.bp_logo else None
+
+
+    @property
     def primary_contact(self):
         try:
             contact_person = self.contact_persons.get(is_primary=True)
@@ -116,8 +134,8 @@ class BpBasic(models.Model):
             'bpTypeId': bp_types_id,
             'bpTypeStr': bp_type_str,
             'contactPerson': contact_person_name,
-            'countryCode': primary_country_code,
-            'country': primary_country
+            'countryCode': primary_country_code if primary_country else 'NotEntered',
+            'country': primary_country if primary_country else 'Not Entered'
         }
 
     def get_by_type_id(self):
@@ -175,5 +193,18 @@ class BpBasic(models.Model):
     def get_business_using_website(cls, url):
         business = cls.objects.get(bp_website__contains=url)
         return business
+
+
+    def get_description_obj(self, base_url):
+        country, country_code, country_flag = self.primary_origin
+        return {
+            'id': self.bp_id,
+            'name': self.bp_name,
+            'country': country,
+            'website': self.bp_website,
+            'countryFlag': country_flag,
+            'primaryContact': self.primary_contact,
+            'logo': None if not self.bp_logo else self.get_business_logo(base_url)
+        }
 
 

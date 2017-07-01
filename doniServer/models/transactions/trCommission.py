@@ -25,3 +25,18 @@ class TrCommission(models.Model):
 
     class Meta:
         db_table = 'tr_commission'
+
+
+    def get_description_obj(self, base_url):
+        return {
+            'price': self.transaction.price,
+            'quantity': self.transaction.quantity,
+            'sellerBroker': None if not self.seller_broker else self.seller_broker.get_description_object(base_url),
+            'buyerBroker': None if not self.buyer_broker else self.buyer_broker.get_description_objects(base_url),
+            'buyerBrokerCommissionType': self.buyer_broker_comm_type.name,
+            'commission': self.commission,
+            'commissionType': self.commission_type.name,
+            'difference': self.difference,
+            'discount': self.discount,
+            'expectedCommission': self.net_commission
+        }

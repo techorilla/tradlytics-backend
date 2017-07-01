@@ -18,7 +18,6 @@ class UserProfilePicAPI(GenericAPIView):
         base_url = request.META.get('HTTP_HOST')
         user_id = kwargs.get('user_id')
         pic = request.FILES.get('profile')
-        print pic, request.FILES
         user_profile = UserProfile.objects.get(user__id=user_id)
 
         if user_profile.profile_pic:

@@ -59,22 +59,16 @@ class TransactionBasicAPI(GenericAPIView):
         seller_country, seller_country_code, seller_country_flag = transaction.seller.primary_origin
         buyer_country, buyer_country_code, buyer_country_flag = transaction.buyer.primary_origin
         cont_buyer_country, cont_buyer_country_code, cont_buyer_country_flag = transaction.contractual_buyer.primary_origin
+
         return Response({
             'transaction': {
                 'basic': {
                     'date': transaction.date,
-
-                    'buyerId': transaction.buyer.bp_id,
-                    'buyerName': transaction.buyer.bp_name,
-                    'buyerCountry': buyer_country,
-                    'buyerCountryFlag': buyer_country_flag,
-                    'buyerPrimaryContact': transaction.buyer.primary_contact,
-
-                    'sellerId': transaction.seller.bp_id,
-                    'sellerName': transaction.seller.bp_name,
-                    'sellerCountry': seller_country,
-                    'sellerCountryFlag': seller_country_flag,
-                    'sellerPrimaryContact': transaction.seller.primary_contact,
+                    'buyer':transaction.buyer.get_description_obj(base_url),
+                    'seller': transaction.seller.get_description_obj(base_url),
+                    'contractualBuyer': transaction.contractual_buyer.get_description_obj(base_url),
+                    'productItem':  transaction.product_item.get_description_obj(base_url),
+                    'commission':  transaction.commission.get_description_obj(base_url),
                     'contractNo': transaction.contract_id,
                     'fileNo': transaction.file_id,
                     'price': transaction.price,
