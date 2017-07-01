@@ -61,12 +61,9 @@ class BpBasicAPI(GenericAPIView):
              key_str.append(business_name[0].upper())
              key = '_'.join(key_str)
              cache.delete(key)
-             print 'deleting cache key %s'%key
 
         cache.delete('get_all_business_drop_down_Seller')
-        print 'Cache key: get_all_business_drop_down_Seller'
         cache.delete('get_all_business_drop_down_Buyer')
-        print 'Cache key: get_all_business_drop_down_Buyer'
 
 
     def post(self, request, *args, **kwargs):
@@ -96,7 +93,6 @@ class BpBasicAPI(GenericAPIView):
                 'message': self.messages['successPOST']
             }, status=status.HTTP_200_OK)
         except Exception, e:
-            print str(e)
             return Response({
                 'success': False,
                 'message': self.messages['errorPOST']
@@ -106,11 +102,12 @@ class BpBasicAPI(GenericAPIView):
         try:
 
             logo = request.FILES.get('logo')
-            print logo
+
             business_data = request.data.get('data')
             business_data = json.loads(business_data)
             business_id = business_data.get('bpId')
             business_type_id = business_data.get('bpType')
+
             business = BpBasic.objects.get(bp_id=business_id)
             if logo:
                 if business.bp_logo:
@@ -120,6 +117,7 @@ class BpBasicAPI(GenericAPIView):
             business.bp_name = business_data.get('name')
             business.bp_ntn = business_data.get('ntn')
             business.bp_website = business_data.get('website')
+            business.bp_database_id = business_data.get('databaseId')
             business.updated_by = request.user
 
             business.updated_at = dt.now()
@@ -145,7 +143,7 @@ class BpBasicAPI(GenericAPIView):
                 'message': self.messages['successPUT']
             })
         except Exception, e:
-            print e
+
             return Response({
                 'success': False,
                 'message': self.messages['errorPUT']

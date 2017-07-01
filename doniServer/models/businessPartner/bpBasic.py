@@ -170,6 +170,7 @@ class BpBasic(models.Model):
             'website': self.bp_website,
             'ntn': self.bp_ntn,
             'bpType': self.get_by_type_id(),
+            'databaseId': self.bp_database_id,
             'banks': banks,
             'locations': locations,
             'contacts': contacts,
