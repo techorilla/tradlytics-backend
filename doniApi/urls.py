@@ -81,6 +81,22 @@ urlpatterns = (
         TransactionListAPI.as_view(),
         name='Transaction List'),
 
+    url(r'transactions/washout/$',
+        TransactionWashoutAPI.as_view(),
+        name='Transaction Washout'),
+
+    url(r'transactions/completeStatus/$',
+        TransactionCompleteStatusAPI.as_view(),
+        name='Transaction List'),
+
+    url(r'transactions/shipmentStatus/$',
+        TransactionShipmentStatusAPI.as_view(),
+        name='Transaction List'),
+
+    url(r'transaction/list/dropdown/$',
+        TransactionDropDownAPI.as_view(),
+        name='Transaction List Dropdown'),
+
     url(r'transactions/basic/$',
         TransactionBasicAPI.as_view(),
         name='Transaction Basic'),
@@ -166,6 +182,31 @@ urlpatterns = (
         ),
 
     # Shipping API
+
+    url('shipping/vessel/list/$',
+        VesselListAPI.as_view(),
+        name='Shipping Ports List API'),
+
+    url('shipping/vessel/$',
+        VesselAPI.as_view(),
+        name='Shipping Ports API'),
+
+    url('shipping/vessel/(?P<vessel_id>[0-9]+)/$',
+        VesselAPI.as_view(),
+        name='Shipping Ports API'),
+
+
+    url('shipping/line/list/$',
+        ShippingLineListAPI.as_view(),
+        name='Shipping Ports List API'),
+
+    url('shipping/line/$',
+        ShippingLineAPI.as_view(),
+        name='Shipping Ports API'),
+
+    url('shipping/line/(?P<line_id>[0-9]+)/$',
+        ShippingLineAPI.as_view(),
+        name='Shipping Ports API'),
 
     url('shipping/ports/list/$',
         ShippingPortListAPI.as_view(),

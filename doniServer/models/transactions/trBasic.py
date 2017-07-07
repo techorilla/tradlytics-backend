@@ -23,6 +23,9 @@ class Transaction(models.Model):
     packaging = models.ForeignKey(Packaging, null=True)
     shipment_start = models.DateField()
     shipment_end = models.DateField()
+    is_complete = models.BooleanField(default=False)
+    is_washout = models.BooleanField(default=False)
+    is_washout_at = models.FloatField(default=0.00)
     file_id = models.CharField(max_length=100, null=False, unique=True, blank=False)
     contract_id = models.CharField(max_length=100, null=True)
     other_info = models.TextField()
@@ -30,6 +33,16 @@ class Transaction(models.Model):
     updated_at = models.DateTimeField(default=None, null=True)
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='tr_basic_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='tr_basic_updated_by')
+
+    @property
+    def get_washout_string(self):
+        if not self.is_washout:
+            return 'Washout Status Deactivated'
+        if self.is_washout and (self.is_washout_at == self.price):
+            return 'Washout At Par'
+        if self.is_washout and (self.is_washout_at != self.price):
+            return 'Washout At Price <span class="titled">USD %.2f</span>'%self.is_washout_at
+
 
 
     def get_list_object(self):
@@ -60,7 +73,57 @@ class Transaction(models.Model):
             'expectedCommission':  self.commission.net_commission
         }
 
+    def get_complete_obj(self, base_url, user):
+        #Transaction change logs
+        change_logs = self.change_log.all()
+        change_logs = [log.get_obj() for log in change_logs]
 
+        # Transaction Notes
+        notes = self.notes.all().order_by('-created_at')
+        notes = [note.get_obj(base_url, user) for note in notes]
+
+        # Transaction Files
+        files = self.files.values('file_name', 'extension', 'created_at', 'created_by__username', 'file_id') \
+            .order_by('-created_at')
+
+        # Washout Detail
+
+        washout_obj = {
+            'status': self.is_washout,
+            'washOutStr': self.get_washout_string,
+            'isWashOutAt': '%.2f'%round(self.is_washout_at,2)
+        }
+
+        files = [{
+                     'fileId': f.get('file_id'),
+                     'fileName': f.get('file_name'),
+                     'uploadedBy': f.get('created_by__username'),
+                     'uploadedAt': f.get('created_at'),
+                     'extension': f.get('extension'),
+                 } for f in files]
+
+        return {
+                'id': self.tr_id,
+                'isComplete': self.is_complete,
+                'basic': {
+                    'date': self.date,
+                    'buyer':self.buyer.get_description_obj(base_url),
+                    'seller': self.seller.get_description_obj(base_url),
+                    'contractualBuyer': self.contractual_buyer.get_description_obj(base_url),
+                    'productItem':  self.product_item.get_description_obj(base_url),
+                    'contractNo': self.contract_id,
+                    'fileNo': self.file_id,
+                    'shipmentEnd': self.shipment_end,
+                    'shipmentStart': self.shipment_start,
+                    'expectedCommission': self.commission.net_commission
+                },
+                'washOut': washout_obj,
+                'changeLogs': change_logs,
+                'shipment': self.shipment.get_description_object(),
+                'commission': self.commission.get_description_obj(base_url),
+                'files': files,
+                'notes': notes
+            }
 
     class Meta:
         db_table = 'tr_basic'

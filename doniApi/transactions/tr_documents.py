@@ -6,7 +6,7 @@ from django.http import HttpResponse
 
 
 class TransactionDocumentAPI(GenericAPIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
         doc_id = kwargs.get('document_id')

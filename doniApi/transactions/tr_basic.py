@@ -1,8 +1,97 @@
 from doniApi.apiImports import Response, GenericAPIView, status
-from doniServer.models import Transaction, TrCommission, BpBasic, ProductItem, Packaging, CommissionType
+from doniServer.models import Transaction, TrCommission, BpBasic, ProductItem, \
+    Packaging, CommissionType, TrShipment, TransactionChangeLog
 from datetime import datetime as dt
 import dateutil.parser
 from rest_framework.permissions import IsAuthenticated, AllowAny
+
+
+class TransactionDropDownAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        user=request.user
+        print request.get
+        return Response({
+            'transactionList': []
+        }, status=status.HTTP_200_OK)
+
+
+class TransactionWashoutAPI(GenericAPIView):
+
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+
+        try:
+            base_url = request.META.get('HTTP_HOST')
+            user= request.user
+            data = request.data
+            washout_status = data.get('status')
+            washout_value = data.get('isWashOutAt')
+            transaction_id = data.get('transactionId')
+            transaction = Transaction.objects.get(tr_id=transaction_id)
+            if not washout_status:
+                transaction.is_washout = False
+                transaction.is_washout_at = float(0.00)
+            elif washout_status:
+                transaction.is_washout = True
+                transaction.is_washout_at = float(washout_value)
+            log = 'Transaction <span class="titled">%s.<span>' % transaction.get_washout_string
+            message = 'Transaction %s successfully.' % transaction.get_washout_string
+            transaction.updated_by = user
+            transaction.updated_at = dt.now()
+            transaction.save()
+            TransactionChangeLog.add_change_log(user, log, transaction)
+
+            return Response({
+                    'transactionObj': transaction.get_complete_obj(base_url, user),
+                    'success': True,
+                    'message': message
+                })
+        except Exception, e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            })
+
+
+
+class TransactionCompleteStatusAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            base_url = request.META.get('HTTP_HOST')
+            user = request.user
+            data = request.data
+            transaction_id = data.get('transactionId')
+            is_complete = data.get('isComplete')
+            if is_complete:
+                log = 'Changed transaction status to <span class="titled">COMPLETED</span>.'
+                message = 'Transaction completed successfully.'
+            else:
+                log = 'Changed transaction status to <span class="titled">INCOMPLETE</span> from <span class="titled">COMPLETED</span>.'
+                message = 'Transaction status changed to incomplete successfully.'
+            transaction = Transaction.objects.get(tr_id=transaction_id)
+            transaction.is_complete = is_complete
+            transaction.updated_by = user
+            transaction.updated_at = dt.now()
+            transaction.save()
+
+            TransactionChangeLog.add_change_log(user, log, transaction)
+
+            return Response({
+                'transactionObj': transaction.get_complete_obj(base_url, user),
+                'success': True,
+                'message': message
+            })
+        except Exception, e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            })
+
 
 
 class TransactionListAPI(GenericAPIView):
@@ -36,59 +125,9 @@ class TransactionBasicAPI(GenericAPIView):
         user = request.user
         transaction_id = request.GET.get('tradeId')
         transaction = Transaction.objects.get(tr_id=transaction_id)
-        # Transaction Notes
-        notes = transaction.notes.all().order_by('-created_at')
-        notes = [note.get_obj(base_url, user) for note in notes]
-
-        # Transaction Files
-        files = transaction.files.values('file_name', 'extension', 'created_at', 'created_by__username', 'file_id') \
-            .order_by('-created_at')
-
-        files = [ {
-                      'fileId': f.get('file_id'),
-                      'fileName': f.get('file_name'),
-                      'uploadedBy': f.get('created_by__username'),
-                      'uploadedAt': f.get('created_at'),
-                      'extension': f.get('extension'),
-                  } for f in files]
-
-
-
-
-
-        seller_country, seller_country_code, seller_country_flag = transaction.seller.primary_origin
-        buyer_country, buyer_country_code, buyer_country_flag = transaction.buyer.primary_origin
-        cont_buyer_country, cont_buyer_country_code, cont_buyer_country_flag = transaction.contractual_buyer.primary_origin
 
         return Response({
-            'transaction': {
-                'basic': {
-                    'date': transaction.date,
-                    'buyer':transaction.buyer.get_description_obj(base_url),
-                    'seller': transaction.seller.get_description_obj(base_url),
-                    'contractualBuyer': transaction.contractual_buyer.get_description_obj(base_url),
-                    'productItem':  transaction.product_item.get_description_obj(base_url),
-                    'commission':  transaction.commission.get_description_obj(base_url),
-                    'contractNo': transaction.contract_id,
-                    'fileNo': transaction.file_id,
-                    'price': transaction.price,
-
-                    'productName': transaction.product_item.product_origin.product.name,
-                    'productItemId': transaction.product_item.id,
-                    'productOriginName': transaction.product_item.product_origin.country.name,
-                    'productOriginFlag': transaction.product_item.product_origin.country.flag,
-                    'quantity': transaction.quantity,
-
-                    'shipmentEnd': transaction.shipment_end,
-                    'shipmentStart': transaction.shipment_start,
-                    'expectedCommission': transaction.commission.net_commission
-
-
-
-                },
-                'files': files,
-                'notes': notes
-            }
+            'transaction': transaction.get_complete_obj(base_url, user)
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -145,6 +184,8 @@ class TransactionBasicAPI(GenericAPIView):
                 commission = TrCommission()
                 transaction.created_by = user
 
+
+
             # saving all transaction details
             transaction.seller = seller
             transaction.buyer = buyer
@@ -173,6 +214,25 @@ class TransactionBasicAPI(GenericAPIView):
             transaction.save()
             commission.transaction = transaction
             commission.save()
+
+            # Assigning not shipped status to new transaction
+            if not tran_id:
+                shipment = TrShipment()
+                shipment.transaction = transaction
+                shipment.not_shipped = True
+                shipment.created_by = user
+                shipment.save()
+
+
+            # Making Transaction Change Log
+
+            if tran_id:
+                #TODO: Have to make detail log message
+                log = '<span class="titled">Updated Transaction</span>'
+                TransactionChangeLog.add_change_log(user, log, transaction)
+            else:
+                log = '<span class="titled">Created Transaction</span>'
+                TransactionChangeLog.add_change_log(user, log, transaction)
 
             return Response({
                 'tradeId': transaction.tr_id,

@@ -22,6 +22,7 @@ class TrCommission(models.Model):
     difference = models.FloatField(default=0.00)
     discount = models.FloatField(default=0.00)
     net_commission = models.FloatField(default=0.00)
+    quantity_commission = models.FloatField(default=0.00)
 
     class Meta:
         db_table = 'tr_commission'
@@ -33,7 +34,8 @@ class TrCommission(models.Model):
             'quantity': self.transaction.quantity,
             'sellerBroker': None if not self.seller_broker else self.seller_broker.get_description_object(base_url),
             'buyerBroker': None if not self.buyer_broker else self.buyer_broker.get_description_objects(base_url),
-            'buyerBrokerCommissionType': self.buyer_broker_comm_type.name,
+            'buyerBrokerCommissionType': None if not self.buyer_broker else self.buyer_broker_comm_type.name,
+            'buyerBrokerCommission': None if not self.buyer_broker else self.buyer_broker_comm,
             'commission': self.commission,
             'commissionType': self.commission_type.name,
             'difference': self.difference,

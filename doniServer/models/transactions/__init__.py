@@ -6,3 +6,4 @@ from trNote import TrNote
 from trSecondary import SecondaryTransaction
 from trShipment import TrShipment
 from trStatus import TrStatus
+from trChangeLog import TransactionChangeLog
