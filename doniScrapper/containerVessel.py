@@ -27,7 +27,7 @@ class VesselScrapper(object):
                 vessel_link = self.URL % a['href']
                 vessel_broken = '(Broken' in a.findChild().text.strip()
                 imo_number = vessel_link.split('.')
-                imo_number = imo_number[1].split('_')[1]
+                imo_number = imo_number[2].split('_')[1]
                 already_exist = Vessel.objects.filter(imo_number=imo_number).exists()
                 if not already_exist:
                     self.get_save_single_vessel_detail(vessel_name, vessel_broken, vessel_link)
