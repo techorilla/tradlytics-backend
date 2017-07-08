@@ -10,8 +10,9 @@ class ShippingLineListAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
+        base_url = request.META.get('HTTP_HOST')
         shipping_line = ShippingLine.objects.all()
-        shipping_line = [line.get_obj() for line in shipping_line]
+        shipping_line = [line.get_list_obj(base_url) for line in shipping_line]
         return Response({
             'list':shipping_line,
             'success': True
@@ -27,8 +28,13 @@ class ShippingLineAPI(GenericAPIView):
     messages['errorPUT'] = 'Shipping Line Information not updated due to some error on server.'
 
     def get(self, request, *args, **kwargs):
-        shippingrequest.GET.get('shippingLineId')
-        return Response({}, status=status.HTTP_200_OK)
+        shipping_line_id = request.GET.get('shippingLineId')[0]
+        base_url = request.META.get('HTTP_HOST')
+        line = ShippingLine.objects.get(id=shipping_line_id)
+        return Response({
+            'success': True,
+            'shippingLineObj': line.get_complete_obj(base_url)
+        }, status=status.HTTP_200_OK)
 
 
     def post(self, request, *args, **kwargs):
@@ -40,8 +46,9 @@ class ShippingLineAPI(GenericAPIView):
     def delete(self, request, *args, **kwargs):
         try:
             line_id = kwargs.get('line_id')
+            print line_id
             line = ShippingLine.objects.get(id=line_id)
-            vessel_exists = line.vessls.exists()
+            vessel_exists = line.vessels.exists()
             line_name = line.name
             if not vessel_exists:
                 line.delete()
@@ -58,7 +65,7 @@ class ShippingLineAPI(GenericAPIView):
                 })
         except Exception, e:
             return Response({
-                'success': True,
+                'success': False,
                 'message': str(e)
             })
 
@@ -76,17 +83,18 @@ class ShippingLineAPI(GenericAPIView):
             tracking_website = line_data.get('trackingWebsite')
 
             if line_id:
-                line = ShippingLine()
-                line.created_by = request.user
-                if logo:
+                line = ShippingLine.objects.get(id=line_id)
+                line.updated_by = request.user
+                line.updated_at = dt.now()
+                if line_logo:
                     if line.logo:
                         path = Utilities.get_media_directory()+'/'+str(line.logo)
                         os.remove(path)
-                    line.logo = logo
+                    line.logo = line_logo
                 success_message = self.messages['successPUT']
             else:
-                line = ShippingLine.objects.get(id=line_id)
-                line.updated_by = request.user
+                line = ShippingLine()
+                line.created_by = request.user
                 if line_logo:
                     line.logo = line_logo
                 success_message = self.messages['successPOST']

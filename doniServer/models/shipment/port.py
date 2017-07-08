@@ -31,6 +31,14 @@ class ShippingPort(models.Model):
             'addedBy': self.created_by.username
         }
 
+    def get_drop_down_obj(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'loCode': self.lo_code,
+            'country': self.country,
+        }
+
     def __unicode__(self):
         return '%s:%s:%s'%(self.country, self.name, self.lo_code)
 

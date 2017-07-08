@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 import time
+import os
 
 
 def get_image_path(instance, filename):
@@ -27,10 +28,30 @@ class ShippingLine(models.Model):
             'name': self.name,
             'codeName': self.code_name,
             'website': self.website,
-            'logo': self.get_business_logo(base_url),
+            'logo': self.get_line_logo(base_url),
             'createdBy': self.created_by.username,
             'createdOn': self.created_at
         }
+
+    def get_list_obj(self, base_url):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'codeName': self.code_name,
+            'website': self.website,
+            'logo': self.get_line_logo(base_url),
+            'vesselCount': self.vessels.count()
+        }
+
+    def get_drop_down_obj(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'codeName': self.code_name
+        }
+
+
+
 
     def get_obj(self, base_url):
         return {
@@ -38,12 +59,12 @@ class ShippingLine(models.Model):
             'name': self.name,
             'codeName': self.code_name,
             'website': self.website,
-            'logo': self.get_business_logo(base_url),
+            'logo': self.get_line_logo(base_url),
             'createdBy': self.created_by.username,
             'createdOn': self.created_at
         }
 
-    def get_business_logo(self, base_url):
+    def get_line_logo(self, base_url):
         if settings.IS_HTTPS:
             pre = 'https://'
         else:

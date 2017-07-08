@@ -94,7 +94,19 @@ urlpatterns = (
 
     url(r'business/$',
         BusinessDropDownAPI.as_view(),
-        name='Business_Drop_Down_API'
-        )
+        name='Business_Drop_Down_API'),
+
+    url(r'ports/$',
+        ShippingPortDDAPI.as_view(),
+        name='Business_Drop_Down_API'),
+
+    url(r'shipping_line/$',
+        ShippingLineDDAPI.as_view(),
+        name='Business_Drop_Down_API'),
+
+    url(r'vessel/$',
+        ShippingVesselDDAPI.as_view(),
+        name='Business_Drop_Down_API'),
+
 
 )

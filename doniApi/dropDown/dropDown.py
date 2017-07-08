@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from doniServer.models.dropDowns import *
 from doniServer.models.product import ProductCategory, Products, PriceMarket, ProductKeyword, ProductItem, PriceMetric
 from doniServer.models.product.priceMarket import get_all_currencies
+from doniServer.models.shipment import ShippingPort, ShippingLine, Vessel
 from doniServer.models import BpBasic
 from django.utils import timezone
 from django.conf import settings
@@ -302,6 +303,42 @@ class ShipmentMonthDDAPI(GenericAPIView):
 
 class TransactionStatus(SimpleDropDownAPI):
     model = TransactionStatus
+
+
+
+class ShippingLineDDAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        all_line = ShippingLine.objects.all()
+        all_line = [line.get_drop_down_obj() for line in all_line]
+        return Response({'list': all_line}, status=status.HTTP_200_OK)
+
+
+class ShippingVesselDDAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        all_vessel = Vessel.objects.all()
+        all_vessel = [vessel.get_drop_down_obj() for vessel in all_vessel]
+        return Response({
+            'list': all_vessel
+        }, status=status.HTTP_200_OK)
+
+
+class ShippingPortDDAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        all_ports = ShippingPort.objects.all()
+        all_ports = [port.get_drop_down_obj() for port in all_ports]
+        return Response({
+            'list': all_ports
+        }, status=status.HTTP_200_OK)
+
+
+
+
 
 
 
