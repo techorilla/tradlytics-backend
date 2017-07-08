@@ -28,7 +28,9 @@ class ShippingLineAPI(GenericAPIView):
     messages['errorPUT'] = 'Shipping Line Information not updated due to some error on server.'
 
     def get(self, request, *args, **kwargs):
-        shipping_line_id = request.GET.get('shippingLineId')[0]
+        print request.GET
+        shipping_line_id = str(request.GET.get('shippingLineId'))
+        print shipping_line_id
         base_url = request.META.get('HTTP_HOST')
         line = ShippingLine.objects.get(id=shipping_line_id)
         return Response({
@@ -46,7 +48,6 @@ class ShippingLineAPI(GenericAPIView):
     def delete(self, request, *args, **kwargs):
         try:
             line_id = kwargs.get('line_id')
-            print line_id
             line = ShippingLine.objects.get(id=line_id)
             vessel_exists = line.vessels.exists()
             line_name = line.name
