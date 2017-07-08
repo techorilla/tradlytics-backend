@@ -13,6 +13,12 @@ class CurrencyExchange(models.Model):
         db_table = 'currency_exchange'
         ordering = ["-exchange_rate_on"]
 
+    def get_graph_obj(self):
+        return {
+            'date': self.exchange_rate_on,
+            'value': self.exchange_rate
+        }
+
     def __unicode__(self):
         return '%s:%s:%s:%s' % (str(self.exchange_rate_on), self.exchange_rate,
                                 self.currency_code_in, self.currency_code_out)

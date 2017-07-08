@@ -304,8 +304,14 @@ urlpatterns = (
 
     url(r'^manifest/dashboard/$',
         ManifestDashboardAPI.as_view(),
-        name='manifest_dashboard'
-        )
+        name='manifest_dashboard'),
+
+
+    # Currency Exchange
+
+    url(r'^currency_exchange/dashboard/$',
+        CurrencyExchangeDashboardAPI.as_view(),
+        name='currency_dashboard')
 
 
 )

@@ -82,6 +82,7 @@ class ShippingLineAPI(GenericAPIView):
             name = line_data.get('name')
             website = line_data.get('website')
             tracking_website = line_data.get('trackingWebsite')
+            logo_exist =  line_data.get('logo')
 
             if line_id:
                 line = ShippingLine.objects.get(id=line_id)
@@ -92,6 +93,11 @@ class ShippingLineAPI(GenericAPIView):
                         path = Utilities.get_media_directory()+'/'+str(line.logo)
                         os.remove(path)
                     line.logo = line_logo
+                else:
+                    if not logo_exist:
+                        path = Utilities.get_media_directory() + '/' + str(line.logo)
+                        os.remove(path)
+                        line.logo = None
                 success_message = self.messages['successPUT']
             else:
                 line = ShippingLine()
