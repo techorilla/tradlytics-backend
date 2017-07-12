@@ -78,7 +78,6 @@ class ProductItemAPI(GenericAPIView):
                 product_item.import_expense = import_expense
                 product_item.product_origin = product_origin
                 product_item.database_ids = database_ids
-                product_item.specification = specification
                 product_item.created_by = user
                 product_item.save()
                 for keyword in keywords:
@@ -90,6 +89,10 @@ class ProductItemAPI(GenericAPIView):
             }, status=status.HTTP_200_OK)
         except Exception as e:
             traceback.print_exc()
+            return Response({
+                'success': False,
+                'message': str(e)
+            })
 
     def post(self, request, *args, **kwargs):
         user = request.user

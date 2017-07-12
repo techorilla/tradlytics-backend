@@ -373,3 +373,14 @@ class ProductItemAdmin(admin.ModelAdmin):
     list_display = ('product_origin','database_ids', 'keyword_str')
 
 
+from django.db.models.signals import pre_save
+def pre_save_post_receiver(sender, instance, *args, **kwargs):
+
+    if not instance.import_expense:
+        instance.import_expense = 1.06
+
+
+pre_save.connect(pre_save_post_receiver, sender=ProductItem)
+
+
+
