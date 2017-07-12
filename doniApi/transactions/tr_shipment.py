@@ -2,6 +2,7 @@ from doniApi.apiImports import Response, GenericAPIView, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from doniServer.models import Transaction, TransactionChangeLog
 
+
 class TransactionShipmentStatusAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
@@ -18,9 +19,11 @@ class TransactionShipmentStatusAPI(GenericAPIView):
     def post(self, request, *args, **kwargs):
         try:
             base_url = request.META.get('HTTP_HOST')
+            user = request.user
+
             data = request.data
             shipment_status = data.get('shipmentStatus')
-            user = request.user
+
             activate = data.get('status')
             transaction_id = data.get('transactionId')
 
@@ -83,15 +86,109 @@ class TransactionShipmentStatusAPI(GenericAPIView):
             })
 
 
-class TransactionShipmentAPI(GenericAPIView):
-    def get(self, request, *args, **kwargs):
-        return Response()
-
-    def post(self, request, *args, **kwargs):
-        return Response()
-
-    def delete(self, request, *args, **kwargs):
-        return Response()
+class ShipmentShippedInfoAPI(GenericAPIView):
 
     def put(self, request, *args, **kwargs):
-        return Response()
+        try:
+            data = request.data
+            transaction_id = data.get('transactionId')
+            base_url = request.META.get('HTTP_HOST')
+            user = request.user
+            trade = Transaction.objects.get(tr_id=transaction_id)
+            shipment = trade.shipment
+
+            return Response({
+                'transactionObj': transaction.get_complete_obj(base_url, user),
+                'success': True,
+                'message': 'Shipment Arrived At Port Information Updated!'
+            })
+        except Exception, e:
+            return Response({
+                'success': True
+            })
+
+
+
+class ShipmentNotShippedInfoAPI(GenericAPIView):
+    def put(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            transaction_id = data.get('transactionId')
+            base_url = request.META.get('HTTP_HOST')
+            user = request.user
+            trade = Transaction.objects.get(tr_id=transaction_id)
+            shipment = trade.shipment
+
+            return Response({
+                'success': True,
+                'transactionObj': transaction.get_complete_obj(base_url, user),
+                'message': 'Shipment Arrived At Port Information Updated!'
+            })
+        except Exception, e:
+            return Response({
+                'success': True
+            })
+
+
+
+class ShipmentApprobationReceivedInfoAPI(GenericAPIView):
+    def put(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            base_url = request.META.get('HTTP_HOST')
+            user = request.user
+            transaction_id = data.get('transactionId')
+            trade = Transaction.objects.get(tr_id=transaction_id)
+            shipment = trade.shipment
+
+            return Response({
+                'success': True,
+                'transactionObj': transaction.get_complete_obj(base_url, user),
+                'message': 'Shipment Arrived At Port Information Updated!'
+            })
+        except Exception, e:
+            return Response({
+                'success': True
+            })
+
+
+
+class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
+
+    def put(self, request, *args, **kwargs):
+        try:
+            data = request.data
+            base_url = request.META.get('HTTP_HOST')
+            user = request.user
+            transaction_id = data.get('transactionId')
+            print transaction_id
+
+            data_obj = data.get('dataObj')
+            earned_commission = data.get('earnedCommission')
+            trade = Transaction.objects.get(tr_id=transaction_id)
+
+            shipment = trade.shipment
+            commission = trade.commission
+            #saving Shipment Data
+            quantity_shipped = data_obj.get('quantityShipped')
+
+            if quantity_shipped:
+
+
+
+                shipment.quantity = float(quantity_shipped)
+                shipment.save()
+                commission.earned_commission = earned_commission
+                commission.save()
+
+
+            return Response({
+                'success': True,
+                'transactionObj': trade.get_complete_obj(base_url, user),
+                'message': 'Shipment Arrived At Port Information Updated!'
+            })
+        except Exception, e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            })

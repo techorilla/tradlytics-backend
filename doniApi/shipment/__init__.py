@@ -1,3 +1,3 @@
-from .ports import ShippingPortAPI, ShippingPortListAPI
-from .vessel import VesselAPI, VesselListAPI
+from .ports import ShippingPortAPI, ShippingPortListAPI, ShippingPortTagAPI
+from .vessel import VesselAPI, VesselListAPI, VesselTagAPI
 from .shippingLine import ShippingLineAPI, ShippingLineListAPI

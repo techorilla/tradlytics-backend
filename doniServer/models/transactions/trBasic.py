@@ -44,6 +44,41 @@ class Transaction(models.Model):
             return 'Washout At Price <span class="titled">USD %.2f</span>'%self.is_washout_at
 
 
+    def get_obj(self):
+
+        return {
+            'id': self.id,
+            'commission': None,
+            'productSpecification': self.product_specification,
+            'basic': {
+                'date': self.date,
+                'buyerId': self.buyer.bp_id,
+                'sellerId': self.seller.bp_id,
+                'productItemId': self.product_item.id,
+                'packagingId': self.packaging.id,
+                'shipmentStart': self.shipment_start,
+                'shipmentEnd': self.shipment_end,
+                'contractualBuyerId': self.contractual_buyer.bp_id,
+                'otherInfo': self.other_info,
+                'fileId': self.file_id,
+                'contractId': self.contract_id,
+                'price': str(round(self.price,2)),
+                'quantity': str(round(self.quantity,2)),
+            },
+            'commission':{
+                'sellerBrokerId': None if not self.commission.seller_broker else self.commission.seller_broker.bp_id,
+                'buyerBrokerId': None if not self.commission.buyer_broker else self.commission.buyer_broker.bp_id,
+                'buyerBrokerCommissionTypeId': None if not self.commission.buyer_broker_comm else  self.commission.buyer_broker_comm.id,
+                'buyerBrokerCommission': str(round(self.commission.buyer_broker_comm,2)),
+                'typeId': self.commission.commission_type.id,
+                'discount': str(round(self.commission.discount,2)),
+                'difference': str(round(self.commission.difference,2)),
+                'commission': str(round(self.commission.commission,2)),
+                'netCommission': str(round(self.commission.net_commission,2))
+            }
+        }
+
+
 
     def get_list_object(self):
         seller_country, seller_country_code, seller_country_flag = self.seller.primary_origin
@@ -70,7 +105,8 @@ class Transaction(models.Model):
             'sellerPrimaryContact': self.seller.primary_contact,
             'shipmentEnd': self.shipment_end,
             'shipmentStart': self.shipment_start,
-            'expectedCommission':  self.commission.net_commission
+            'netCommission':  self.commission.net_commission,
+            'earnedCommission': self.commission.earned_commission
         }
 
     def get_complete_obj(self, base_url, user):
@@ -106,6 +142,7 @@ class Transaction(models.Model):
                 'id': self.tr_id,
                 'isComplete': self.is_complete,
                 'basic': {
+                    'price': self.price,
                     'date': self.date,
                     'buyer':self.buyer.get_description_obj(base_url),
                     'seller': self.seller.get_description_obj(base_url),
@@ -119,7 +156,7 @@ class Transaction(models.Model):
                 },
                 'washOut': washout_obj,
                 'changeLogs': change_logs,
-                'shipment': self.shipment.get_description_object(),
+                'shipment': self.shipment.get_description_object(base_url),
                 'commission': self.commission.get_description_obj(base_url),
                 'files': files,
                 'notes': notes

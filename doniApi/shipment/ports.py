@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from doniServer.models import ShippingPort
 import pycountry
 from datetime import datetime as dt
-
+from django.db.models import Q
 
 class ShippingPortListAPI(GenericAPIView):
 
@@ -16,6 +16,21 @@ class ShippingPortListAPI(GenericAPIView):
             'allPorts': all_ports
         }, status=status.HTTP_200_OK)
 
+
+class ShippingPortTagAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('query')
+        if query:
+            port_tags = ShippingPort.objects.filter(Q(country__icontains=query) | Q(lo_code__istartswith=query)
+                                                | Q(name__icontains=query)) \
+                .values('country', 'name', 'id', 'lo_code').order_by('name')
+            # port_tags = [tag.get('name') for tag in port_tags]
+        else:
+            port_tags = []
+
+        return Response({'data': port_tags}, status=status.HTTP_200_OK)
 
 class ShippingPortAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)

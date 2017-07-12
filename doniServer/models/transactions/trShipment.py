@@ -3,7 +3,7 @@ from datetime import date
 from django.contrib.auth.models import User
 from .trBasic import Transaction
 from ..businessPartner import BpBasic
-from ..shipment import ShippingPort
+from ..shipment import ShippingPort, ShippingLine
 
 from django.utils import timezone
 
@@ -15,6 +15,8 @@ class TrShipment(models.Model):
         null=True,
         related_name='shipment'
     )
+
+    shipper = models.ForeignKey(BpBasic, null=True, related_name='tr_shipment_shipper')
 
     not_shipped = models.BooleanField(default=False)
     not_shipped_reason = models.TextField()
@@ -28,16 +30,17 @@ class TrShipment(models.Model):
     transit_port = models.CharField(max_length=500, null=True)
     arrived_at_port = models.BooleanField(default=False)
     date_arrived = models.DateField(default=None, null=True)
+    date_shipped_on = models.DateField(default=None, null=True)
     actual_arrived = models.DateField(default=None, null=True)
     bl_no = models.CharField(max_length=50, null=True)
     invoice_no = models.CharField(max_length=50, null=True)
     invoice_amount = models.FloatField(null=True)
     quantity = models.FloatField(null=True)
     vessel_no = models.CharField(max_length=50)
-    shipper_id = models.ForeignKey(BpBasic, null=True, related_name='tr_shipment_shipper')
+
     port_loading = models.ForeignKey(ShippingPort, null=True, related_name='tr_shipment_port_loading')
     port_destination = models.ForeignKey(ShippingPort, null=True, related_name='tr_shipment_port_destination')
-    ship_line_details = models.TextField()
+    shipping_line = models.ForeignKey(ShippingLine, null=True, related_name='line_shipments')
     chk_reason = models.BooleanField(default=False)
     chk_ship_ext = models.BooleanField(default=False)
     chk_exp_ship = models.BooleanField(default=False)
@@ -57,7 +60,7 @@ class TrShipment(models.Model):
         db_table = 'tr_shipment'
 
 
-    def get_description_object(self):
+    def get_description_object(self, base_url):
 
         return {
             'notShipped': {
@@ -72,11 +75,20 @@ class TrShipment(models.Model):
                 'inTransit': self.in_transit,
             },
             'shipped':{
-                'active': self.shipped
+                'active': self.shipped,
+                'expectedArrival': self.expected_arrival,
+                'shipper': None if not self.shipper else self.shipper.get_description_obj(base_url),
+                'shippedOn': self.date_shipped_on,
+
             },
             'arrivedAtPort':{
                 'active': self.arrived_at_port,
-                'quantityShipped': self.quantity,
+                'quantityShipped': None if not self.quantity else str(round(self.quantity,2)),
+                'blNo': self.bl_no,
+                'shippingLine': {} if not self.shipping_line else self.shipping_line.get_drop_down_obj(),
+                'loadingPort': {} if not self.port_loading else self.port_loading.get_drop_down_obj(),
+                'destinationPort': {} if not self.port_destination else self.port_destination.get_drop_down_obj()
+
 
             }
         }

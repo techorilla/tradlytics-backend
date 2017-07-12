@@ -124,10 +124,14 @@ class TransactionBasicAPI(GenericAPIView):
         base_url = request.META.get('HTTP_HOST')
         user = request.user
         transaction_id = request.GET.get('tradeId')
+        full_obj = request.GET.get('full')
         transaction = Transaction.objects.get(tr_id=transaction_id)
-
+        if full_obj:
+            transaction = transaction.get_complete_obj(base_url, user)
+        else:
+            transaction = transaction.get_obj()
         return Response({
-            'transaction': transaction.get_complete_obj(base_url, user)
+            'transaction': transaction,
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):

@@ -93,6 +93,22 @@ urlpatterns = (
         TransactionShipmentStatusAPI.as_view(),
         name='Transaction List'),
 
+    url(r'transactions/approbation_received_info/$',
+        ShipmentApprobationReceivedInfoAPI.as_view(),
+        name='Transaction Approbation Recieved Info'),
+
+    url(r'transactions/arrived_at_port_info/$',
+        ShipmentArrivedAtPortInfoAPI.as_view(),
+        name='Transaction Arrived Info'),
+
+    url(r'transactions/shipped_info/$',
+        ShipmentShippedInfoAPI.as_view(),
+        name='Transaction Shipment Info'),
+
+    url(r'transactions/not_shipped_info/$',
+        ShipmentNotShippedInfoAPI.as_view(),
+        name='Transaction Not Shipped Info'),
+
     url(r'transaction/list/dropdown/$',
         TransactionDropDownAPI.as_view(),
         name='Transaction List Dropdown'),
@@ -145,9 +161,9 @@ urlpatterns = (
         TransactionBasicAPI.as_view(),
         name='Transaction Status'),
 
-    url(r'transactions/(?P<tr_id>[a-zA-Z0-9.@_-]+)/shipment/$',
-        TransactionShipmentAPI.as_view(),
-        name='Transaction Shipment'),
+    # url(r'transactions/(?P<tr_id>[a-zA-Z0-9.@_-]+)/shipment/$',
+    #     TransactionShipmentAPI.as_view(),
+    #     name='Transaction Shipment'),
 
     # Reports Related API
 
@@ -182,6 +198,15 @@ urlpatterns = (
         ),
 
     # Shipping API
+
+    url('shipping/port_tag/$',
+        ShippingPortTagAPI.as_view(),
+        name='Shipping Ports List API'),
+
+    url('shipping/vessel_tag/$',
+        VesselTagAPI.as_view(),
+        name='Shipping Ports List API'),
+
 
     url('shipping/vessel/list/$',
         VesselListAPI.as_view(),

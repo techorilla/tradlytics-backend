@@ -22,6 +22,7 @@ class TrCommission(models.Model):
     difference = models.FloatField(default=0.00)
     discount = models.FloatField(default=0.00)
     net_commission = models.FloatField(default=0.00)
+    earned_commission = models.FloatField(default=0.00)
     quantity_commission = models.FloatField(default=0.00)
 
     class Meta:
@@ -30,6 +31,7 @@ class TrCommission(models.Model):
 
     def get_description_obj(self, base_url):
         return {
+            'typeId': self.commission_type.id,
             'price': self.transaction.price,
             'quantity': self.transaction.quantity,
             'sellerBroker': None if not self.seller_broker else self.seller_broker.get_description_object(base_url),
@@ -40,5 +42,6 @@ class TrCommission(models.Model):
             'commissionType': self.commission_type.name,
             'difference': self.difference,
             'discount': self.discount,
-            'expectedCommission': self.net_commission
+            'netCommission': str(round(self.net_commission,2)),
+            'earnedCommission': str(round(self.earned_commission,2))
         }

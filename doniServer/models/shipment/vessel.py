@@ -45,14 +45,25 @@ class Vessel(models.Model):
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='vessel_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='vessel_updated_by')
 
-    def get_list_obj(self):
+    def get_list_obj(self, base_url):
         return {
+            'id': self.id,
             'imoNumber': self.imo_number,
             'broken': self.broken,
             'nationality': self.nationality,
             'operator': self.operator,
-            'first_name': self.first_name,
-            'shippingLine': None if not self.shipping_line else self.shipping_line.get_obj()
+            'name': self.first_name,
+            'shippingLine': None if not self.shipping_line else self.shipping_line.get_obj(base_url)
+        }
+
+    def get_complete_obj(self):
+
+        return {
+            'id': self.id,
+            'imoNumber': self.imo_number,
+            'mmsi': self.mmsi_number,
+            'name': self.first_name,
+            'shippingLineId': None if not self.shipping_line else self.shipping_line.id
         }
 
     def get_drop_down_obj(self):
