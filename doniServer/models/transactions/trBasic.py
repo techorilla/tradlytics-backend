@@ -66,7 +66,7 @@ class Transaction(models.Model):
             'commission':{
                 'sellerBrokerId': None if not self.commission.seller_broker else self.commission.seller_broker.bp_id,
                 'buyerBrokerId': None if not self.commission.buyer_broker else self.commission.buyer_broker.bp_id,
-                'buyerBrokerCommissionTypeId': None if not self.commission.buyer_broker_comm else  self.commission.buyer_broker_comm.id,
+                'buyerBrokerCommissionTypeId': None if not self.commission.buyer_broker_comm else  self.commission.buyer_broker_comm_type.id,
                 'buyerBrokerCommission': str(round(self.commission.buyer_broker_comm,2)),
                 'typeId': self.commission.commission_type.id,
                 'discount': str(round(self.commission.discount,2)),
