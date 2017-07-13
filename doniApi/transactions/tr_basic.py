@@ -169,124 +169,124 @@ class TransactionBasicAPI(GenericAPIView):
         return self.save_transaction(data, request.user)
 
     def save_transaction(self, data, user):
-        # try:
-        tran_id = data.get('id')
-        product_specs = data.get('productSpecification')
-        commission_data = data.get('commission')
-        basic = data.get('basic')
-        buyer_id = basic.get('buyerId')
-        contractual_buyer_id = basic.get('contractualBuyerId')
-        seller_id = basic.get('sellerId')
-        packaging_id = basic.get('packagingId')
-        product_item_id = basic.get('productItemId')
+        try:
+            tran_id = data.get('id')
+            product_specs = data.get('productSpecification')
+            commission_data = data.get('commission')
+            basic = data.get('basic')
+            buyer_id = basic.get('buyerId')
+            contractual_buyer_id = basic.get('contractualBuyerId')
+            seller_id = basic.get('sellerId')
+            packaging_id = basic.get('packagingId')
+            product_item_id = basic.get('productItemId')
 
 
-        transaction_date = dateutil.parser.parse(str(basic.get('date')).replace('"', ''))
-        transaction_date =  transaction_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            transaction_date = dateutil.parser.parse(str(basic.get('date')).replace('"', ''))
+            transaction_date =  transaction_date.replace(hour=0, minute=0, second=0, microsecond=0)
 
-        shipment_start = dateutil.parser.parse(str(basic.get('shipmentStart')).replace('"', ''))
-        shipment_start = shipment_start.replace(hour=0, minute=0, second=0, microsecond=0)
+            shipment_start = dateutil.parser.parse(str(basic.get('shipmentStart')).replace('"', ''))
+            shipment_start = shipment_start.replace(hour=0, minute=0, second=0, microsecond=0)
 
-        shipment_end = dateutil.parser.parse(str(basic.get('shipmentEnd')).replace('"', ''))
-        shipment_end = shipment_end.replace(hour=0, minute=0, second=0, microsecond=0)
+            shipment_end = dateutil.parser.parse(str(basic.get('shipmentEnd')).replace('"', ''))
+            shipment_end = shipment_end.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
-        packaging = Packaging.objects.get(id=packaging_id)
-        commission_type_id = commission_data.get('typeId')
-        seller_broker_id = commission_data.get('sellerBrokerId')
-        buyer_broker_id = commission_data.get('buyerBrokerId')
-        buyer_broker_commission_type_id = commission_data.get('buyerBrokerCommissionTypeId')
+            packaging = Packaging.objects.get(id=packaging_id)
+            commission_type_id = commission_data.get('typeId')
+            seller_broker_id = commission_data.get('sellerBrokerId')
+            buyer_broker_id = commission_data.get('buyerBrokerId')
+            buyer_broker_commission_type_id = commission_data.get('buyerBrokerCommissionTypeId')
 
-        if buyer_id == seller_id:
+            if buyer_id == seller_id:
+                return Response({
+                    'success': False,
+                    'message': 'Buyer and Seller can not be same'
+                })
+            buyer = BpBasic.objects.get(bp_id=buyer_id)
+            seller = BpBasic.objects.get(bp_id=seller_id)
+            product_item = ProductItem.objects.get(id=product_item_id)
+            contractual_buyer = BpBasic.objects.get(bp_id=contractual_buyer_id)
+            commission_type = CommissionType.objects.get(id=commission_type_id)
+            buyer_broker_commission_type = None if not buyer_broker_id else CommissionType.objects.get(id=buyer_broker_commission_type_id)
+            seller_broker = None if not seller_broker_id else BpBasic.objects.get(bp_id=seller_broker_id)
+            buyer_broker = None if not buyer_broker_id else BpBasic.objects.get(bp_id=buyer_broker_id)
+            net_commission = data.get('netCommission')
+
+            #update
+            if tran_id:
+                success_message = self.messages['successPUT']
+                transaction = Transaction.objects.get(tr_id=tran_id)
+                commission = TrCommission.objects.get(transaction__tr_id=tran_id)
+                transaction.updated_by = user
+                transaction.updated_at = dt.now()
+
+            #add
+            else:
+                success_message = self.messages['successPOST']
+                transaction = Transaction()
+                commission = TrCommission()
+                transaction.created_by = user
+
+
+
+            # saving all transaction details
+            transaction.seller = seller
+            transaction.buyer = buyer
+            transaction.product_item = product_item
+            transaction.contractual_buyer = contractual_buyer
+            transaction.other_info = basic.get('otherInfo')
+            transaction.file_id = basic.get('fileId')
+            transaction.contract_id = basic.get('contractId')
+            transaction.product_specification = product_specs
+            transaction.shipment_start = shipment_start.date()
+            transaction.shipment_end = shipment_end.date()
+            transaction.price = float(basic.get('price'))
+            transaction.quantity = float(basic.get('quantity'))
+            transaction.date = transaction_date.date()
+            transaction.packaging = packaging
+            # saving all commission details
+            commission.net_commission = float(net_commission)
+            commission.discount = float(commission_data.get('discount'))
+            commission.difference = float(commission_data.get('difference'))
+            commission.commission = float(commission_data.get('commission'))
+            commission.commission_type = commission_type
+            commission.seller_broker = seller_broker
+            commission.buyer_broker = buyer_broker
+            commission.buyer_broker_comm_type = buyer_broker_commission_type
+            commission.buyer_broker_comm = float(commission_data.get('buyerBrokerCommission', 0.00))
+            transaction.save()
+            commission.transaction = transaction
+            commission.save()
+
+            # Assigning not shipped status to new transaction
+            if not tran_id:
+                shipment = TrShipment()
+                shipment.transaction = transaction
+                shipment.not_shipped = True
+                shipment.created_by = user
+                shipment.save()
+
+
+            # Making Transaction Change Log
+
+            if tran_id:
+                #TODO: Have to make detail log message
+                log = '<span class="titled">Updated Transaction</span>'
+                TransactionChangeLog.add_change_log(user, log, transaction)
+            else:
+                log = '<span class="titled">Created Transaction</span>'
+                TransactionChangeLog.add_change_log(user, log, transaction)
+
+            return Response({
+                'tradeId': transaction.tr_id,
+                'success': True,
+                'message': success_message % transaction.file_id
+            }, status=status.HTTP_200_OK)
+        except Exception, e:
             return Response({
                 'success': False,
-                'message': 'Buyer and Seller can not be same'
+                'message': str(e)
             })
-        buyer = BpBasic.objects.get(bp_id=buyer_id)
-        seller = BpBasic.objects.get(bp_id=seller_id)
-        product_item = ProductItem.objects.get(id=product_item_id)
-        contractual_buyer = BpBasic.objects.get(bp_id=contractual_buyer_id)
-        commission_type = CommissionType.objects.get(id=commission_type_id)
-        buyer_broker_commission_type = None if not buyer_broker_id else CommissionType.objects.get(id=buyer_broker_commission_type_id)
-        seller_broker = None if not seller_broker_id else BpBasic.objects.get(bp_id=seller_broker_id)
-        buyer_broker = None if not buyer_broker_id else BpBasic.objects.get(bp_id=buyer_broker_id)
-        net_commission = data.get('netCommission')
-
-        #update
-        if tran_id:
-            success_message = self.messages['successPUT']
-            transaction = Transaction.objects.get(tr_id=tran_id)
-            commission = TrCommission.objects.get(transaction__tr_id=tran_id)
-            transaction.updated_by = user
-            transaction.updated_at = dt.now()
-
-        #add
-        else:
-            success_message = self.messages['successPOST']
-            transaction = Transaction()
-            commission = TrCommission()
-            transaction.created_by = user
-
-
-
-        # saving all transaction details
-        transaction.seller = seller
-        transaction.buyer = buyer
-        transaction.product_item = product_item
-        transaction.contractual_buyer = contractual_buyer
-        transaction.other_info = basic.get('otherInfo')
-        transaction.file_id = basic.get('fileId')
-        transaction.contract_id = basic.get('contractId')
-        transaction.product_specification = product_specs
-        transaction.shipment_start = shipment_start.date()
-        transaction.shipment_end = shipment_end.date()
-        transaction.price = float(basic.get('price'))
-        transaction.quantity = float(basic.get('quantity'))
-        transaction.date = transaction_date.date()
-        transaction.packaging = packaging
-        # saving all commission details
-        commission.net_commission = float(net_commission)
-        commission.discount = float(commission_data.get('discount'))
-        commission.difference = float(commission_data.get('difference'))
-        commission.commission = float(commission_data.get('commission'))
-        commission.commission_type = commission_type
-        commission.seller_broker = seller_broker
-        commission.buyer_broker = buyer_broker
-        commission.buyer_broker_comm_type = buyer_broker_commission_type
-        commission.buyer_broker_comm = float(commission_data.get('buyerBrokerCommission', 0.00))
-        transaction.save()
-        commission.transaction = transaction
-        commission.save()
-
-        # Assigning not shipped status to new transaction
-        if not tran_id:
-            shipment = TrShipment()
-            shipment.transaction = transaction
-            shipment.not_shipped = True
-            shipment.created_by = user
-            shipment.save()
-
-
-        # Making Transaction Change Log
-
-        if tran_id:
-            #TODO: Have to make detail log message
-            log = '<span class="titled">Updated Transaction</span>'
-            TransactionChangeLog.add_change_log(user, log, transaction)
-        else:
-            log = '<span class="titled">Created Transaction</span>'
-            TransactionChangeLog.add_change_log(user, log, transaction)
-
-        return Response({
-            'tradeId': transaction.tr_id,
-            'success': True,
-            'message': success_message % transaction.file_id
-        }, status=status.HTTP_200_OK)
-        # except Exception, e:
-        #     return Response({
-        #         'success': False,
-        #         'message': str(e)
-        #     })
 
 
 
