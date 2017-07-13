@@ -45,7 +45,7 @@ class Transaction(models.Model):
     def get_obj(self):
 
         return {
-            'id': self.id,
+            'id': self.tr_id,
             'commission': None,
             'productSpecification': self.product_specification,
             'basic': {
