@@ -24,8 +24,6 @@ class Transaction(models.Model):
     shipment_start = models.DateField()
     shipment_end = models.DateField()
     is_complete = models.BooleanField(default=False)
-    is_washout = models.BooleanField(default=False)
-    is_washout_at = models.FloatField(default=0.00)
     file_id = models.CharField(max_length=100, null=False, unique=True, blank=False)
     contract_id = models.CharField(max_length=100, null=True)
     other_info = models.TextField()
@@ -125,9 +123,9 @@ class Transaction(models.Model):
         # Washout Detail
 
         washout_obj = {
-            'status': self.is_washout,
-            'washOutStr': self.get_washout_string,
-            'isWashOutAt': '%.2f'%round(self.is_washout_at,2)
+            # 'status': self.is_washout,
+            # 'washOutStr': self.get_washout_string,
+            # 'isWashOutAt': '%.2f'%round(self.is_washout_at,2)
         }
 
         files = [{
@@ -154,7 +152,7 @@ class Transaction(models.Model):
                     'shipmentStart': self.shipment_start,
                     'expectedCommission': self.commission.net_commission
                 },
-                'washOut': washout_obj,
+                'washOut': None if not hasattr(self, 'washout') else self.washout.get_description_obj(),
                 'changeLogs': change_logs,
                 'shipment': self.shipment.get_description_object(base_url),
                 'commission': self.commission.get_description_obj(base_url),

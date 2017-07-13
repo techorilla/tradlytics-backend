@@ -1,9 +1,11 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from doniServer.models import Transaction, TrCommission, BpBasic, ProductItem, \
-    Packaging, CommissionType, TrShipment, TransactionChangeLog
+    Packaging, CommissionType, TrShipment, TransactionChangeLog, TrWashout
 from datetime import datetime as dt
 import dateutil.parser
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import dateutil.parser
+
 
 
 class TransactionDropDownAPI(GenericAPIView):
@@ -24,25 +26,53 @@ class TransactionWashoutAPI(GenericAPIView):
     def post(self, request, *args, **kwargs):
 
         try:
+
             base_url = request.META.get('HTTP_HOST')
-            user= request.user
-            data = request.data
-            washout_status = data.get('status')
-            washout_value = data.get('isWashOutAt')
-            transaction_id = data.get('transactionId')
+            user = request.user
+            washout_data = request.data.get('washOut')
+            initial_commission_payable = washout_data.get('initialCommissionPayable')
+
+            is_washout = washout_data.get('isWashout')
+            buyer_washout_price = washout_data.get('buyerWashoutPrice')
+            seller_washout_price = washout_data.get('sellerWashoutPrice')
+            broker_difference = washout_data.get('brokerDifference')
+            washout_date = washout_data.get('washoutDate')
+            washout_due_date = washout_data.get('washoutDueDate')
+
+            if is_washout:
+                washout_date = dateutil.parser.parse(washout_date)
+                washout_due_date = dateutil.parser.parse(washout_due_date)
+                washout_date = washout_date.replace(hour=0, minute=0, second=0, microsecond=0)
+                washout_due_date = washout_due_date.replace(hour=0, minute=0, second=0, microsecond=0)
+
+            transaction_id = request.data.get('transactionId')
             transaction = Transaction.objects.get(tr_id=transaction_id)
-            if not washout_status:
-                transaction.is_washout = False
-                transaction.is_washout_at = float(0.00)
-            elif washout_status:
-                transaction.is_washout = True
-                transaction.is_washout_at = float(washout_value)
-            log = 'Transaction <span class="titled">%s.<span>' % transaction.get_washout_string
-            message = 'Transaction %s successfully.' % transaction.get_washout_string
-            transaction.updated_by = user
-            transaction.updated_at = dt.now()
-            transaction.save()
-            TransactionChangeLog.add_change_log(user, log, transaction)
+
+            if hasattr(transaction, 'washout'):
+                washout = transaction.washout
+                washout.updated_by = user
+                if washout:
+                    message = 'Transaction Washout Details Updated Successfully!'
+                else:
+                    message = 'Transaction Washout Status Deactivated Successfully!'
+            else:
+                washout = TrWashout()
+                washout.transaction = transaction
+                washout.created_by = user
+                washout.updated_at = dt.now()
+                message = 'Transaction Washout Status Activated Successfully!'
+
+            washout.initial_commission_payable = initial_commission_payable
+            washout.washout_date = washout_date
+            washout.washout_due_date = washout_due_date
+            washout.is_washout = is_washout
+            washout.buyer_washout_price = float(buyer_washout_price)
+            washout.seller_washout_price = float(seller_washout_price)
+            washout.broker_difference = float(broker_difference)
+            washout.save()
+
+
+            print washout.get_description_obj()
 
             return Response({
                     'transactionObj': transaction.get_complete_obj(base_url, user),
@@ -149,9 +179,18 @@ class TransactionBasicAPI(GenericAPIView):
             seller_id = basic.get('sellerId')
             packaging_id = basic.get('packagingId')
             product_item_id = basic.get('productItemId')
+
+
             transaction_date = dateutil.parser.parse(str(basic.get('date')).replace('"', ''))
+            transaction_date =  transaction_date.replace(hour=0, minute=0, second=0, microsecond=0)
+
             shipment_start = dateutil.parser.parse(str(basic.get('shipmentStart')).replace('"', ''))
+            shipment_start = shipment_start.replace(hour=0, minute=0, second=0, microsecond=0)
+
             shipment_end = dateutil.parser.parse(str(basic.get('shipmentEnd')).replace('"', ''))
+            shipment_end = shipment_end.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
             packaging = Packaging.objects.get(id=packaging_id)
             commission_type_id = commission_data.get('typeId')
             seller_broker_id = commission_data.get('sellerBrokerId')
