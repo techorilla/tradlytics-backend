@@ -13,6 +13,13 @@ import os
 def get_image_path(instance, filename):
     return os.path.join('profilePic', instance.business.bp_name, instance.user.username, str(time.time())+'_'+filename)
 
+class BusinessAppProfile(models.Model):
+    business = models.ForeignKey(BpBasic, related_name='business_profile')
+    currency = models.CharField(max_length=20, null=False)
+
+    class Meta:
+        db_table = 'business_profile'
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile')

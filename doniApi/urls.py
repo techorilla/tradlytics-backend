@@ -338,7 +338,13 @@ urlpatterns = (
 
     url(r'^currency_exchange/dashboard/$',
         CurrencyExchangeDashboardAPI.as_view(),
-        name='currency_dashboard')
+        name='currency_dashboard'),
+
+    # Accounts
+
+    url(r'^accounts/invoice/$',
+        InvoiceAPI.as_view(),
+        name='Invoice API')
 
 
 )

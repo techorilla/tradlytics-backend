@@ -6,11 +6,11 @@ from doniServer.models import CurrencyExchange
 
 
 class CurrencyScrapper(object):
-    URL = 'http://www.forex.pk/currency-open.php?base=%s&curr=%s'
+    URL = 'http://www.forex.pk/currency-inter.php?base=%s&curr=%s'
     HIST_URL = 'http://x-rates.com/historical/?from=%s&amount=1&date=%s'
 
     EXCHANGE_PAD = {
-        'PKR': 1.82
+        'PKR': 0.26
     }
 
     def get_currency_rate(self, currency_code_input='USD', currency_code_output='PKR'):

@@ -1,0 +1,124 @@
+from django.contrib.auth.models import User
+from django.db import models
+from doniServer.models import Transaction
+from django.utils import timezone
+from django.conf import settings
+import time
+from jsonfield import JSONField
+from .expenseType import ExpenseType
+from datetime import datetime as dt
+
+from ..authentication.userProfile import BusinessAppProfile
+
+
+
+class IntTradeInvoice(models.Model):
+    invoice_date = models.DateField(default=None, null=False)
+    invoice_no = models.IntegerField(null=False)
+    transaction = models.ForeignKey(
+        Transaction,
+        on_delete=models.PROTECT,
+        null=True,
+        related_name='invoices'
+    )
+
+
+    invoice_obj = JSONField(null=False)
+
+    invoice_amount = models.FloatField(default=0.00, null=False)
+    weight_in_kg = models.FloatField(null=False, default=0.00)
+    rate_per_kg = models.FloatField(null=False, default=0.00)
+    currency = currency = models.CharField(max_length=20, null=False, default='PKR')
+
+    note = models.TextField()
+
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=None, null=True)
+    created_by = models.ForeignKey(User, null=False, blank=False, related_name='invoice_created_by')
+    updated_by = models.ForeignKey(User, null=True, blank=False, related_name='invoice_updated_by')
+
+    @classmethod
+    def get_new_invoice_no(cls):
+        if cls.objects.exists():
+            return cls.objects.all().order_by('-invoice_no').first().invoice_no
+        else:
+            return 1
+
+    def save(self):
+        business = self.created_by.profile.business
+        currency = business.business_profile.currency
+        self.currency = currency
+        super(IntTradeInvoice, self).save()
+
+
+    def get_complete_obj(self):
+
+        return {
+            'id': self.id,
+            'price': self.transaction.price,
+            'quantity': self.transaction.quanity,
+            'fileNo': self.transaction.file_no,
+            'contractNo': self.transaction.contract_no,
+            'blNo': self.transaction.shipment.bl_no,
+            'invoiceTo': self.transaction.contractual_buyer.get_description_obj(base_url),
+            'productItem': self.transaction.product_item.get_description_obj(base_url),
+            'date': dt.now().date(),
+            'invoiceNo': self.invoice_no,
+            'invoiceObj': self.invoice_obj,
+            'note': self.note
+        }
+
+
+
+    @classmethod
+    def get_default_invoice_obj(cls, trade, dollar_rate, user):
+        trade_commission = trade.commission
+        commission = trade_commission.earned_commission if trade_commission.earned_commission else trade_commission.net_commission
+        business = user.created_by.profile.business
+        currency = business.business_profile.currency
+        return {
+            'price': trade.price,
+            'quantity': trade.quanity,
+            'fileNo': trade.file_no,
+            'contractNo': trade.contract_no,
+            'blNo': trade.shipment.bl_no,
+            'invoiceTo': trade.contractual_buyer.get_description_obj(base_url),
+            'productItem': trade.product_item.get_description_obj(base_url),
+            'date': dt.now().date(),
+            'invoiceNo': cls.get_new_invoice_no(),
+            'invoiceObj': cls.get_default_invoice_expense_obj(dollar_rate, commission=commission, currency=currency),
+            'note': ''
+
+        }
+
+    @classmethod
+    def get_default_invoice_expense_obj(self, dollar_rate, commission='', rate='', currency='PKR'):
+        default_expenses = ExpenseType.objects.filter(default=True).order_by('default_order')
+        default_expenses = [expense.get_default_expense_item_obj(rate,dollar_rate, commission) for expense in default_expenses]
+        return default_expenses
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
