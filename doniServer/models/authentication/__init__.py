@@ -1,2 +1,2 @@
 from .userSessions import *
-from .userProfile import UserProfile
+from .userProfile import UserProfile, BusinessAppProfile
