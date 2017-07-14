@@ -17,6 +17,13 @@ class ExpenseType(models.Model):
         ordering = ('id',)
 
 
+    def save(self):
+        if not self.default_order:
+            last_default_order = ExpenseType.objects.order_by('-default_order')[0]
+            self.default_order = last_default_order
+            super(ExpenseType, self).save()
+
+
     def __unicode__(self):
         return '%s:%s:%s'%(self.expense_name, self.default, self.default_order)
 
@@ -37,24 +44,24 @@ class ExpenseType(models.Model):
             ('Bank Charges', True, 1),
             ('Indenting Commission + Adjustment', True, 2),
             ('Pay Order Collector of Custom', True, 3),
-            ('Pay Order Excise & Taxation Office', True, 2),
-            ('Pay Order Wharfage', True, 2),
-            ('Pay Order Terminal Handling Charges', True, 2),
-            ('Endorsment Charges', True, 2),
-            ('Documents ( $ %commission% * %currency% %dollarRate%)', True, 2),
-            ('L/C Fees', True, 2),
-            ('Insurance', True, 2),
-            ('Market Fees', True, 2),
-            ('Import Permit', True, 2),
-            ('LC Form', True, 2),
-            ('Demurrage Charges', True, 2),
-            ('Detention Charges', True, 2),
-            ('SGS Charges', True, 2),
-            ('Godown/Warehouse Charges', True, 2),
-            ('Packing Charges', True, 2),
-            ('UN Loading', True, 2),
-            ('Lolo Charges', True, 2),
-            ('Clearing Charges', True, 2)
+            ('Pay Order Excise & Taxation Office', True, 4),
+            ('Pay Order Wharfage', True, 5),
+            ('Pay Order Terminal Handling Charges', True, 6),
+            ('Endorsment Charges', True, 7),
+            ('Documents ( $ %commission% * %currency% %dollarRate%)', True, 8),
+            ('L/C Fees', True, 9),
+            ('Insurance', True, 10),
+            ('Market Fees', True, 11),
+            ('Import Permit', True, 12),
+            ('LC Form', True, 13),
+            ('Demurrage Charges', True, 14),
+            ('Detention Charges', True, 15),
+            ('SGS Charges', True, 16),
+            ('Godown/Warehouse Charges', True, 17),
+            ('Packing Charges', True, 18),
+            ('UN Loading', True, 19),
+            ('Lolo Charges', True, 20),
+            ('Clearing Charges', True, 21)
         ]
 
         count = cls.objects.count()
