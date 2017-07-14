@@ -17,6 +17,8 @@ urlpatterns = (
 
     url(r'^dashboard/$', MainDashboardAPI.as_view(), name='Main_Dashboard_API'),
 
+    url(r'^dashboard/search_top/$', PageTopSearchAPI.as_view(), name='Page_Top_API'),
+
     url(r'website/dashboard/$', WebsiteDashboardAPI.as_view(), name='Website_Dashboard_API'),
 
     url(r'^website/research/display/$', BlogDisplayAPI.as_view(), name='Blogs_API'),

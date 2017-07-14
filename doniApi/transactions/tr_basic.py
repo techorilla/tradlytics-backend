@@ -153,9 +153,9 @@ class TransactionBasicAPI(GenericAPIView):
     def get(self, request, *args, **kwargs):
         base_url = request.META.get('HTTP_HOST')
         user = request.user
-        transaction_id = request.GET.get('tradeId')
+        file_id = request.GET.get('tradeId')
         full_obj = request.GET.get('full')
-        transaction = Transaction.objects.get(tr_id=transaction_id)
+        transaction = Transaction.objects.get(file_id=file_id)
         if full_obj:
             transaction = transaction.get_complete_obj(base_url, user)
         else:
@@ -278,7 +278,7 @@ class TransactionBasicAPI(GenericAPIView):
                 TransactionChangeLog.add_change_log(user, log, transaction)
 
             return Response({
-                'tradeId': transaction.tr_id,
+                'fileId': transaction.file_id,
                 'success': True,
                 'message': success_message % transaction.file_id
             }, status=status.HTTP_200_OK)
