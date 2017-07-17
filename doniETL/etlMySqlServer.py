@@ -1,6 +1,8 @@
 from os import getenv
 import pymssql
 from django.contrib.auth.models import User
+from pymssql import InterfaceError
+
 
 server = "donigroup.cczhghwibti9.us-west-2.rds.amazonaws.com:1433"
 user = "immadimtiaz"
@@ -27,10 +29,16 @@ def get_files_for_all_trades():
 
 
 def get_transaction_files_from_old_erp(file_id, cursor):
+
     query = 'SELECT tf.tf_fileId,tf_file,tf_fileName, tf_fileType FROM TransactionFiles as tf INNER JOIN Transactions as t ON t.tr_transactionID = tf.tf_transactionID AND t.tr_fileID =\'%s\' '
     query = query.replace('%s',file_id)
     transaction = Transaction.objects.get(file_id=file_id)
-    cursor.execute(query)
+    try:
+        cursor.execute(query)
+    except InterfaceError:
+        cursor = conn.cursor()
+        cursor.execute(query)
+
     for row in cursor:
         if not transaction.files.filter(file_name=row[2]).exists():
             file = TrFiles()
