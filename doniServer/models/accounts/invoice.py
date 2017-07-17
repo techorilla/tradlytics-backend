@@ -8,9 +8,9 @@ from jsonfield import JSONField
 from .expenseType import ExpenseType
 from datetime import datetime as dt
 
-from ..authentication.userProfile import BusinessAppProfile
+from ..authentication import BusinessAppProfile
 
-
+from doniServer.models import CurrencyExchange
 
 class IntTradeInvoice(models.Model):
     invoice_date = models.DateField(default=None, null=False)
@@ -46,7 +46,7 @@ class IntTradeInvoice(models.Model):
 
     def save(self):
         business = self.created_by.profile.business
-        currency = business.business_profile.currency
+        currency = business.app_profile.currency
         self.currency = currency
         super(IntTradeInvoice, self).save()
 
@@ -54,47 +54,58 @@ class IntTradeInvoice(models.Model):
     def get_complete_obj(self):
 
         return {
+            'invoiceAmount': self.invoice_amount,
             'id': self.id,
             'price': self.transaction.price,
-            'quantity': self.transaction.quanity,
-            'fileNo': self.transaction.file_no,
-            'contractNo': self.transaction.contract_no,
+            'quantity': self.transaction.quantity,
+            'fileNo': self.transaction.file_id,
+            'contractNo': self.transaction.contract_id,
             'blNo': self.transaction.shipment.bl_no,
             'invoiceTo': self.transaction.contractual_buyer.get_description_obj(base_url),
             'productItem': self.transaction.product_item.get_description_obj(base_url),
             'date': dt.now().date(),
             'invoiceNo': self.invoice_no,
             'invoiceObj': self.invoice_obj,
-            'note': self.note
+            'note': self.note,
+            'currency': self.currency
         }
 
 
 
     @classmethod
-    def get_default_invoice_obj(cls, trade, dollar_rate, user):
+    def get_default_invoice_obj(cls, base_url, trade):
         trade_commission = trade.commission
-        commission = trade_commission.earned_commission if trade_commission.earned_commission else trade_commission.net_commission
-        business = user.created_by.profile.business
-        currency = business.business_profile.currency
+        commission = trade_commission.earned_commission if trade_commission.actual_commission else trade_commission.expected_commission
+        difference = trade_commission.difference
+        discount = trade_commission.discount
+        price = trade.price
+        net_price = float(price)+float(difference)-float(discount)
+        business = trade.created_by.profile.business
+        currency = business.app_profile.currency
+        date, dollar_rate = CurrencyExchange.get_last_rate(currency)
+
+        print trade.price, dollar_rate, date, commission, currency
         return {
-            'price': trade.price,
-            'quantity': trade.quanity,
-            'fileNo': trade.file_no,
-            'contractNo': trade.contract_no,
+            'invoiceAmount': 0.00,
+            'currency': currency,
+            'price': str(round(net_price,2)),
+            'quantity': trade.quantity,
+            'fileNo': trade.file_id,
+            'contractNo': trade.contract_id,
             'blNo': trade.shipment.bl_no,
             'invoiceTo': trade.contractual_buyer.get_description_obj(base_url),
             'productItem': trade.product_item.get_description_obj(base_url),
-            'date': dt.now().date(),
+            'date': date,
             'invoiceNo': cls.get_new_invoice_no(),
-            'invoiceObj': cls.get_default_invoice_expense_obj(dollar_rate, commission=commission, currency=currency),
+            'invoiceItems': cls.get_default_invoice_expense_obj(trade.price, dollar_rate, commission=commission, currency=currency),
             'note': ''
 
         }
 
     @classmethod
-    def get_default_invoice_expense_obj(self, dollar_rate, commission='', rate='', currency='PKR'):
+    def get_default_invoice_expense_obj(cls, price, dollar_rate, commission='', currency='PKR'):
         default_expenses = ExpenseType.objects.filter(default=True).order_by('default_order')
-        default_expenses = [expense.get_default_expense_item_obj(rate,dollar_rate, commission) for expense in default_expenses]
+        default_expenses = [expense.get_default_expense_item_obj(price, dollar_rate, commission, currency) for expense in default_expenses]
         return default_expenses
 
 

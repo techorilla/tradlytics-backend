@@ -83,7 +83,7 @@ class TrShipment(models.Model):
             },
             'arrivedAtPort':{
                 'active': self.arrived_at_port,
-                'quantityShipped': None if not self.quantity else str(round(self.quantity,2)),
+                'quantityShipped': None if not self.transaction.commission.quantity_shipped else str(round(self.transaction.commission.quantity_shipped,2)),
                 'blNo': self.bl_no,
                 'shippingLine': {} if not self.shipping_line else self.shipping_line.get_drop_down_obj(),
                 'loadingPort': {} if not self.port_loading else self.port_loading.get_drop_down_obj(),

@@ -12,26 +12,27 @@ class TransactionDocumentAPI(GenericAPIView):
         doc_id = kwargs.get('document_id')
         doc = TrFiles.objects.get(file_id=doc_id)
         binary_doc = doc.file
-        content_disposition = 'attachment; filename=%s'%doc.file_name
-        response = HttpResponse(binascii.a2b_qp(binary_doc), content_type='application/octet-stream')
+
+        content_disposition = 'attachment; filename="%s"'%doc.file_name
+        content_type = 'application/%s' % doc.extension
+        response = HttpResponse(str(binary_doc.decode('hex')), content_type='application/octet-stream')
         response['Content-Disposition'] = content_disposition
         return response
 
     def post(self, request, *args, **kwargs):
         data =  request.data
-        trade_id = data.get(u'tradeId')[0]
+        trade_id = str(data.get(u'tradeId'))
         extension = data.get(u'extension')
         filename = data.get(u'name')
         document = request.FILES.get('file')
         doc_read = document.read()
-        # doc_64_encode = base64.encodestring(doc_read)
         # print doc_64_encode
         transaction = Transaction.objects.get(tr_id=trade_id)
 
         tr_file = TrFiles()
         tr_file.file = doc_read
         tr_file.file_name = filename
-        tr_file.extension = extension
+        tr_file.extension = 'application/'+extension
         tr_file.transaction = transaction
         tr_file.created_by = request.user
         tr_file.save()

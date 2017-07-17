@@ -344,6 +344,10 @@ urlpatterns = (
 
     url(r'^accounts/invoice/$',
         InvoiceAPI.as_view(),
+        name='Invoice API'),
+
+    url(r'^accounts/commission_flow/$',
+        CommissionFlowAPI.as_view(),
         name='Invoice API')
 
 

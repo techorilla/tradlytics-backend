@@ -21,7 +21,7 @@ class ExpenseType(models.Model):
         if not self.default_order:
             last_default_order = ExpenseType.objects.order_by('-default_order')[0]
             self.default_order = last_default_order
-            super(ExpenseType, self).save()
+        super(ExpenseType, self).save()
 
 
     def __unicode__(self):
@@ -29,11 +29,12 @@ class ExpenseType(models.Model):
 
     def get_default_expense_item_obj(self, price, dollar_rate, commission, currency='PKR'):
 
-        name = self.expense_name.replace('%price%', price).replace('%dollarRate%', dollar_rate)\
-            .replace('%commission%', commission).replace('%currency%', currency)
+        name = self.expense_name.replace('%price%', str(round(price,2))).replace('%dollarRate%', str(round(dollar_rate,2)))\
+            .replace('%commission%', str(round(commission,2))).replace('%currency%', currency)
         return {
             'name': name,
-            'amount': 0.00
+            'amount': 0.00,
+            'remarks': ''
         }
 
 

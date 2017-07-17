@@ -18,6 +18,7 @@ class Transaction(models.Model):
     seller = models.ForeignKey(BpBasic, null=False, related_name='tr_basic_seller')
     product_item = models.ForeignKey(ProductItem, null=True)
     product_specification = JSONField(null=True)
+    quantity_fcl = models.FloatField(default=0.00)
     quantity = models.FloatField(default=None)
     price = models.FloatField(default=None)
     packaging = models.ForeignKey(Packaging, null=True)
@@ -62,6 +63,7 @@ class Transaction(models.Model):
                 'contractId': self.contract_id,
                 'price': str(round(self.price,2)),
                 'quantity': str(round(self.quantity,2)),
+                'quantityFcl': str(round(self.quantity_fcl, 2))
             },
             'commission':{
                 'sellerBrokerId': None if not self.commission.seller_broker else self.commission.seller_broker.bp_id,
@@ -71,8 +73,7 @@ class Transaction(models.Model):
                 'typeId': self.commission.commission_type.id,
                 'discount': str(round(self.commission.discount,2)),
                 'difference': str(round(self.commission.difference,2)),
-                'commission': str(round(self.commission.commission,2)),
-                'netCommission': str(round(self.commission.net_commission,2))
+                'commission': str(round(self.commission.commission,2))
             }
         }
 
@@ -103,11 +104,13 @@ class Transaction(models.Model):
             'sellerPrimaryContact': self.seller.primary_contact,
             'shipmentEnd': self.shipment_end,
             'shipmentStart': self.shipment_start,
-            'netCommission':  self.commission.net_commission,
-            'earnedCommission': self.commission.earned_commission
+            'expectedCommission':  self.commission.expected_commission,
+            'actualCommission': self.commission.actual_commission
         }
 
     def get_complete_obj(self, base_url, user):
+
+        business = user.profile.business
         #Transaction change logs
         change_logs = self.change_log.all()
         change_logs = [log.get_obj() for log in change_logs]
@@ -139,6 +142,7 @@ class Transaction(models.Model):
         return {
                 'id': self.tr_id,
                 'isComplete': self.is_complete,
+                'invoiceCreation': (self.contractual_buyer == business),
                 'basic': {
                     'price': self.price,
                     'date': self.date,
@@ -149,8 +153,7 @@ class Transaction(models.Model):
                     'contractNo': self.contract_id,
                     'fileNo': self.file_id,
                     'shipmentEnd': self.shipment_end,
-                    'shipmentStart': self.shipment_start,
-                    'expectedCommission': self.commission.net_commission
+                    'shipmentStart': self.shipment_start
                 },
                 'washOut': None if not hasattr(self, 'washout') else self.washout.get_description_obj(),
                 'changeLogs': change_logs,

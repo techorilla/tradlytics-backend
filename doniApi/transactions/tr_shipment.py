@@ -164,7 +164,6 @@ class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
             print transaction_id
 
             data_obj = data.get('dataObj')
-            earned_commission = data.get('earnedCommission')
             trade = Transaction.objects.get(tr_id=transaction_id)
 
             shipment = trade.shipment
@@ -173,12 +172,8 @@ class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
             quantity_shipped = data_obj.get('quantityShipped')
 
             if quantity_shipped:
-
-
-
-                shipment.quantity = float(quantity_shipped)
+                trade.commission.quantity_shipped = float(quantity_shipped)
                 shipment.save()
-                commission.earned_commission = earned_commission
                 commission.save()
 
 

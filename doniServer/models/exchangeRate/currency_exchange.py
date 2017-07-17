@@ -24,6 +24,13 @@ class CurrencyExchange(models.Model):
                                 self.currency_code_in, self.currency_code_out)
 
     @classmethod
+    def get_last_rate(cls, base_currency):
+        exchange = cls.objects.filter(currency_code_in='USD', currency_code_out=base_currency).order_by('-exchange_rate_on')[0]
+        return exchange.exchange_rate_on, exchange.exchange_rate
+
+
+
+    @classmethod
     def already_exist(cls, date, input_currency, output_currency):
         cur = cls.objects.filter(exchange_rate_on=date, currency_code_in=input_currency,
                                  currency_code_out=output_currency)

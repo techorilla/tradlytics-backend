@@ -210,7 +210,7 @@ class TransactionBasicAPI(GenericAPIView):
             buyer_broker_commission_type = None if not buyer_broker_id else CommissionType.objects.get(id=buyer_broker_commission_type_id)
             seller_broker = None if not seller_broker_id else BpBasic.objects.get(bp_id=seller_broker_id)
             buyer_broker = None if not buyer_broker_id else BpBasic.objects.get(bp_id=buyer_broker_id)
-            net_commission = data.get('netCommission')
+
 
             #update
             if tran_id:
@@ -245,7 +245,6 @@ class TransactionBasicAPI(GenericAPIView):
             transaction.date = transaction_date.date()
             transaction.packaging = packaging
             # saving all commission details
-            commission.net_commission = float(net_commission)
             commission.discount = float(commission_data.get('discount'))
             commission.difference = float(commission_data.get('difference'))
             commission.commission = float(commission_data.get('commission'))
