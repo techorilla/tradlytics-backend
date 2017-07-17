@@ -10,23 +10,23 @@ password = "Giki1990????"
 
 conn = pymssql.connect(server, user, password, "DoniEnterprises")
 
-# cursor = conn.cursor()
+
 
 from doniServer.models import Transaction, TrFiles
 
 created_by = User.objects.get(username='immadimtiaz')
-cursor = conn.cursor()
+
 
 def get_files_for_all_trades():
-
+    cursor = conn.cursor()
     all_trade = Transaction.objects.all()
     for trade in all_trade:
-        get_transaction_files_from_old_erp(trade.file_id)
+        get_transaction_files_from_old_erp(trade.file_id, cursor)
         print  trade.file_id
     conn.close()
 
 
-def get_transaction_files_from_old_erp(file_id):
+def get_transaction_files_from_old_erp(file_id, cursor):
 
     query = 'SELECT tf.tf_fileId,tf_file,tf_fileName, tf_fileType FROM TransactionFiles as tf INNER JOIN Transactions as t ON t.tr_transactionID = tf.tf_transactionID AND t.tr_fileID =\'%s\' '
     query = query.replace('%s',file_id)
