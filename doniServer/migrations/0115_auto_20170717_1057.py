@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('doniServer', '0115_auto_20170717_1057'),
+        ('doniServer', '0114_trcommission_seller_commission_expected'),
     ]
 
     operations = [

@@ -9,7 +9,7 @@ import doniServer.fields.var_binary
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('doniServer', '0114_trcommission_seller_commission_expected'),
+        ('doniServer', '0115_auto_20170717_1057'),
     ]
 
     operations = [
