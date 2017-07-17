@@ -37,4 +37,4 @@ class VarBinaryField(models.Field):
         return value.encode('hex')
 
     def db_type(self, connection):
-            return ''
+            return 'longtext COLLATE utf8mb4_unicode_ci'

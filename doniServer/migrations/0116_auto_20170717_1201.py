@@ -5,17 +5,17 @@ from __future__ import unicode_literals
 from django.db import migrations
 import doniServer.fields.var_binary
 
-
-class Migration(migrations.Migration):
-
-    dependencies = [
-        ('doniServer', '0115_auto_20170717_1057'),
-    ]
-
-    operations = [
-        migrations.AlterField(
-            model_name='trfiles',
-            name='file',
-            field=doniServer.fields.var_binary.VarBinaryField(max_length=b'65535'),
-        ),
-    ]
+#
+# class Migration(migrations.Migration):
+#
+#     dependencies = [
+#         ('doniServer', '0115_auto_20170717_1057'),
+#     ]
+#
+#     operations = [
+#         migrations.AlterField(
+#             model_name='trfiles',
+#             name='file',
+#             field=doniServer.fields.var_binary.VarBinaryField(max_length=b'65535'),
+#         ),
+#     ]
