@@ -58,10 +58,11 @@ class TrCommission(models.Model):
 
     @property
     def buyer_broker_commission_into_price(self):
-        if self.buyer_broker_comm_type.name == 'Fixed':
-            return float(self.buyer_broker_comm)
-        else:
-            return float(self.buyer_broker_comm) * 0.01 * float(self.transaction.price)
+        if self.buyer_broker_comm and self.buyer_broker_comm_type:
+            if self.buyer_broker_comm_type.name == 'Fixed':
+                return float(self.buyer_broker_comm)
+            else:
+                return float(self.buyer_broker_comm) * 0.01 * float(self.transaction.price)
 
     @property
     def calculate_actual_commission(self):
