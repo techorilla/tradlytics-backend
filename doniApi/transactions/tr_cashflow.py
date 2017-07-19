@@ -9,13 +9,13 @@ permission_classes = (IsAuthenticated,)
 class TransactionCashFlowAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request, *args, **kwargs):
-        print 'hello'
         initial_commission_payable = True
         base_url = request.META.get('HTTP_HOST')
         cash_flow = []
         file_id = request.GET.get(u'fileId')
         transaction = Transaction.objects.get(file_id=file_id)
-        washout =  None if not hasattr(Transaction, 'washout') else transaction.washout
+        washout =  None if not hasattr(transaction, 'washout') else transaction.washout
+        print 'hello'
         commission = transaction.commission
 
         if washout:
