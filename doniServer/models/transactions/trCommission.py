@@ -55,7 +55,7 @@ class TrCommission(models.Model):
             return float(self.commission)
         else:
             return float(self.commission) * 0.01 * float(self.transaction.price)
-        return 0.00
+
 
     @property
     def buyer_broker_commission_into_price(self):
@@ -64,6 +64,8 @@ class TrCommission(models.Model):
                 return float(self.buyer_broker_comm)
             else:
                 return float(self.buyer_broker_comm) * 0.01 * float(self.transaction.price)
+        else:
+            return 0.00
 
     @property
     def calculate_actual_commission(self):
