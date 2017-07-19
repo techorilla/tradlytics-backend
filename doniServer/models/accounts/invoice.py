@@ -40,7 +40,8 @@ class IntTradeInvoice(models.Model):
     @classmethod
     def get_new_invoice_no(cls):
         if cls.objects.exists():
-            return cls.objects.all().order_by('-invoice_no').first().invoice_no
+            invoice_no = cls.objects.all().order_by('-invoice_no').first().invoice_no
+            return invoice_no
         else:
             return 1
 
@@ -75,37 +76,39 @@ class IntTradeInvoice(models.Model):
     @classmethod
     def get_default_invoice_obj(cls, base_url, trade):
         trade_commission = trade.commission
-        commission = trade_commission.earned_commission if trade_commission.actual_commission else trade_commission.expected_commission
+        commission = trade_commission.actual_commission if trade_commission.actual_commission else trade_commission.expected_commission
         difference = trade_commission.difference
         discount = trade_commission.discount
         price = trade.price
+        quantity = trade.commission.quantity_shipped if trade.commission.quantity_shipped else trade.quantity
+
         net_price = float(price)+float(difference)-float(discount)
+        quantity_into_price = net_price * quantity
         business = trade.created_by.profile.business
         currency = business.app_profile.currency
         date, dollar_rate = CurrencyExchange.get_last_rate(currency)
-
-        print trade.price, dollar_rate, date, commission, currency
         return {
             'invoiceAmount': 0.00,
             'currency': currency,
+            'currencyRate': dollar_rate,
             'price': str(round(net_price,2)),
-            'quantity': trade.quantity,
+            'quantity': quantity,
             'fileNo': trade.file_id,
             'contractNo': trade.contract_id,
             'blNo': trade.shipment.bl_no,
-            'invoiceTo': trade.contractual_buyer.get_description_obj(base_url),
+            'invoiceTo': trade.buyer.get_description_obj(base_url),
             'productItem': trade.product_item.get_description_obj(base_url),
             'date': date,
             'invoiceNo': cls.get_new_invoice_no(),
-            'invoiceItems': cls.get_default_invoice_expense_obj(trade.price, dollar_rate, commission=commission, currency=currency),
-            'note': ''
+            'invoiceItems': cls.get_default_invoice_expense_obj(trade.price, quantity_into_price, dollar_rate, commission=commission, currency=currency),
+            'note': 'Invoice Sending By Courier'
 
         }
 
     @classmethod
-    def get_default_invoice_expense_obj(cls, price, dollar_rate, commission='', currency='PKR'):
+    def get_default_invoice_expense_obj(cls, price, quantity_into_price, dollar_rate, commission='', currency='PKR', ):
         default_expenses = ExpenseType.objects.filter(default=True).order_by('default_order')
-        default_expenses = [expense.get_default_expense_item_obj(price, dollar_rate, commission, currency) for expense in default_expenses]
+        default_expenses = [expense.get_default_expense_item_obj(price, quantity_into_price, dollar_rate, commission, currency) for expense in default_expenses]
         return default_expenses
 
 

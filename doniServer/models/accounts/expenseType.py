@@ -23,17 +23,32 @@ class ExpenseType(models.Model):
             self.default_order = last_default_order
         super(ExpenseType, self).save()
 
+    @classmethod
+    def calculate_amount_with_in(cls, name):
+        name = name[name.find("(") + 1:name.find(")")]
+        if len(name) > 0:
+            name = name.replace('$', '').replace('PKR', '').strip()
+            try:
+                return eval(name)
+            except Exception,e:
+                return 0.00
+        else:
+            return 0.00
+
 
     def __unicode__(self):
         return '%s:%s:%s'%(self.expense_name, self.default, self.default_order)
 
-    def get_default_expense_item_obj(self, price, dollar_rate, commission, currency='PKR'):
+    def get_default_expense_item_obj(self, price, quantity_into_price, dollar_rate, commission, currency='PKR'):
 
         name = self.expense_name.replace('%price%', str(round(price,2))).replace('%dollarRate%', str(round(dollar_rate,2)))\
-            .replace('%commission%', str(round(commission,2))).replace('%currency%', currency)
+            .replace('%commission%', str(round(commission,2))).replace('%currency%', currency)\
+            .replace('%quantityIntoPrice%',  str(round(quantity_into_price,2)))
+
+
         return {
             'name': name,
-            'amount': 0.00,
+            'amount': self.calculate_amount_with_in(name),
             'remarks': ''
         }
 
@@ -49,7 +64,7 @@ class ExpenseType(models.Model):
             ('Pay Order Wharfage', True, 5),
             ('Pay Order Terminal Handling Charges', True, 6),
             ('Endorsment Charges', True, 7),
-            ('Documents ( $ %commission% * %currency% %dollarRate%)', True, 8),
+            ('Documents ( $ %quantityIntoPrice% * %currency% %dollarRate%)', True, 8),
             ('L/C Fees', True, 9),
             ('Insurance', True, 10),
             ('Market Fees', True, 11),

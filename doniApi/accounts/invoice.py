@@ -17,10 +17,15 @@ class InvoiceAPI(GenericAPIView):
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        return Response()
+        print request.data
+        return Response({
+
+        }, status=status.HTTP_200_OK)
 
     def delete(self, request, *args, **kwargs):
         return Response()
 
     def put(self, request, *args, **kwargs):
-        return Response()
+        print request.data
+        return Response({
+        }, status=status.HTTP_200_OK)

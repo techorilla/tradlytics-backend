@@ -34,6 +34,8 @@ class TrWashout(models.Model):
     class Meta:
         db_table = 'tr_washout'
 
+    ##:TODO Trigger for T accounts on
+
 
 
 

@@ -19,7 +19,7 @@ class TrShipment(models.Model):
     shipper = models.ForeignKey(BpBasic, null=True, related_name='tr_shipment_shipper')
 
     not_shipped = models.BooleanField(default=False)
-    not_shipped_reason = models.TextField()
+    not_shipped_reason = models.TextField(null=True)
     extension = models.CharField(max_length=100)
     app_received = models.BooleanField(default=False)
     expected_shipment = models.DateField(default=None, null=True)
