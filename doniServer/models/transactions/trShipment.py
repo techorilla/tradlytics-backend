@@ -20,7 +20,7 @@ class TrShipment(models.Model):
 
     not_shipped = models.BooleanField(default=False)
     not_shipped_reason = models.TextField(null=True)
-    extension = models.DateField(max_length=100)
+    extension = models.DateField(default=None, null=True)
     app_received = models.BooleanField(default=False)
     expected_shipment = models.DateField(default=None, null=True)
     in_transit = models.DateField(default=None, null=True)
