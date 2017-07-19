@@ -28,7 +28,7 @@ class IntTradeInvoice(models.Model):
     invoice_amount = models.FloatField(default=0.00, null=False)
     weight_in_kg = models.FloatField(null=False, default=0.00)
     rate_per_kg = models.FloatField(null=False, default=0.00)
-    currency = currency = models.CharField(max_length=20, null=False, default='PKR')
+    currency = models.CharField(max_length=20, null=False, default='PKR')
 
     note = models.TextField()
 

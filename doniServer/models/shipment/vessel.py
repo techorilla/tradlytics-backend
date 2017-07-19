@@ -66,6 +66,14 @@ class Vessel(models.Model):
             'shippingLineId': None if not self.shipping_line else self.shipping_line.id
         }
 
+    def get_tag_obj(self):
+        return {
+            'first_name': self.first_name,
+            'imo_number': self.imo_number,
+            'id': self.id,
+            'mmsi_number': self.mmsi_number
+        }
+
     def get_drop_down_obj(self):
         return {
             'imoNumber': self.imo_number,

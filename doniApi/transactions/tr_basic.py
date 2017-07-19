@@ -1,10 +1,11 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from doniServer.models import Transaction, TrCommission, BpBasic, ProductItem, \
-    Packaging, CommissionType, TrShipment, TransactionChangeLog, TrWashout
+    Packaging, CommissionType, TrShipment, TransactionChangeLog, TrWashout, TrComplete
 from datetime import datetime as dt
 import dateutil.parser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import dateutil.parser
+from notifications.signals import notify
 
 
 
@@ -66,9 +67,9 @@ class TransactionWashoutAPI(GenericAPIView):
             washout.washout_date = washout_date
             washout.washout_due_date = washout_due_date
             washout.is_washout = is_washout
-            washout.buyer_washout_price = float(buyer_washout_price)
-            washout.seller_washout_price = float(seller_washout_price)
-            washout.broker_difference = float(broker_difference)
+            washout.buyer_washout_price = float(buyer_washout_price.replace(',',''))
+            washout.seller_washout_price = float(seller_washout_price.replace(',',''))
+            washout.broker_difference = float(broker_difference.replace(',',''))
             washout.save()
 
 
@@ -80,6 +81,7 @@ class TransactionWashoutAPI(GenericAPIView):
                 'message': message
             })
         except Exception, e:
+            print str(e)
             return Response({
                 'success': False,
                 'message': str(e)
@@ -96,20 +98,35 @@ class TransactionCompleteStatusAPI(GenericAPIView):
             user = request.user
             data = request.data
             transaction_id = data.get('transactionId')
-            is_complete = data.get('isComplete')
-            if is_complete:
-                log = 'Changed transaction status to <span class="titled">COMPLETED</span>.'
+            transaction = Transaction.objects.get(tr_id=transaction_id)
+
+            complete_obj = data.get('completeObj')
+
+            if hasattr(transaction, 'completion_status'):
+                transaction_completion = transaction.completion_status
+                transaction_completion.updated_by = user
+                transaction_completion.updated_at = dt.now()
+            else:
+                transaction_completion = TrComplete()
+                transaction_completion.created_by = user
+                transaction_completion.transaction = transaction
+
+
+            transaction_completion.is_complete = complete_obj.get('complete')
+            completion_date = complete_obj.get('completionDate')
+            if completion_date:
+                completion_date = dateutil.parser.parse(str(completion_date).replace('"', ''))
+                completion_date = completion_date.replace(hour=0, minute=0, second=0, microsecond=0)
+
+            transaction_completion.completion_date = completion_date
+            transaction_completion.save()
+
+
+            #TODO: MOVE TO SIGNAL
+            if  complete_obj.get('complete'):
                 message = 'Transaction completed successfully.'
             else:
-                log = 'Changed transaction status to <span class="titled">INCOMPLETE</span> from <span class="titled">COMPLETED</span>.'
                 message = 'Transaction status changed to incomplete successfully.'
-            transaction = Transaction.objects.get(tr_id=transaction_id)
-            transaction.is_complete = is_complete
-            transaction.updated_by = user
-            transaction.updated_at = dt.now()
-            transaction.save()
-
-            TransactionChangeLog.add_change_log(user, log, transaction)
 
             return Response({
                 'transactionObj': transaction.get_complete_obj(base_url, user),

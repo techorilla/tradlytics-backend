@@ -20,12 +20,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+
 urlpatterns = [
                   url(r'^admin/', admin.site.urls),
                   url(r'^api/', include('doniApi.urls', namespace='api')),
                   url(r'^grappelli/', include('grappelli.urls')),
                   url(r'^', include("website.urls", namespace='web')),
-                  url(r'^markdownx/', include('markdownx.urls')),
+                  url(r'^markdownx/', include('markdownx.urls'))
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG is True:

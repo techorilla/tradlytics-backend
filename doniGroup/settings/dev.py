@@ -1,7 +1,7 @@
 from .settings import *
 from .constants import *
 
-FRONT_END_HOST = 'http://localhost:3002'
+FRONT_END_HOST = 'http://localhost:3000'
 
 MYSQL_ENGINE = 'django.db.backends.mysql'
 MYSQL_HOST = '127.0.0.1'

@@ -32,6 +32,7 @@ SECRET_KEY = '=^5p6c(@(e#^w!v_0cvwnfh11bwng6@dltr!z-ujdifxrm5eh3'
 
 
 
+
 ALLOWED_HOSTS = [
     'tramodity.com',
     'www.donigroup.com',
@@ -69,7 +70,8 @@ INSTALLED_APPS = [
     'markdownx',
     'django_countries',
     'cities_light',
-    'django_crontab'
+    'django_crontab',
+    'notifications'
 ]
 
 
@@ -270,3 +272,5 @@ CELERY_RESULT_DBURI = "redis://%s:%s/0" % (BROKER_INTERNAL_IP, BROKER_PORT)
 CELERYD_MAX_TASKS_PER_CHILD = 4
 CELERY_REDIRECT_STDOUTS_LEVEL = 'ERROR'
 CELERY_TRACK_STARTED = True
+
+NOTIFICATIONS_USE_JSONFIELD=True

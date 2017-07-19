@@ -3,8 +3,8 @@ from datetime import date
 from django.contrib.auth.models import User
 from .trBasic import Transaction
 from ..businessPartner import BpBasic
-from ..shipment import ShippingPort, ShippingLine
-
+from ..shipment import ShippingPort, ShippingLine, Vessel
+from jsonfield import JSONField
 from django.utils import timezone
 
 
@@ -27,7 +27,7 @@ class TrShipment(models.Model):
     shipped = models.BooleanField(default=False)
     date_arrived = models.DateField(default=None, null=True)
     expected_arrival = models.DateField(default=None, null=True)
-    transit_port = models.CharField(max_length=500, null=True)
+    transit_port = JSONField(null=True)
     arrived_at_port = models.BooleanField(default=False)
     date_arrived = models.DateField(default=None, null=True)
     date_shipped_on = models.DateField(default=None, null=True)
@@ -36,7 +36,7 @@ class TrShipment(models.Model):
     invoice_no = models.CharField(max_length=50, null=True)
     invoice_amount = models.FloatField(null=True)
     quantity = models.FloatField(null=True)
-    vessel_no = models.CharField(max_length=50)
+    vessel = models.ForeignKey(Vessel, null=True, related_name='tr_shipment_vessel')
 
     port_loading = models.ForeignKey(ShippingPort, null=True, related_name='tr_shipment_port_loading')
     port_destination = models.ForeignKey(ShippingPort, null=True, related_name='tr_shipment_port_destination')
@@ -65,8 +65,8 @@ class TrShipment(models.Model):
         return {
             'notShipped': {
                 'active': self.not_shipped,
-                'reason': self.not_shipped_reason,
-                'shipmentExtension': self.extension
+                'reason': None if not self.not_shipped_reason else self.not_shipped_reason,
+                'shipmentExtension': None if not self.extension else self.extension
 
             },
             'approbationReceived':{
@@ -79,17 +79,17 @@ class TrShipment(models.Model):
                 'expectedArrival': self.expected_arrival,
                 'shipper': None if not self.shipper else self.shipper.get_description_obj(base_url),
                 'shippedOn': self.date_shipped_on,
+                'transitPorts': [] if not self.transit_port else self.transit_port
 
             },
             'arrivedAtPort':{
+                'vessel': [] if not self .vessel else [self.vessel.get_tag_obj()],
                 'active': self.arrived_at_port,
                 'quantityShipped': None if not self.transaction.commission.quantity_shipped else str(round(self.transaction.commission.quantity_shipped,2)),
                 'blNo': self.bl_no,
                 'shippingLine': {} if not self.shipping_line else self.shipping_line.get_drop_down_obj(),
                 'loadingPort': {} if not self.port_loading else self.port_loading.get_drop_down_obj(),
                 'destinationPort': {} if not self.port_destination else self.port_destination.get_drop_down_obj()
-
-
             }
         }
 

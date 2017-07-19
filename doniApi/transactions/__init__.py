@@ -6,3 +6,4 @@ from doniApi.transactions.tr_secondary import *
 from doniApi.transactions.tr_notes import *
 from doniApi.transactions.tr_shipment import *
 from doniApi.transactions.tr_status import *
+from doniApi.transactions.tr_cashflow import *

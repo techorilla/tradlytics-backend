@@ -8,6 +8,7 @@ from django.utils import timezone
 from ..product import ProductKeyword
 from ..dropDowns import Packaging
 from jsonfield import JSONField
+from notifications.signals import notify
 
 
 class Transaction(models.Model):
@@ -24,7 +25,6 @@ class Transaction(models.Model):
     packaging = models.ForeignKey(Packaging, null=True)
     shipment_start = models.DateField()
     shipment_end = models.DateField()
-    is_complete = models.BooleanField(default=False)
     file_id = models.CharField(max_length=100, null=False, unique=True, blank=False)
     contract_id = models.CharField(max_length=100, null=True)
     other_info = models.TextField()
@@ -140,28 +140,52 @@ class Transaction(models.Model):
                  } for f in files]
 
         return {
-                'id': self.tr_id,
-                'isComplete': self.is_complete,
-                'invoiceCreation': (self.contractual_buyer == business),
-                'basic': {
-                    'price': self.price,
-                    'date': self.date,
-                    'buyer':self.buyer.get_description_obj(base_url),
-                    'seller': self.seller.get_description_obj(base_url),
-                    'contractualBuyer': self.contractual_buyer.get_description_obj(base_url),
-                    'productItem':  self.product_item.get_description_obj(base_url),
-                    'contractNo': self.contract_id,
-                    'fileNo': self.file_id,
-                    'shipmentEnd': self.shipment_end,
-                    'shipmentStart': self.shipment_start
-                },
-                'washOut': None if not hasattr(self, 'washout') else self.washout.get_description_obj(),
-                'changeLogs': change_logs,
-                'shipment': self.shipment.get_description_object(base_url),
-                'commission': self.commission.get_description_obj(base_url),
-                'files': files,
-                'notes': notes
-            }
+            'id': self.tr_id,
+            'invoiceCreation': (self.contractual_buyer == business),
+            'basic': {
+                'price': self.price,
+                'date': self.date,
+                'buyer':self.buyer.get_description_obj(base_url),
+                'seller': self.seller.get_description_obj(base_url),
+                'contractualBuyer': self.contractual_buyer.get_description_obj(base_url),
+                'productItem':  self.product_item.get_description_obj(base_url),
+                'contractNo': self.contract_id,
+                'fileNo': self.file_id,
+                'shipmentEnd': self.shipment_end,
+                'shipmentStart': self.shipment_start
+            },
+            'completeObj': None if not hasattr(self, 'completion_status') else self.completion_status.get_description_obj(),
+            'washOut': None if not hasattr(self, 'washout') else self.washout.get_description_obj(),
+            'changeLogs': change_logs,
+            'shipment': self.shipment.get_description_object(base_url),
+            'commission': self.commission.get_description_obj(base_url),
+            'files': files,
+            'notes': notes
+        }
 
     class Meta:
         db_table = 'tr_basic'
+
+
+from django.db.models.signals import post_save
+from notifications.signals import notify
+
+def my_handler(sender, instance, created, **kwargs):
+    if created or not instance.updated_by:
+        user = instance.created_by
+        peers = user.profile.get_notification_peers()
+        peer_notification = 'New International transaction with File Id <strong>%s</strong> created by %s'
+        peer_notification = peer_notification%(instance.file_id, instance.created_by.username)
+        notify.send(user, recipient=peers, verb=peer_notification, description='international_trade', state='dashboard.transactionView',
+                    state_id=instance.file_id, user_image=user.profile.get_profile_pic())
+    else:
+        user = instance.updated_by
+        peers = user.profile.get_notification_peers()
+        peer_notification = 'International Transaction with File Id <strong>%s</strong> updated by %s'
+        peer_notification = peer_notification % (instance.file_id, instance.created_by.username)
+        notify.send(user, recipient=peers, verb=peer_notification, description='international_trade', state='dashboard.transactionView',
+                    state_id=instance.file_id, user_image=user.profile.get_profile_pic())
+
+post_save.connect(my_handler, sender=Transaction)
+
+

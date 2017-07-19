@@ -3,13 +3,14 @@ from django.conf.urls import include, url
 
 from doniApi.authentication.Login import LoginAPI
 from doniApi.authentication.Logout import LogOutAPI
-
+import notifications.urls
 
 '''
     All Data API for Doni Group
 '''
 
 urlpatterns = (
+    url('^notifications/', include(notifications.urls, namespace='notifications')),
     url(r"login/$", LoginAPI.as_view(), {"public_api": True}, name="login"),
     url(r"logout/$", LogOutAPI.as_view(), name="logout"),
 
@@ -134,6 +135,10 @@ urlpatterns = (
     url(r'transactions/note/(?P<tr_id>[a-zA-Z0-9.@_-]+)/$',
         TransactionNoteAPI.as_view(),
         name='Transaction Notes'),
+
+    url(r'transactions/cash_flow/$',
+        TransactionCashFlowAPI.as_view(),
+        name='Transaction Cash Flow'),
 
     url(r'transactions/commission/(?P<tr_id>[a-zA-Z0-9.@_-]+)/$',
         TransactionCommissionAPI.as_view(),

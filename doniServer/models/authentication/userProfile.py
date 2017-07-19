@@ -38,12 +38,19 @@ class UserProfile(models.Model):
     class Meta:
         db_table = 'user_profile'
 
-    def get_profile_pic(self, base_url):
+    def get_profile_pic(self, base_url=None):
+        if base_url is None:
+            return settings.FRONT_END_HOST+'/media/'+str(self.profile_pic) if self.profile_pic else None
         if settings.IS_HTTPS:
             pre = 'https://'
         else:
             pre = 'http://'
         return pre+base_url+'/media/'+str(self.profile_pic) if self.profile_pic else None
+
+    def get_notification_peers(self):
+        peers = self.business.business_users.all().exclude(user=self.user)
+        return [p.user for p in peers]
+
 
     def complete_profile(self, base_url):
         return {

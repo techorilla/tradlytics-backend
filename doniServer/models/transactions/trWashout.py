@@ -68,7 +68,7 @@ class TrWashout(models.Model):
 
 
 from django.db.models.signals import pre_save, post_save, post_delete
-
+from notifications.signals import notify
 
 def pre_save_post_receiver(sender, instance, *args, **kwargs):
     #saving washout Total Difference
@@ -82,13 +82,22 @@ def pre_save_post_receiver(sender, instance, *args, **kwargs):
 
 def post_save_receiver(sender, instance, created, *args, **kwargs):
     user = instance.created_by if created else instance.updated_by
+    peers = user.profile.get_notification_peers()
+
     if instance.is_washout:
         if created:
             log = '<span class="titled">Activated Washout Transaction Status!</span>'
+            notification_msg = '<strong> File Id  %s</strong> washout status activated.' % instance.transaction.file_id
         else:
             log = '<span class="titled">Changed Transaction Washout Details!</span>'
+            notification_msg = '<strong> File Id  %s</strong> washout details changed.' % instance.transaction.file_id
     else:
+        notification_msg = '<strong> File Id  %s</strong> washout status deactivated changed.' % instance.transaction.file_id
         log='<span class="titled">Deactivated Transaction Washout Status!</span>'
+
+    notify.send(user, recipient=peers, verb=notification_msg, description='international_trade',
+                state='dashboard.transactionView',
+                state_id=instance.transaction.file_id, user_image=user.profile.get_profile_pic())
 
     TransactionChangeLog.add_change_log(user, log, instance.transaction)
 

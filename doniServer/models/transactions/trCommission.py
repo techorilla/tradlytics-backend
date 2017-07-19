@@ -123,7 +123,7 @@ class TrCommission(models.Model):
             self.actual_commission = self.calculate_actual_commission
             self.buyer_broker_commission_actual = self.calculate_buyer_actual_commission
             self.seller_commission_actual = self.calculate_seller_actual_commission
-            self.buyer_commission_actual = self.calculate_seller_actual_commission
+            self.buyer_commission_actual = self.calculate_buyer_actual_commission
 
         self.expected_commission = self.calculate_expected_commission
         self.buyer_broker_commission_expected = self.calculate_buyer_broker_expected_commission
