@@ -58,6 +58,8 @@ class TransactionShipmentStatusAPI(GenericAPIView):
             elif shipment_status == self.SHIPMENT_STATUS['ARRIVED_AT_PORT']:
                 if activate:
                     shipment.arrived_at_port = True
+                    shipment.shipped = True
+                    shipment.not_shipped = False
                 else:
                     shipment.arrived_at_port = False
             else:
