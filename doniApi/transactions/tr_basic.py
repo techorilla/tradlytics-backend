@@ -259,6 +259,7 @@ class TransactionBasicAPI(GenericAPIView):
             transaction.shipment_end = shipment_end.date()
             transaction.price = float(basic.get('price'))
             transaction.quantity = float(basic.get('quantity'))
+            transaction.quantity_fcl = float(basic.get('quantityFcl'))
             transaction.date = transaction_date.date()
             transaction.packaging = packaging
             # saving all commission details

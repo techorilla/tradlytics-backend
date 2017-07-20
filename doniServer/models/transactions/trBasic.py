@@ -111,6 +111,7 @@ class Transaction(models.Model):
     def get_complete_obj(self, base_url, user):
 
         business = user.profile.business
+        currency = business.app_profile.currency
         #Transaction change logs
         change_logs = self.change_log.all()
         change_logs = [log.get_obj() for log in change_logs]
@@ -123,13 +124,9 @@ class Transaction(models.Model):
         files = self.files.values('file_name', 'extension', 'created_at', 'created_by__username', 'file_id') \
             .order_by('-created_at')
 
-        # Washout Detail
+        #Invoice
 
-        washout_obj = {
-            # 'status': self.is_washout,
-            # 'washOutStr': self.get_washout_string,
-            # 'isWashOutAt': '%.2f'%round(self.is_washout_at,2)
-        }
+        invoice = None if not self.invoices.exists() else self.invoices.all()[0]
 
         files = [{
                      'fileId': f.get('file_id'),
@@ -141,7 +138,8 @@ class Transaction(models.Model):
 
         return {
             'id': self.tr_id,
-            'invoiceCreation': (self.contractual_buyer == business),
+            'invoiceCreation': (self.contractual_buyer == business) and not self.invoices.exists(),
+            'businessCurrency': currency,
             'basic': {
                 'price': self.price,
                 'date': self.date,
@@ -154,6 +152,7 @@ class Transaction(models.Model):
                 'shipmentEnd': self.shipment_end,
                 'shipmentStart': self.shipment_start
             },
+            'invoice': None if not invoice else invoice.get_description_obj(),
             'completeObj': None if not hasattr(self, 'completion_status') else self.completion_status.get_description_obj(),
             'washOut': None if not hasattr(self, 'washout') else self.washout.get_description_obj(),
             'changeLogs': change_logs,
@@ -177,14 +176,14 @@ def my_handler(sender, instance, created, **kwargs):
         peer_notification = 'New International transaction with File Id <strong>%s</strong> created by %s'
         peer_notification = peer_notification%(instance.file_id, instance.created_by.username)
         notify.send(user, recipient=peers, verb=peer_notification, description='international_trade', state='dashboard.transactionView',
-                    state_id=instance.file_id, user_image=user.profile.get_profile_pic())
+                    state_params={'id': instance.file_id}, user_image=user.profile.get_profile_pic())
     else:
         user = instance.updated_by
         peers = user.profile.get_notification_peers()
         peer_notification = 'International Transaction with File Id <strong>%s</strong> updated by %s'
         peer_notification = peer_notification % (instance.file_id, instance.created_by.username)
         notify.send(user, recipient=peers, verb=peer_notification, description='international_trade', state='dashboard.transactionView',
-                    state_id=instance.file_id, user_image=user.profile.get_profile_pic())
+                    state_params={'id': instance.file_id}, user_image=user.profile.get_profile_pic())
 
 post_save.connect(my_handler, sender=Transaction)
 

@@ -98,8 +98,8 @@ def post_save_receiver(sender, instance, created, *args, **kwargs):
         log='<span class="titled">Deactivated Transaction Washout Status!</span>'
 
     notify.send(user, recipient=peers, verb=notification_msg, description='international_trade',
-                state='dashboard.transactionView',
-                state_id=instance.transaction.file_id, user_image=user.profile.get_profile_pic())
+                state='dashboard.transactionView', state_params={'id': instance.transaction.file_id},
+                user_image=user.profile.get_profile_pic())
 
     TransactionChangeLog.add_change_log(user, log, instance.transaction)
 

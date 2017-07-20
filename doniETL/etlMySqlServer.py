@@ -2,7 +2,7 @@ from os import getenv
 import pymssql
 from django.contrib.auth.models import User
 from pymssql import InterfaceError
-
+import dateutil.parser
 
 server = "donigroup.cczhghwibti9.us-west-2.rds.amazonaws.com:1433"
 user = "immadimtiaz"
@@ -12,7 +12,7 @@ conn = pymssql.connect(server, user, password, "DoniEnterprises")
 
 
 
-from doniServer.models import Transaction, TrFiles
+from doniServer.models import Transaction, TrFiles, TrShipment
 
 created_by = User.objects.get(username='immadimtiaz')
 
@@ -47,3 +47,54 @@ def get_transaction_files_from_old_erp(file_id, cursor):
             file.created_by = created_by
             file.save()
     return query
+
+
+
+def get_transaction_shipment_data():
+    cursor = conn.cursor()
+    query = """
+                Select
+                    t.tr_fileID,
+                    tr_expectedShipment,
+                    tr_inTransit,
+                    tr_dateShipped,
+                    tr_expectedArrival,
+                    tr_ship_notShipped_reason,
+                    ts.tr_ship_BlNo,
+                    ts.tr_ship_quantity
+                from TransactionsShipment  as ts
+                inner join
+                Transactions as t
+                ON
+                t.tr_transactionID = ts.tr_transactionID
+            """
+
+    cursor.execute(query.strip())
+    for row in cursor:
+        try:
+            transaction = Transaction.objects.get(file_id=row[0])
+            commission = transaction.commission
+            try:
+                shipment = transaction.shipment
+            except TrShipment.DoesNotExist:
+                print row[0], 'Not Exist'
+                shipment = TrShipment()
+                shipment.created_by = created_by
+
+            if row[1]: shipment.expected_shipment = row[1]
+            if row[2]: shipment.in_transit = row[2]
+            if row[3]: shipment.date_shipped_on = row[3]
+            if row[4]: shipment.expected_arrival = row[4]
+            if row[5]: shipment.not_shipped_reason = row[5]
+            if row[6]: shipment.bl_no = row[6]
+            if row[7]: commission.quantity_shipped = float(row[7])
+
+            transaction.save()
+            commission.save()
+            shipment.save()
+        except Transaction.DoesNotExist:
+            pass
+
+
+
+

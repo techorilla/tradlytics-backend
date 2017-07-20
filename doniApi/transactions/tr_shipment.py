@@ -76,7 +76,7 @@ class TransactionShipmentStatusAPI(GenericAPIView):
                 TransactionChangeLog.add_change_log(user, log, transaction)
                 notify.send(user, recipient=peers, verb=notification_msg, description='international_trade',
                             state='dashboard.transactionView',
-                            state_id=transaction.file_id, user_image=user.profile.get_profile_pic())
+                            state_params={'id': transaction.file_id}, user_image=user.profile.get_profile_pic())
 
             else:
                 log = self.DEACTIVATED_MESSAGE%txt_status
@@ -84,7 +84,7 @@ class TransactionShipmentStatusAPI(GenericAPIView):
                 TransactionChangeLog.add_change_log(user, log, transaction)
                 notify.send(user, recipient=peers, verb=notification_msg, description='international_trade',
                             state='dashboard.transactionView',
-                            state_id=transaction.file_id, user_image=user.profile.get_profile_pic())
+                            state_params={'id': transaction.file_id}, user_image=user.profile.get_profile_pic())
 
 
             return Response({

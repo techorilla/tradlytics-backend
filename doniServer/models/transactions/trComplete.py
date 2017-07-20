@@ -46,7 +46,7 @@ def my_handler(sender, instance, created, **kwargs):
 
     TransactionChangeLog.add_change_log(user, log, transaction)
     notify.send(user, recipient=peers, verb=peer_notification, description='international_trade',
-                state='dashboard.transactionView',
-                state_id=transaction.file_id, user_image=user.profile.get_profile_pic())
+                state='dashboard.transactionView', state_params={'id': transaction.file_id},
+                user_image=user.profile.get_profile_pic())
 
 post_save.connect(my_handler, sender=TrComplete)

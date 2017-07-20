@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
-from doniServer.models import Transaction
+from doniServer.models import Transaction, BpBasic
 from django.utils import timezone
 from django.conf import settings
 import time
 from jsonfield import JSONField
 from .expenseType import ExpenseType
 from datetime import datetime as dt
+
 
 from ..authentication import BusinessAppProfile
 
@@ -21,15 +22,16 @@ class IntTradeInvoice(models.Model):
         null=True,
         related_name='invoices'
     )
+    invoice_to = models.ForeignKey(BpBasic, null=False)
 
-
-    invoice_obj = JSONField(null=False)
-
+    invoice_items = JSONField(null=False)
     invoice_amount = models.FloatField(default=0.00, null=False)
+
     weight_in_kg = models.FloatField(null=False, default=0.00)
     rate_per_kg = models.FloatField(null=False, default=0.00)
     currency = models.CharField(max_length=20, null=False, default='PKR')
 
+    currency_rate = models.FloatField(null=False)
     note = models.TextField()
 
     created_at = models.DateTimeField(default=timezone.now)
@@ -41,20 +43,27 @@ class IntTradeInvoice(models.Model):
     def get_new_invoice_no(cls):
         if cls.objects.exists():
             invoice_no = cls.objects.all().order_by('-invoice_no').first().invoice_no
-            return invoice_no
+            return invoice_no +1
         else:
             return 1
 
     def save(self):
         business = self.created_by.profile.business
+        trade = self.transaction
+        quantity = trade.commission.quantity_shipped if trade.commission.quantity_shipped else trade.quantity
         currency = business.app_profile.currency
         self.currency = currency
+        self.weight_in_kg = quantity*1000
+        self.rate_per_kg = float(self.invoice_amount / self.weight_in_kg)
         super(IntTradeInvoice, self).save()
 
 
-    def get_complete_obj(self):
-
+    def get_complete_obj(self, base_url):
+        trade = self.transaction
+        quantity = trade.commission.quantity_shipped if trade.commission.quantity_shipped else trade.quantity
         return {
+            'currencyRate': str(round(self.currency_rate,2)),
+            'quantityFCL': trade.quantity_fcl if trade.quantity_fcl  else round(quantity / 23),
             'invoiceAmount': self.invoice_amount,
             'id': self.id,
             'price': self.transaction.price,
@@ -62,13 +71,19 @@ class IntTradeInvoice(models.Model):
             'fileNo': self.transaction.file_id,
             'contractNo': self.transaction.contract_id,
             'blNo': self.transaction.shipment.bl_no,
-            'invoiceTo': self.transaction.contractual_buyer.get_description_obj(base_url),
+            'invoiceTo': self.invoice_to.get_description_obj(base_url),
             'productItem': self.transaction.product_item.get_description_obj(base_url),
             'date': dt.now().date(),
             'invoiceNo': self.invoice_no,
-            'invoiceObj': self.invoice_obj,
+            'invoiceItems': self.invoice_items,
             'note': self.note,
             'currency': self.currency
+        }
+
+    def get_description_obj(self):
+        return {
+            'invoiceNo': self.invoice_no,
+            'invoiceAmount': str(round(float(self.invoice_amount),2))
         }
 
 
@@ -92,7 +107,8 @@ class IntTradeInvoice(models.Model):
             'currency': currency,
             'currencyRate': dollar_rate,
             'price': str(round(net_price,2)),
-            'quantity': quantity,
+            'quantity': str(round(quantity,2)),
+            'quantityFCL': trade.quantity_fcl if trade.quantity_fcl  else round(quantity/23),
             'fileNo': trade.file_id,
             'contractNo': trade.contract_id,
             'blNo': trade.shipment.bl_no,
@@ -110,6 +126,9 @@ class IntTradeInvoice(models.Model):
         default_expenses = ExpenseType.objects.filter(default=True).order_by('default_order')
         default_expenses = [expense.get_default_expense_item_obj(price, quantity_into_price, dollar_rate, commission, currency) for expense in default_expenses]
         return default_expenses
+
+
+
 
 
 
