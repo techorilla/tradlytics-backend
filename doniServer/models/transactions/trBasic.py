@@ -157,7 +157,7 @@ class Transaction(models.Model):
             'completeObj': None if not hasattr(self, 'completion_status') else self.completion_status.get_description_obj(),
             'washOut': None if not hasattr(self, 'washout') else self.washout.get_description_obj(),
             'changeLogs': change_logs,
-            'shipment': self.shipment.get_description_object(base_url),
+            'shipment': None if not hasattr(self, 'shipment') else self.shipment.get_description_object(base_url),
             'commission': self.commission.get_description_obj(base_url),
             'files': files,
             'notes': notes

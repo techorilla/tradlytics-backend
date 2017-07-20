@@ -17,7 +17,13 @@ class InvoiceAPI(GenericAPIView):
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        print request.data
+        return self.save_invoice(request)
+
+    def save_invoice(self, request):
+        user = request.user
+        data=request.data
+        invoice_obj = data.get('invoiceObj')
+        file_id = data.get('file_id')
         return Response({
 
         }, status=status.HTTP_200_OK)
@@ -26,6 +32,4 @@ class InvoiceAPI(GenericAPIView):
         return Response()
 
     def put(self, request, *args, **kwargs):
-        print request.data
-        return Response({
-        }, status=status.HTTP_200_OK)
+        return self.save_invoice(request)
