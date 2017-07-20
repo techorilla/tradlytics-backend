@@ -138,7 +138,8 @@ class Transaction(models.Model):
 
         return {
             'id': self.tr_id,
-            'invoiceCreation': (self.contractual_buyer == business) and not self.invoices.exists(),
+            'onOurContract': business.app_profile.on_our_contract(self.contractual_buyer),
+            'invoiceCreation': business.app_profile.on_our_contract(self.contractual_buyer) and not self.invoices.exists(),
             'businessCurrency': currency,
             'basic': {
                 'price': self.price,

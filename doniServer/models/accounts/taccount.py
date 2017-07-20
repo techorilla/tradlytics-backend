@@ -91,7 +91,7 @@ def post_save_handler(sender, instance, created, **kwargs):
         notify.send(user, recipient=peers, verb=peer_notification, description='international_trade_invoice', state='dashboard.accounts.invoiceForm',
                     state_params={'invoiceId':instance.invoice_no , 'fileId': instance.transaction.file_id}, user_image=user.profile.get_profile_pic())
 
-    TAccount.international_invoice_to_taccount(created, instance, user.profile.business)
+    TAccount.international_invoice_to_taccount(created, instance, instance.transaction.contractual_buyer)
 
 post_save.connect(post_save_handler, sender=IntTradeInvoice)
 post_delete.connect(post_delete_handler, sender=IntTradeInvoice)
