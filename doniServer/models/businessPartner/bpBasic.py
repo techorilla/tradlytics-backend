@@ -22,7 +22,7 @@ class BpBasic(models.Model):
     bp_website = models.CharField(max_length=255, null=False, blank=False)
     bp_credibility_index = models.IntegerField(default=1)
     bp_types = models.ManyToManyField(BusinessType, related_name='business')
-    bp_database_id = models.CharField(max_length=5, null=True)
+    bp_database_id = models.CharField(max_length=50, null=True)
     bp_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
@@ -35,6 +35,10 @@ class BpBasic(models.Model):
 
     def __unicode__(self):
         return self.bp_name.replace(' ', '_')
+
+    @classmethod
+    def get_business_with_database_id(cls, database_id):
+        return cls.objects.get(bp_database_id=database_id)
 
     @property
     def is_delete_able(self):

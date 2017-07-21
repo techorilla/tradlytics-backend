@@ -12,7 +12,7 @@ conn = pymssql.connect(server, user, password, "DoniEnterprises")
 
 
 
-from doniServer.models import Transaction, TrFiles, TrShipment
+from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic
 
 created_by = User.objects.get(username='immadimtiaz')
 
@@ -48,6 +48,63 @@ def get_transaction_files_from_old_erp(file_id, cursor):
             file.save()
     return query
 
+
+def transfer_trade_commission_data():
+    cursor = conn.cursor()
+    query = """
+                SELECT
+                    t.tr_fileID,
+                    t.tr_contractId,
+                    t.tr_bpBuyerId,
+                    t.tr_bpSellerId,
+                    t.tr_productId,
+                    t.tr_price,
+                    t.tr_quantity,
+                    t.tr_packing,
+                    t.tr_shipment_start,
+                    t.tr_shipment_end,
+                    t.tr_other_info,
+                    tc.tr_sellerBrokerID,
+                    tc.tr_buyerBrokerID,
+                    tc.tr_ownCommissionType,
+                    tc.tr_own_Commission,
+                    tc.tr_buyerBroker_comm_type,
+                    tc.tr_buyerBroker_comm,
+                    tc.tr_difference,
+                    tc.tr_discount
+                FROM
+                Transactions as t
+                INNER JOIN
+                TransactionsCommission tc
+                ON t.tr_transactionID = tc.tr_transactionID
+    """
+
+    cursor.execute(query.strip())
+
+    for row in cursor:
+        file_id = row[0]
+        contract_id = row[1]
+        buyer = BpBasic.get_business_with_database_id(database_id=row[2])
+        seller = BpBasic.get_business_with_database_id(database_id=row[3])
+        product = ProductItem.get_product_with_database_id(database_id=row[4])
+        price = float(row[5])
+        quantity = float(row[6])
+        packing = row[7]
+        ship_start = row[8]
+        ship_end = row[9]
+        other_info = row[10]
+        if row[11]:
+            seller_broker = BpBasic.get_business_with_database_id(database_id=row[11])
+        if row[12]:
+            buyer_broker =  BpBasic.get_business_with_database_id(database_id=row[12])
+        commission_type = row[13]
+        commission = row[14]
+        buyer_broker_commission_type = row[15]
+        buyer_broker_commission = row[16]
+        difference = row[17]
+        discount = row[18]
+
+        print file_id, product, packing, commission_type
 
 
 def get_transaction_shipment_data():
