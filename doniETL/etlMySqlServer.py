@@ -100,10 +100,9 @@ def transfer_trade_commission_data():
         ship_start = row[8]
         ship_end = row[9]
         other_info = row[10]
-        if row[11]:
-            seller_broker = BpBasic.get_business_with_database_id(database_id=row[11])
-        if row[12]:
-            buyer_broker =  BpBasic.get_business_with_database_id(database_id=row[12])
+
+        seller_broker = None if not row[11] else BpBasic.get_business_with_database_id(database_id=row[11])
+        buyer_broker = None if row[12] else BpBasic.get_business_with_database_id(database_id=row[12])
         commission_type = CommissionType.objects.get(name=row[13])
 
         commission = row[14]
