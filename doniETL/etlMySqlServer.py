@@ -139,6 +139,7 @@ def transfer_trade_commission_data():
             new_commission.transaction = new_trade
             new_commission.buyer_broker = buyer_broker
             new_commission.buyer_broker_comm_type = buyer_broker_commission_type
+            new_commission.buyer_broker_comm = buyer_broker_commission
             new_commission.commission_type = commission_type
             new_commission.commission = commission
             new_commission.difference = difference
