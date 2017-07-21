@@ -83,6 +83,12 @@ COUNTRIES_FLAG_URL = 'flags/1x1/{code}.svg'
 COUNTRIES_OVERRIDE = {
     ('RK', 'Russia / Ukraine'),
     ('EU', 'European Union'),
+    ('UC', 'USA / Canada'),
+    ('BC', 'Black Sea'),
+    ('BK', 'Russian / Ukraine / EU'),
+    ('BP', 'Russia / Ukraine / EU / USA / Canada'),
+    ('BX', 'EU/Baltic/Black Sea')
+
 }
 
 #CKE EDITOR TEXT EDITOR FOR DJANGO ADMIN

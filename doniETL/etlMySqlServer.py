@@ -87,7 +87,9 @@ def get_transaction_shipment_data():
             if row[4]: shipment.expected_arrival = row[4]
             if row[5]: shipment.not_shipped_reason = row[5]
             if row[6]: shipment.bl_no = row[6]
-            if row[7]: commission.quantity_shipped = float(row[7])
+            if row[7]:
+                if not commission.quantity_shipped:
+                    commission.quantity_shipped = float(row[7])
 
             transaction.save()
             commission.save()
