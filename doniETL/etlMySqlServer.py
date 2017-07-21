@@ -11,8 +11,8 @@ password = "Giki1990????"
 conn = pymssql.connect(server, user, password, "DoniEnterprises")
 
 
-
-from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic
+from doniServer.models.dropDowns import *
+from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission
 
 created_by = User.objects.get(username='immadimtiaz')
 
@@ -71,12 +71,18 @@ def transfer_trade_commission_data():
                     tc.tr_buyerBroker_comm_type,
                     tc.tr_buyerBroker_comm,
                     tc.tr_difference,
-                    tc.tr_discount
+                    tc.tr_discount,
+                    t.tr_date,
+                    tcc.tr_ContractualBuyer
                 FROM
                 Transactions as t
                 INNER JOIN
                 TransactionsCommission tc
                 ON t.tr_transactionID = tc.tr_transactionID
+                INNER JOIN
+                TransactionsContract tcc
+                ON t.tr_transactionID = tcc.tr_transactionID
+
     """
 
     cursor.execute(query.strip())
@@ -89,7 +95,8 @@ def transfer_trade_commission_data():
         product = ProductItem.get_product_with_database_id(database_id=row[4])
         price = float(row[5])
         quantity = float(row[6])
-        packing = row[7]
+        packing = Packaging.objects.get(name=row[7])
+
         ship_start = row[8]
         ship_end = row[9]
         other_info = row[10]
@@ -97,12 +104,47 @@ def transfer_trade_commission_data():
             seller_broker = BpBasic.get_business_with_database_id(database_id=row[11])
         if row[12]:
             buyer_broker =  BpBasic.get_business_with_database_id(database_id=row[12])
-        commission_type = row[13]
+        commission_type = CommissionType.objects.get(name=row[13])
+
         commission = row[14]
-        buyer_broker_commission_type = row[15]
-        buyer_broker_commission = row[16]
+        buyer_broker_commission_type = CommissionType.objects.get(name=row[15])
+        buyer_broker_commission = 0.00 if not row[16] else float(row[16])
         difference = row[17]
         discount = row[18]
+        date = row[19]
+
+        if row[20]:
+            contractual_buyer = BpBasic.get_business_with_database_id(database_id=row[20])
+        else:
+            contractual_buyer = buyer
+
+        if not Transaction.objects.filter(file_id=file_id).exists():
+            new_trade = Transaction()
+            new_trade.date = date
+            new_trade.buyer = buyer
+            new_trade.seller = seller
+            new_trade.contractual_buyer = contractual_buyer
+            new_trade.product_item = product
+            new_trade.quantity = quantity
+            new_trade.price = price
+            new_trade.packaging = packing
+            new_trade.shipment_start = ship_start
+            new_trade.shipment_end = ship_end
+            new_trade.file_id = file_id
+            new_trade.contract_id = contract_id
+            new_trade.other_info = other_info
+            new_trade.created_by = created_by
+            new_trade.save()
+            new_commission = TrCommission()
+            new_commission.seller_broker = seller_broker
+            new_commission.transaction = new_trade
+            new_commission.buyer_broker = buyer_broker
+            new_commission.buyer_broker_comm_type = buyer_broker_commission_type
+            new_commission.commission_type = commission_type
+            new_commission.commission = commission
+            new_commission.difference = difference
+            new_commission.discount = discount
+            new_commission.save()
 
         print file_id, product, packing, commission_type
 

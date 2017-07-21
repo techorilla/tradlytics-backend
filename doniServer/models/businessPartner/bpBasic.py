@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db import connection
 import os
 import time
+from django.db.models import Q
 
 
 def get_image_path(instance, filename):
@@ -38,7 +39,13 @@ class BpBasic(models.Model):
 
     @classmethod
     def get_business_with_database_id(cls, database_id):
-        return cls.objects.get(bp_database_id=database_id)
+        if cls.objects.filter(bp_database_id=database_id).exists():
+            return cls.objects.get(bp_database_id=database_id)
+        else:
+            id_string = [str(database_id) + ',', ',' + str(database_id) + ',', ',' + str(database_id)]
+            return cls.objects.get(
+                Q(bp_database_id__startswith=id_string[0]) | Q(bp_database_id__contains=id_string[1]) | Q(
+                    bp_database_id__endswith=id_string[2]))
 
     @property
     def is_delete_able(self):

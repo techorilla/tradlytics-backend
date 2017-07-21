@@ -42,7 +42,7 @@ class ProductItem(models.Model):
             return ProductItem.objects.get(database_ids=database_id)
         else:
             id_string = [str(database_id)+',',',' + str(database_id) + ',',','+str(database_id)]
-            return ProductItem.objects.get(Q(database_ids__startswith=id_string[0]) | Q(database_ids__contains=id_string[1]) | Q(database_ids__startswith=id_string[2]))
+            return ProductItem.objects.get(Q(database_ids__startswith=id_string[0]) | Q(database_ids__contains=id_string[1]) | Q(database_ids__endswith=id_string[2]))
 
 
 
