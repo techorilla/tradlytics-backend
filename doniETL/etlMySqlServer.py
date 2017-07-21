@@ -105,11 +105,11 @@ def transfer_trade_commission_data():
         buyer_broker = None if not row[12] else BpBasic.get_business_with_database_id(database_id=row[12])
         commission_type = CommissionType.objects.get(name=row[13])
 
-        commission = row[14]
+        commission = float(row[14])
         buyer_broker_commission_type = CommissionType.objects.get(name=row[15])
         buyer_broker_commission = 0.00 if not row[16] else float(row[16])
-        difference = row[17]
-        discount = row[18]
+        difference = float(row[17])
+        discount = float(row[18])
         date = row[19]
 
         if row[20]:
