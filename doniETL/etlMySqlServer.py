@@ -21,18 +21,19 @@ def check_files_not_in_system():
     cursor = conn.cursor()
     query = """
             Select
-                t.tr_fileID
+                RTRIM(LTRIM(t.tr_fileID))
             from Transactions as t
         """
     cursor.execute(query)
     file_does_not_exist = []
     for row in cursor:
         try:
-            trade = Transaction.objects.get(file_id=row[0])
+            trade = Transaction.objects.get(file_id=t.tr_fileID)
         except Transaction.DoesNotExist:
             file_does_not_exist.append(row[0])
             print 'This transaction is not in the system %s' % row[0]
-            transfer_trade_commission_data(file_id=row[0])
+            # transfer_trade_commission_data(file_id=row[0])
+
     return file_does_not_exist
 
 
@@ -72,7 +73,7 @@ def mark_completed_transactions():
             complete_status.save()
 
         except Transaction.DoesNotExist:
-            print 'This transaction is not in the system %s'%file_id
+            print 'This transaction is not in the system  %s'%file_id
 
 
 
@@ -145,7 +146,7 @@ def transfer_trade_commission_data(file_id=None):
     """
 
     if file_id:
-        query = query + ' WHERE t.tr_fileID = \'%s\''
+        query = query + ' WHERE RTRIM(LTRIM(t.tr_fileID)) = \'%s\''
         query = query%file_id
     cursor.execute(query.strip())
     save_trade_commission_data(cursor)
