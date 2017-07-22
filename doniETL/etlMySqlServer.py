@@ -12,14 +12,43 @@ conn = pymssql.connect(server, user, password, "DoniEnterprises")
 
 
 from doniServer.models.dropDowns import *
-from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission
+from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission, TrComplete
 
 created_by = User.objects.get(username='immadimtiaz')
 
 
-def get_files_for_all_trades():
+
+def mark_completed_transactions():
     cursor = conn.cursor()
-    all_trade = Transaction.objects.all()
+    query = """
+        Select
+            tr_transactionID,
+            tr_transactionStatus,
+            tr_editedOn
+        from TransactionsStatus where tr_transactionStatus=\'Completed\'
+    """
+    cursor.execute(query)
+
+    for row in cursor:
+        file_id = row[0]
+        completion_date = row[2]
+        try:
+            trade = Transaction.objects.get(file_id=file_id)
+            complete_status = trade.completion_status if hasattr(trade, 'completion_status') else TrComplete()
+            complete_status.is_complete = True
+            complete_status.completion_date = completion_date
+            complete_status.transaction = trade
+            complete_status.created_by = created_by
+            complete_status.save()
+
+        except Transaction.DoesNotExist:
+            print 'This transaction is not in the system %s'%file_id
+
+
+
+def get_files_for_all_trades(trades=None):
+    cursor = conn.cursor()
+    all_trade = all_trade if trades else Transaction.objects.all()
     for trade in all_trade:
         get_transaction_files_from_old_erp(trade.file_id, cursor)
         print  trade.file_id
