@@ -17,28 +17,58 @@ from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpB
 created_by = User.objects.get(username='immadimtiaz')
 
 
+def check_files_not_in_system():
+    cursor = conn.cursor()
+    query = """
+            Select
+                t.tr_fileID
+            from Transactions as t
+        """
+    cursor.execute(query)
+    file_does_not_exist = []
+    for row in cursor:
+        try:
+            trade = Transaction.objects.get(file_id=row[0])
+        except Transaction.DoesNotExist:
+            file_does_not_exist.append(row[0])
+            print 'This transaction is not in the system %s' % row[0]
+            transfer_trade_commission_data(file_id=row[0])
+    return file_does_not_exist
+
+
+
 
 def mark_completed_transactions():
     cursor = conn.cursor()
     query = """
         Select
-            tr_transactionID,
-            tr_transactionStatus,
-            tr_editedOn
-        from TransactionsStatus where tr_transactionStatus=\'Completed\'
+            t.tr_fileID,
+            ts.tr_transactionStatus,
+            ts.tr_editedOn,
+            ts.tr_createdOn
+        from TransactionsStatus as ts
+        INNER JOIN
+        Transactions as t
+        ON t.tr_transactionID = ts.tr_transactionID
+        where tr_transactionStatus=\'Completed\'
     """
     cursor.execute(query)
 
     for row in cursor:
         file_id = row[0]
-        completion_date = row[2]
+        completion_date = row[2] if row[2] else row[3]
         try:
             trade = Transaction.objects.get(file_id=file_id)
             complete_status = trade.completion_status if hasattr(trade, 'completion_status') else TrComplete()
+
             complete_status.is_complete = True
             complete_status.completion_date = completion_date
             complete_status.transaction = trade
-            complete_status.created_by = created_by
+            if not hasattr(trade, 'completion_status'):
+                complete_status.created_by = created_by
+            else:
+                complete_status.created_by = created_by
+                complete_status.updated_by = created_by
             complete_status.save()
 
         except Transaction.DoesNotExist:
@@ -78,7 +108,7 @@ def get_transaction_files_from_old_erp(file_id, cursor):
     return query
 
 
-def transfer_trade_commission_data():
+def transfer_trade_commission_data(file_id=None):
     cursor = conn.cursor()
     query = """
                 SELECT
@@ -114,8 +144,13 @@ def transfer_trade_commission_data():
 
     """
 
+    if file_id:
+        query = query + ' WHERE t.tr_fileID = \'%s\''
+        query = query%file_id
     cursor.execute(query.strip())
 
+
+def save_trade_commission_data(cursor):
     for row in cursor:
         file_id = row[0]
         contract_id = row[1]
@@ -174,8 +209,9 @@ def transfer_trade_commission_data():
             new_commission.difference = difference
             new_commission.discount = discount
             new_commission.save()
+        else:
+            print 'File Already Exist in the System'
 
-        print file_id, product, packing, commission_type
 
 
 def get_transaction_shipment_data():
