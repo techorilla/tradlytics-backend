@@ -6,6 +6,37 @@ from django.db import IntegrityError
 from datetime import datetime as dt
 import dateutil.parser
 from django.db.models import Max
+from .website_pricing import get_product_pricing_data
+
+
+
+
+class PricingAnalyticsAPI(GenericAPIView):
+    permission_class = (IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        start_date = request.data.get(u'startDate')
+        end_date = request.data.get(u'endDate')
+        product_item_id = request.data.get(u'productItemId')
+        start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
+        end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
+        product_item = ProductItem.objects.get(id=product_item_id)
+        start_date = start_date
+        end_date = end_date
+
+        graph_data, total_volume = get_product_pricing_data(product_item, product_item.get_related_product_ids(), start_date, end_date)
+
+        return Response({
+            'success': True,
+            'data': {
+                'totalVolume': total_volume,
+                'graphData': graph_data
+            }
+        })
+
+
+
+
 
 
 class PricingSummaryAPI(GenericAPIView):

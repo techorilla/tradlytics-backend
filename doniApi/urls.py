@@ -168,6 +168,10 @@ urlpatterns = (
         TransactionBasicAPI.as_view(),
         name='Transaction Status'),
 
+    url(r'transactions/dashboard/$',
+        TransactionDashboardAPI.as_view(),
+        name='Transaction Dashboard API'),
+
     # url(r'transactions/(?P<tr_id>[a-zA-Z0-9.@_-]+)/shipment/$',
     #     TransactionShipmentAPI.as_view(),
     #     name='Transaction Shipment'),
@@ -182,6 +186,10 @@ urlpatterns = (
         PricingMarketAPI.as_view(),
         name='Pricing_Market_API'
         ),
+
+    url(r'pricing/product_item/analytics/$',
+        PricingAnalyticsAPI.as_view(),
+        name='Product Pricing Analytics'),
 
     # Product Items Pricing API
 

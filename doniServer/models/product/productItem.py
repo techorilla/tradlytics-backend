@@ -36,6 +36,14 @@ class ProductItem(models.Model):
     def __unicode__(self):
         return '%s:%s:%s'%(self.product_origin.product.name, self.product_origin.country, self.product_origin.product.category.name)
 
+
+    def get_related_product_ids(self):
+        product = self.product_origin.product
+        all_manifest_product_id = list()
+        all_manifest_product_id.append(int(product.id))
+        all_manifest_product_id = all_manifest_product_id + product.related_product_ids
+        return all_manifest_product_id
+
     @classmethod
     def get_product_with_database_id(cls, database_id):
         if ProductItem.objects.filter(database_ids=database_id).exists():

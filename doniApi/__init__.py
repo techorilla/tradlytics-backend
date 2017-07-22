@@ -4,11 +4,10 @@ from products import *
 from reports import *
 from manifest import *
 from origins import *
-from pricing import *
+from pricingList import *
 from tabFilters import *
 from authentication import *
 from website import *
-from pricing import *
 from dashboard import *
 from shipment import *
 from currencyExchange import *
