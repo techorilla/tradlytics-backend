@@ -148,7 +148,7 @@ def transfer_trade_commission_data(file_id=None):
     if file_id:
         query = query + ' WHERE t.tr_fileID = \'%s\''
         query = query%file_id
-    all = cursor.execute(query.strip())
+    cursor.execute(query.strip())
     all = cursor.fetchall()
     save_trade_commission_data(all)
 
