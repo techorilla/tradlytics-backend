@@ -148,6 +148,7 @@ def transfer_trade_commission_data(file_id=None):
         query = query + ' WHERE t.tr_fileID = \'%s\''
         query = query%file_id
     cursor.execute(query.strip())
+    save_trade_commission_data(cursor)
 
 
 def save_trade_commission_data(cursor):
