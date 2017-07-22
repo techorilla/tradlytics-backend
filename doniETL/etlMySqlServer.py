@@ -27,7 +27,6 @@ def check_files_not_in_system():
     cursor.execute(query)
     file_does_not_exist = []
     for row in cursor.fetchall():
-        print row
         try:
             trade = Transaction.objects.get(file_id=row[0])
         except Transaction.DoesNotExist:
@@ -149,8 +148,9 @@ def transfer_trade_commission_data(file_id=None):
     if file_id:
         query = query + ' WHERE RTRIM(LTRIM(t.tr_fileID)) = \'%s\''
         query = query%file_id
-    cursor.execute(query.strip())
-    save_trade_commission_data(cursor)
+    all = cursor.execute(query.strip())
+    all = cursor.fetchall()
+    save_trade_commission_data(all)
 
 
 def save_trade_commission_data(cursor):
