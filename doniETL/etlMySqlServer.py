@@ -154,6 +154,7 @@ def transfer_trade_commission_data(file_id=None):
 
 
 def save_trade_commission_data(cursor):
+    print cursor
     for row in cursor:
         file_id = row[0]
         contract_id = row[1]
