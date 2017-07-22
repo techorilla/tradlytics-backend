@@ -146,7 +146,7 @@ def transfer_trade_commission_data(file_id=None):
     """
 
     if file_id:
-        query = query + ' WHERE RTRIM(LTRIM(t.tr_fileID)) = \'%s\''
+        query = query + ' WHERE t.tr_fileID) = \'%s\''
         query = query%file_id
     all = cursor.execute(query.strip())
     all = cursor.fetchall()
@@ -213,6 +213,7 @@ def save_trade_commission_data(cursor):
             new_commission.difference = difference
             new_commission.discount = discount
             new_commission.save()
+            print 'File Created'
         else:
             print 'File Already Exist in the System'
 
