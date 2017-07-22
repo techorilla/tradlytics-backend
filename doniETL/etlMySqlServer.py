@@ -32,7 +32,7 @@ def check_files_not_in_system():
         except Transaction.DoesNotExist:
             file_does_not_exist.append(row[0])
             print 'This transaction is not in the system %s' % row[0]
-            # transfer_trade_commission_data(file_id=row[0])
+            transfer_trade_commission_data(file_id=row[0])
 
     return file_does_not_exist
 
