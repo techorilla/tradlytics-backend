@@ -28,7 +28,7 @@ def check_files_not_in_system():
     file_does_not_exist = []
     for row in cursor:
         try:
-            trade = Transaction.objects.get(file_id=t.tr_fileID)
+            trade = Transaction.objects.get(file_id=row[0])
         except Transaction.DoesNotExist:
             file_does_not_exist.append(row[0])
             print 'This transaction is not in the system %s' % row[0]
