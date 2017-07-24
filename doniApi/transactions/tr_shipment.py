@@ -274,6 +274,7 @@ class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
                 'message': 'Shipment Arrived At Port Information Updated!'
             })
         except Exception, e:
+            print str(e)
             return Response({
                 'success': False,
                 'message': str(e)

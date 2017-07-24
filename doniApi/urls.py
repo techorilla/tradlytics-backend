@@ -4,12 +4,14 @@ from django.conf.urls import include, url
 from doniApi.authentication.Login import LoginAPI
 from doniApi.authentication.Logout import LogOutAPI
 import notifications.urls
+import doniInventory.urls
 
 '''
     All Data API for Doni Group
 '''
 
 urlpatterns = (
+    url('^inventory/', include(doniInventory.urls, namespace='inventory')),
     url('^notifications/', include(notifications.urls, namespace='notifications')),
     url(r"login/$", LoginAPI.as_view(), {"public_api": True}, name="login"),
     url(r"logout/$", LogOutAPI.as_view(), name="logout"),
