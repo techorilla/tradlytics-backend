@@ -28,6 +28,12 @@ class Warehouse(models.Model):
     def __unicode__(self):
         return self.name
 
+    def drop_down_obj(self):
+        return {
+            'name': self.name,
+            'id': self.id
+        }
+
     def get_complete_obj(self, with_rent=False):
         complete_obj = {
             'id': self.id,
@@ -123,9 +129,29 @@ class InventoryTransaction(models.Model):
     fcl_quantity = models.IntegerField(default=0.00)
     product = models.ForeignKey(Products, null=False)
     positive = models.BooleanField(default=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(default=None, null=True)
+    created_by = models.ForeignKey(User, null=False, blank=False, related_name='inventory_record_created_by')
+    updated_by = models.ForeignKey(User, null=True, blank=False, related_name='inventory_record_updated_by')
 
     class Meta:
         db_table = 'inventory_transaction'
+
+    def get_complete_obj(self):
+        all_trucks = self.trucks.all()
+        trucks = [truck.get_obj() for truck in all_trucks]
+        return {
+            'id': self.id,
+            'warehouseId': self.warehouse.id,
+            'lotNo': self.lot_no,
+            'date': self.date,
+            'businessId': self.transaction_business.bp_id,
+            'portClearingNo': self.port_clearing_no,
+            'fclQuantity': self.fcl_quantity,
+            'productId': self.product.id,
+            'positive': self.positive,
+            'trucks':trucks
+        }
 
     def __unicode__(self):
         return '%s:%s:%s'%(self.date, self.product.name,self.fcl_quantity)
@@ -133,12 +159,23 @@ class InventoryTransaction(models.Model):
 
 class InventoryTransactionTruckFlow(models.Model):
     date = models.DateField(null=False)
+    transaction = models.ForeignKey(InventoryTransaction, null=False, related_name='trucks')
     truck_no = models.CharField(max_length=100, null=True)
     weight_in_kg = models.FloatField(default=0.00)
     remarks = models.TextField(null=True)
 
     class Meta:
         db_table = 'inventory_transaction_truck_flow'
+
+
+    def get_obj(self):
+        return {
+            'id': self.id,
+            'date': self.date,
+            'truckNo': self.truck_no,
+            'weightInKg': self.weight_in_kg,
+            'remarks': self.remarks
+        }
 
     def __unicode__(self):
         return '%s:%s:%s'%(self.date, self.truck_no, self.weight_in_kg)

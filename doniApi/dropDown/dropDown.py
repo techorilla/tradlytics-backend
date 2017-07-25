@@ -1,6 +1,7 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from doniServer.models.dropDowns import *
+from doniInventory.models import Warehouse
 from doniServer.models.product import ProductCategory, Products, PriceMarket, ProductKeyword, ProductItem, PriceMetric
 from doniServer.models.product.priceMarket import get_all_currencies
 from doniServer.models.shipment import ShippingPort, ShippingLine, Vessel
@@ -229,6 +230,10 @@ class ContactType(SimpleDropDownAPI):
 
 class ContractType(SimpleDropDownAPI):
     model = TransactionContractType
+
+
+class WarehouseDDAPI(SimpleDropDownAPI):
+    model = Warehouse
 
 
 class Designation(SimpleDropDownAPI):

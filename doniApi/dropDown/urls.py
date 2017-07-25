@@ -19,6 +19,10 @@ urlpatterns = (
         PackagingAPI.as_view(),
         name='Business Partner Basic'),
 
+    url(r'^warehouses/$',
+        WarehouseDDAPI.as_view(),
+        name='Warehouses'),
+
     url(r'^business_type/$',
         BusinessTypeAPI.as_view(),
         name='Business Partner Basic'),
