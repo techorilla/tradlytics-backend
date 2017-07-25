@@ -12,7 +12,7 @@ conn = pymssql.connect(server, user, password, "DoniEnterprises")
 
 
 from doniServer.models.dropDowns import *
-from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission, TrComplete
+from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission, TrComplete, TrSellerInvoice
 
 created_by = User.objects.get(username='immadimtiaz')
 
@@ -272,16 +272,34 @@ def fix_all_transaction_date_invoice_data():
     query = """
                     Select
                         t.tr_fileID,
-                        t.tr_date
+                        t.tr_date,
+                        ts.tr_ship_invoiceNo,
+                        ts.tr_ship_invoiceAmt
                     from TransactionsShipment  as ts
                     inner join
                     Transactions as t
                     ON
                     t.tr_transactionID = ts.tr_transactionID
                 """
-    cursor.execute('query')
+    cursor.execute(query)
+    all_row = cursor.fetchall()
 
-    return cursor
+    for row in all_row:
+        file_id = row[0]
+        date = row[1]
+
+        try:
+
+            transaction = Transaction.objects.get(file_id=file_id)
+            transaction.date = date
+            if row[3]:
+                transaction.seller_invoice = TrSellerInvoice()
+                transaction.seller_invoice.tr_seller_invoice_no = row[2]
+                transaction.seller_invoice.tr_seller_invoice_amount_usd = row[3]
+                transaction.seller_invoice.save()
+            transaction.save()
+        except transaction.DoesNotExist:
+            pass
 
 
 
