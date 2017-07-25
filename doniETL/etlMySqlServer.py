@@ -267,5 +267,23 @@ def get_transaction_shipment_data():
             pass
 
 
+def fix_all_transaction_date_invoice_data():
+    cursor = conn.cursor()
+    query = """
+                    Select
+                        t.tr_fileID,
+                        t.tr_date
+                    from TransactionsShipment  as ts
+                    inner join
+                    Transactions as t
+                    ON
+                    t.tr_transactionID = ts.tr_transactionID
+                """
+    cursor.execute('query')
+
+    return cursor
+
+
+
 
 

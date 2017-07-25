@@ -61,6 +61,7 @@ class TrShipment(models.Model):
 
 
     def get_description_object(self, base_url):
+        seller_invoice = None if not hasattr(self.transaction, 'seller_invoice') else self.transaction.seller_invoice
 
         return {
             'notShipped': {
@@ -77,6 +78,8 @@ class TrShipment(models.Model):
             'shipped':{
                 'active': self.shipped,
                 'expectedArrival': self.expected_arrival,
+                'sellerInvoiceNo': None if not seller_invoice else seller_invoice.tr_seller_invoice_no,
+                'sellerInvoiceAmount': None if not seller_invoice else seller_invoice.tr_seller_invoice_amount_usd,
                 'shipper': None if not self.shipper else self.shipper.get_description_obj(base_url),
                 'shippedOn': self.date_shipped_on,
                 'transitPorts': [] if not self.transit_port else self.transit_port

@@ -1,6 +1,6 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from doniServer.models import Transaction, TransactionChangeLog, ShippingPort, ShippingLine, Vessel, BpBasic
+from doniServer.models import Transaction, TransactionChangeLog, ShippingPort, ShippingLine, Vessel, BpBasic, TrSellerInvoice
 import dateutil.parser
 from notifications.signals import notify
 
@@ -102,6 +102,7 @@ class TransactionShipmentStatusAPI(GenericAPIView):
 
 
 class ShipmentShippedInfoAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
 
     def put(self, request, *args, **kwargs):
         try:
@@ -112,11 +113,24 @@ class ShipmentShippedInfoAPI(GenericAPIView):
             user = request.user
             transaction = Transaction.objects.get(tr_id=transaction_id)
             shipment = transaction.shipment
+            try:
+                shipper_id = shipped_data.get('shipper',{}).get('id')
+            except AttributeError:
+                shipper_id = None
 
-            shipper_id = shipped_data.get('shipper',{}).get('id')
             transit_ports = shipped_data.get('transitPorts')
             shipped_on = shipped_data.get('shippedOn')
             expected_arrival = shipped_data.get('expectedArrival')
+            seller_invoice_no = shipped_data.get('sellerInvoiceNo')
+            seller_invoice_amount = shipped_data.get('sellerInvoiceAmount')
+
+            seller_invoice = None if not hasattr(transaction, 'seller_invoice') else transaction.seller_invoice
+
+            if seller_invoice:
+                TrSellerInvoice.save_seller_invoice(seller_invoice_no,seller_invoice_amount, transaction)
+            else:
+                if seller_invoice_no and seller_invoice_amount:
+                    TrSellerInvoice.save_seller_invoice(seller_invoice_no, seller_invoice_amount, transaction)
 
             if shipped_on:
                 shipped_on = dateutil.parser.parse(str(shipped_on).replace('"', ''))
@@ -126,6 +140,7 @@ class ShipmentShippedInfoAPI(GenericAPIView):
                 expected_arrival = dateutil.parser.parse(str(expected_arrival).replace('"', ''))
                 expected_arrival = expected_arrival.replace(hour=0, minute=0, second=0, microsecond=0)
 
+            shipper = None
             if shipper_id:
                 shipper = BpBasic.objects.get(bp_id=shipper_id)
 
@@ -141,6 +156,9 @@ class ShipmentShippedInfoAPI(GenericAPIView):
                 'message': 'Shipment Arrived At Port Information Updated!'
             })
         except Exception, e:
+            import traceback
+            print traceback.format_exc()
+            print str(e)
             return Response({
                 'success': False,
                 'message': str(e)
@@ -149,6 +167,8 @@ class ShipmentShippedInfoAPI(GenericAPIView):
 
 
 class ShipmentNotShippedInfoAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
     def put(self, request, *args, **kwargs):
         try:
             data = request.data
@@ -180,6 +200,8 @@ class ShipmentNotShippedInfoAPI(GenericAPIView):
 
 
 class ShipmentApprobationReceivedInfoAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
     def put(self, request, *args, **kwargs):
         try:
             data = request.data
@@ -225,6 +247,7 @@ class ShipmentApprobationReceivedInfoAPI(GenericAPIView):
 
 class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
+
     def put(self, request, *args, **kwargs):
         try:
             data = request.data

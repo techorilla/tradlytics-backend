@@ -9,3 +9,5 @@ from trStatus import TrStatus
 from trWashout import TrWashout
 from trChangeLog import TransactionChangeLog
 from trComplete import TrComplete
+from trSellerInvoice import TrSellerInvoice
+
