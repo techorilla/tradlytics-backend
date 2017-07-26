@@ -10,6 +10,14 @@ class BusinessAppProfile(models.Model):
     class Meta:
         db_table = 'business_profile'
 
+    @property
+    def all_associated_companies_id(self):
+        associated_ids = list()
+        associated_ids.append(self.business.bp_id)
+        all_other = self.other_companies.all().values('bp_id')
+        all_other_id = [id.get('bp_id') for id in all_other]
+        return associated_ids+all_other_id
+
 
     def on_our_contract(self, business):
         return (self.business == business) or \

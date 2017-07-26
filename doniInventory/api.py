@@ -231,8 +231,34 @@ class InventoryTransactionAPI(GenericAPIView):
 
 class InventoryDashboardAPI(GenericAPIView):
     def get(self, request, *args, **kwargs):
+        total_warehouse = Warehouse.objects.count()
+        owned_warehouse = Warehouse.objects.filter(self_warehouse=True).count()
+        all_warehouses = Warehouse.objects.all()
+        all_warehouses = [warehouse.dashboard_warehouse_card() for warehouse in all_warehouses]
+
         return Response({
-            'data': {}
+            'data': {
+
+                'allWarehouse':all_warehouses
+            }
+        }, status=status.HTTP_200_OK)
+
+class WarehouseProductReportAPI(GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        warehouse_id = request.GET.get('warehouseId')
+        warehouse = Warehouse.objects.get(id=warehouse_id)
+        user = request.user
+        business = user.profile.business
+        all_products= warehouse.record.all().values('product__id', 'product__name').distinct()
+
+        product_report = []
+
+        for product in all_products:
+            product_report.append(warehouse.get_product_report(business.app_profile.all_associated_companies_id,
+                                                               product.get('product__id'), product.get('product__name')))
+
+        return Response({
+            'productReport': product_report
         }, status=status.HTTP_200_OK)
 
 

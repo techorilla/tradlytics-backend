@@ -4,6 +4,7 @@ from django.db import models
 from doniServer.models import Products, BpBasic
 from django.contrib.auth.models import User
 from datetime import timedelta
+from django.db.models import Sum
 
 # Create your models here.
 
@@ -66,9 +67,83 @@ class Warehouse(models.Model):
             'lots': self.lots,
             'selfWarehouse': self.self_warehouse,
             'totalCapacity': self.total_capacity_kgs,
-            'consumedCapacity': 'NA',
+            'consumedCapacity': self.get_current_weight_stored_in_kgs,
             'rentPer50Kg': rent_per_50kg
         }
+
+
+
+    def dashboard_warehouse_card(self):
+        capacity_consumed =  self.get_current_weight_stored_in_kgs
+        total_capacity = self.total_capacity_kgs
+        percentage_consumed = (capacity_consumed/total_capacity)*100
+        return {
+            'id':self.id,
+            'currentKgs': capacity_consumed,
+            'name': self.name,
+            'totalCapacity': total_capacity,
+            'percentageConsumed': percentage_consumed
+        }
+
+    @property
+    def get_current_weight_stored_in_kgs(self):
+        total_out_flow = self.record.filter(positive=False)\
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+
+        total_in_flow = self.record.filter(positive=True) \
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+
+        total_in_flow = total_in_flow if total_in_flow else 0.00
+        total_out_flow = total_out_flow if total_out_flow else 0.00
+        return total_in_flow - total_out_flow
+
+    def get_product_report(self, all_self_business_id, product_id, product_name):
+        total_out_flow = self.record.filter(positive=False).filter(product__id=product_id)\
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+        total_in_flow = self.record.filter(positive=True).filter(product__id=product_id) \
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+        total_in_flow = total_in_flow if total_in_flow else 0.00
+        total_out_flow = total_out_flow if total_out_flow else 0.00
+        quantity_in_stock = total_in_flow - total_out_flow
+
+        total_self_out_flow = self.record.filter(positive=False)\
+            .filter(transaction_business__bp_id__in=all_self_business_id).filter(product__id=product_id) \
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+        total_self_out_flow = total_self_out_flow if total_self_out_flow else 0.00
+
+        total_self_in_flow = self.record.filter(positive=True) \
+            .filter(transaction_business__bp_id__in=all_self_business_id).filter(product__id=product_id) \
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+        total_self_in_flow = total_self_in_flow if total_self_in_flow else 0.00
+
+        self_quantity = total_self_in_flow-total_self_out_flow
+
+        other_self_out_flow = self.record.filter(positive=False) \
+            .exclude(transaction_business__bp_id__in=all_self_business_id).filter(product__id=product_id) \
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+        other_self_out_flow = other_self_out_flow if other_self_out_flow else 0.00
+
+        other_self_in_flow = self.record.filter(positive=True) \
+            .exclude(transaction_business__bp_id__in=all_self_business_id).filter(product__id=product_id) \
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+        other_self_in_flow = other_self_in_flow if other_self_in_flow else 0.00
+
+        other_business_quantity = other_self_in_flow - other_self_out_flow
+
+        stock_percentage = (quantity_in_stock/self.get_current_weight_stored_in_kgs)*100
+
+
+
+        return {
+            'stockPercentage': stock_percentage,
+            'quantityInStock': quantity_in_stock,
+            'productName': product_name,
+            'selfQuantity': self_quantity,
+            'otherBusinessQuantityInStock': other_business_quantity
+        }
+
+
+
 
 
 class WarehouseRent(models.Model):
@@ -121,7 +196,7 @@ class WarehouseRent(models.Model):
 
 
 class InventoryTransaction(models.Model):
-    warehouse = models.ForeignKey(Warehouse, null=False)
+    warehouse = models.ForeignKey(Warehouse, null=False, related_name='record')
     lot_no = models.IntegerField(default=1)
     date = models.DateField(null=False)
     transaction_business = models.ForeignKey(BpBasic, null=True, on_delete=models.SET_NULL)

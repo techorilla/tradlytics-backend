@@ -9,5 +9,6 @@ urlpatterns = (
     url(r"^transaction/$", InventoryTransactionAPI.as_view(), name="inventory_transactions"),
     url(r"^transaction/list/$", InventoryTransactionListAPI.as_view(), name="inventory_transactions"),
     url(r"^warehouse_rent/$", WarehouseRentAPI.as_view(), name="warehouse_rent"),
+    url(r"^warehouse_product_report/$", WarehouseProductReportAPI.as_view(), name="warehouse_product_report"),
 
 )
