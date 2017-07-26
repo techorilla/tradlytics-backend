@@ -19,16 +19,21 @@ class TrShipment(models.Model):
     shipper = models.ForeignKey(BpBasic, null=True, related_name='tr_shipment_shipper')
 
     not_shipped = models.BooleanField(default=False)
+    app_received = models.BooleanField(default=False)
+    shipped = models.BooleanField(default=False)
+    arrived_at_port = models.BooleanField(default=False)
+
+
     not_shipped_reason = models.TextField(null=True)
     extension = models.DateField(default=None, null=True)
-    app_received = models.BooleanField(default=False)
+
     expected_shipment = models.DateField(default=None, null=True)
     in_transit = models.DateField(default=None, null=True)
-    shipped = models.BooleanField(default=False)
+
     date_arrived = models.DateField(default=None, null=True)
     expected_arrival = models.DateField(default=None, null=True)
     transit_port = JSONField(null=True)
-    arrived_at_port = models.BooleanField(default=False)
+
     date_arrived = models.DateField(default=None, null=True)
     date_shipped_on = models.DateField(default=None, null=True)
     actual_arrived = models.DateField(default=None, null=True)

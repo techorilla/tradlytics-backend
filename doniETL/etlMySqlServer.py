@@ -302,6 +302,35 @@ def fix_all_transaction_date_invoice_data():
             pass
 
 
-
+def update_arrived_at_port_transaction():
+    cursor = conn.cursor()
+    query = """
+                SELECT
+                      t.tr_fileID,
+                      ts.tr_transactionStatus,
+                      ts.tr_editedOn,
+                      sh.tr_dateArrived
+                FROM TransactionsStatus as ts
+                INNER JOIN dbo.Transactions as t
+                ON t.tr_transactionID = ts.tr_transactionID
+                INNER JOIN TransactionsShipment as sh
+                ON sh.tr_transactionID = ts.tr_transactionID
+                where tr_transactionStatus=\'Arrived\'
+            """
+    cursor.execute(query)
+    all = cursor.fetchall()
+    for row in cursor.fetchall():
+        try:
+            transaction = Transaction.objects.get(file_id=row[0])
+            shipment=transaction.shipment
+            shipment.not_shipped = False
+            shipment.app_received = True
+            shipment.shipped = True
+            shipment.arrived_at_port = True
+            shipment.save()
+            print 'Saved'
+        except Transaction.DoesNotExist:
+            print '%s file does not exist'%row[0]
+    return all
 
 
