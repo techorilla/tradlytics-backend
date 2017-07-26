@@ -286,10 +286,8 @@ def fix_all_transaction_date_invoice_data():
 
     for row in all_row:
         file_id = row[0]
-        date = row[1]
-
+        date = row[1]ex
         try:
-
             transaction = Transaction.objects.get(file_id=file_id)
             transaction.date = date
             if row[3]:
@@ -319,10 +317,12 @@ def update_arrived_at_port_transaction():
             """
     cursor.execute(query)
     all = cursor.fetchall()
-    for row in cursor.fetchall():
+    for row in all:
         try:
             transaction = Transaction.objects.get(file_id=row[0])
-            shipment=transaction.shipment
+            shipment= TrShipment() if not hasattr(transaction,'shipment') else transaction.shipment
+            shipment.created_by=created_by
+            shipment.transaction = transaction
             shipment.not_shipped = False
             shipment.app_received = True
             shipment.shipped = True
