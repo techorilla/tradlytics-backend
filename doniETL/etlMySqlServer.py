@@ -286,7 +286,7 @@ def fix_all_transaction_date_invoice_data():
 
     for row in all_row:
         file_id = row[0]
-        date = row[1]ex
+        date = row[1]
         try:
             transaction = Transaction.objects.get(file_id=file_id)
             transaction.date = date
