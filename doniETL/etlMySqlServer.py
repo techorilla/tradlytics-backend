@@ -12,7 +12,8 @@ conn = pymssql.connect(server, user, password, "DoniEnterprises")
 
 
 from doniServer.models.dropDowns import *
-from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission, TrComplete, TrSellerInvoice, TrWashout
+from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission, \
+    TrComplete, TrSellerInvoice, TrWashout
 
 created_by = User.objects.get(username='immadimtiaz')
 
@@ -521,6 +522,22 @@ def transfer_transaction_other_info():
             transaction.save()
         except Transaction.DoesNotExist:
             print '%s file does not exist' % row[0]
+
+
+def add_missing_transaction_status():
+    all_status = ['Shipped', 'Not Shipped', 'Arrived At Port', 'Washout At Par', 'Washout At X', 'Completed']
+
+    for status in all_status:
+        try:
+            TransactionStatus.objects.get(name=status)
+        except TransactionStatus.DoesNotExist:
+            new_status = TransactionStatus()
+            new_status.name = status
+            new_status.created_by = created_by
+            new_status.save()
+
+
+
 
 
 

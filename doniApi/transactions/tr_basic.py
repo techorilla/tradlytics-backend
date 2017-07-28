@@ -6,8 +6,99 @@ import dateutil.parser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import dateutil.parser
 from notifications.signals import notify
+from django.db.models.functions import Concat
+from django.db.models import Q, F
+import operator
+
+column_maping = {
+    'date': 'Date',
+    'buyer': 'Buyer',
+    'fileNo': 'File No',
+    'product': 'Product',
+    'origin': 'Origin',
+    'quantity': 'Quantity',
+    'rate': 'Rate',
+    'shipmentStart': 'Shipment Start',
+    'shipmentEnd': 'Shipment End'
+}
 
 
+
+BASE_TRANSACTION_LIST = {
+    'columns': [
+        'date',
+        'fileNo',
+        'buyer',
+        'product',
+        'origin',
+        'quantity',
+        'rate',
+        'shipmentStart',
+        'shipmentEnd'
+    ],
+    'restricted_columns':[
+        'expectedCommission',
+        'actualCommission'
+    ]
+}
+
+# ARRIVAL_TRANSACTION_LIST = {
+#     'columns': [
+#         'Arrival Date',
+#         'Day Since Arrival'
+#         'B/L</span> Number'
+#         'File No',
+#         'Buyer',
+#         'Product',
+#         'Origin',
+#         'Quantity <span class=\'titled\'>MT</span>',
+#         'Quantity Shipped<span class=\'titled\'>MT</span>',
+#         'Rate',
+#         'Shipment Start',
+#         'Shipment End'
+#     ],
+#     'restricted_columns':[
+#       'Seller Invoice No'
+#       'Invoice Amount <span class=\'titled\'>USD<span>',
+#       'Local Invoice No'
+#     ],
+#     'actions':['complete']
+# }
+
+# def get_transactions_list(business, start_date, end_date, list_type):
+#     Transaction.get_trades_in_date_range(business, start_date, end_date).order_by('-date') \
+#         .filter(get_business_location_query('seller')).filter(get_business_location_query('buyer'))
+#     .values
+
+
+
+def get_business_location_query(business_type):
+    location_query = [
+        (business_type + '__locations__is_primary', True),
+        (business_type + '__locations__isnull', True)
+    ]
+    location_query_list = [Q(query) for query in location_query]
+    return reduce(operator.or_, location_query_list)
+
+
+
+
+class TransactionListAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        business = user.profile.business
+        start_date = request.GET.get(u'startDate')
+        end_date = request.GET.get(u'endDate')
+        start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
+        end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
+        all_transactions = Transaction.get_trades_in_date_range(business, start_date, end_date).order_by('-date')
+        all_transactions = [trade.get_list_object() for trade in all_transactions]
+        return Response({
+            'success': True,
+            'transactions': all_transactions
+        }, status=status.HTTP_200_OK)
 
 class TransactionDropDownAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -141,23 +232,6 @@ class TransactionCompleteStatusAPI(GenericAPIView):
 
 
 
-class TransactionListAPI(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
-
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        business = user.profile.business
-        start_date = request.GET.get(u'startDate')
-        end_date = request.GET.get(u'endDate')
-        start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
-        end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
-        all_transactions = Transaction.objects.filter(date__gte=start_date.date(), date__lte=end_date.date()) \
-            .filter(created_by__profile__business=business).order_by('-date')
-        all_transactions = [trade.get_list_object() for trade in all_transactions]
-        return Response({
-            'success': True,
-            'transactions': all_transactions
-        }, status=status.HTTP_200_OK)
 
 
 class TransactionBasicAPI(GenericAPIView):

@@ -42,7 +42,7 @@ class TransactionDashboardAPI(GenericAPIView):
         date_limits = [one_year, six_month, last_month, last_week]
 
         #New Trades
-        new_trades = map(lambda end_date: Transaction.get_new_trades_in_date_range(business,end_date, today).count(), date_limits)
+        new_trades = map(lambda end_date: Transaction.get_trades_in_date_range(business,end_date, today).count(), date_limits)
         #Completed Trades
         complete_trades = map(lambda end_date: Transaction.get_all_business_completed_trades_in_date_range(business, end_date, today).count(), date_limits)
 

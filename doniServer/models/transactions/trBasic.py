@@ -88,7 +88,7 @@ class Transaction(models.Model):
             .filter(contractual_buyer__bp_id__in=all_company_ids)
 
     @classmethod
-    def get_new_trades_in_date_range(cls, business,start, end):
+    def get_trades_in_date_range(cls, business,start, end):
         return Transaction.objects.filter(created_by__profile__business=business)\
             .filter(date__lte=end).filter(date__gte=start)
 
