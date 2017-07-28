@@ -35,6 +35,7 @@ class CrashLogMiddleware(MiddlewareMixin):
             response = dict()
             response['status_code'] = 500
             response['message'] = 'Something went wrong. Please contact tramodity staff for the fix.'
+            # print log
             self.LOGGER.info('%s', str(log))
             return HttpResponse(content=json.dumps(response), content_type='application/json', status=500)
         except Exception, exc:

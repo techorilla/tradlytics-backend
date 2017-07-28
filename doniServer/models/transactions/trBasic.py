@@ -82,6 +82,51 @@ class Transaction(models.Model):
         return business_list
 
     @classmethod
+    def get_self_contract_trades(cls, business):
+        all_company_ids = business.app_profile.all_associated_companies_id
+        return Transaction.objects.filter(created_by__profile__business=business) \
+            .filter(contractual_buyer__bp_id__in=all_company_ids)
+
+    @classmethod
+    def get_new_trades_in_date_range(cls, business,start, end):
+        return Transaction.objects.filter(created_by__profile__business=business)\
+            .filter(date__lte=end).filter(date__gte=start)
+
+    @classmethod
+    def get_buyer_contract_trades_in_date_range(cls, business, start, end):
+        all_company_ids = business.app_profile.all_associated_companies_id
+        return Transaction.objects.filter(created_by__profile__business=business) \
+            .exclude(contractual_buyer__bp_id__in=all_company_ids).filter(date__lte=end).filter(date__gte=start)
+
+    @classmethod
+    def get_all_business_completed_trades_in_date_range(cls, business, start, end):
+        return Transaction.objects.filter(created_by__profile__business=business) \
+            .filter(completion_status__is_complete=True) \
+            .filter(completion_status__completion_date__lte=end).filter(completion_status__completion_date__gte=start)
+
+    @classmethod
+    def get_all_washout_trades_in_date_range(cls, business, start, end):
+        return Transaction.objects.filter(created_by__profile__business=business) \
+            .filter(washout__is_washout=True) \
+            .filter(washout__washout_date__lte=end).filter(washout__washout_date__gte=start)
+
+    @classmethod
+    def get_arrived_at_port_not_completed_in_date_range(cls, business, start, end):
+        return cls.objects.filter(created_by__profile__business=business) \
+            .filter(Q(completion_status=None) | Q(completion_status__is_complete=False)) \
+            .filter(shipment__arrived_at_port=True).filter(shipment__date_arrived__lte=end).filter(shipment__date_arrived__gte=start)
+
+    @classmethod
+    def get_all_business_completed_trades(cls, business):
+        return Transaction.objects.filter(created_by__profile__business=business) \
+            .filter(completion_status__is_complete=True)
+
+    @classmethod
+    def get_business_all_washout(cls, business):
+        return Transaction.objects.filter(created_by__profile__business=business) \
+            .filter(washout__is_washout=True)
+
+    @classmethod
     def get_not_shipped_not_washout_not_completed(cls, business):
         return cls.objects.filter(created_by__profile__business=business) \
             .filter(Q(completion_status=None) | Q(completion_status__is_complete=False)) \
