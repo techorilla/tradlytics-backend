@@ -9,6 +9,10 @@ from ..product import ProductKeyword
 from ..dropDowns import Packaging
 from jsonfield import JSONField
 from notifications.signals import notify
+from functools import reduce
+from django.db.models import Q, F
+import operator
+import pycountry
 
 
 class Transaction(models.Model):
@@ -41,6 +45,65 @@ class Transaction(models.Model):
             return 'Washout At Par'
         if self.is_washout and (self.is_washout_at != self.price):
             return 'Washout At Price <span class="titled">USD %.2f</span>'%self.is_washout_at
+
+
+    @classmethod
+    def get_business_type_drop_down_for_transaction_page(cls, business_type, business_id):
+        def country_flag(business):
+            # business['countryFlag'] = None if not business['country'] else 'flags/1x1/%s.svg' % business['country'].lower()
+            if business['country']:
+                try:
+                    business['country'] = pycountry.countries.get(alpha_2=business['country']).common_name
+                except AttributeError:
+                    business['country'] = pycountry.countries.get(alpha_2=business['country']).name
+
+
+        business_type = business_type.lower()
+        location_query = [
+            (business_type+'__locations__is_primary', True),
+            (business_type + '__locations__isnull', True)
+        ]
+        location_query_list = [Q(query) for query in location_query]
+        contact_person_query = [
+            (business_type + '__contact_persons__is_primary', True),
+            (business_type + '__contact_persons__isnull', True)
+        ]
+        contact_person_list = [Q(query) for query in contact_person_query]
+
+        business_list = cls.objects.filter(created_by__profile__business_id=business_id) \
+            .filter(reduce(operator.or_, location_query_list))\
+            .filter(reduce(operator.or_, contact_person_list)).distinct()\
+            .annotate(id=F(business_type+'__bp_id')).annotate(name=F(business_type+'__bp_name'))\
+            .annotate(country=F(business_type+'__locations__country'))\
+            .annotate(contactPerson=F(business_type+'__contact_persons__full_name'))\
+            .values('id', 'name', 'country', 'contactPerson')\
+            .order_by('name')
+        map(country_flag, business_list)
+        return business_list
+
+    @classmethod
+    def get_not_shipped_not_washout_not_completed(cls, business):
+        return cls.objects.filter(created_by__profile__business=business) \
+            .filter(Q(completion_status=None) | Q(completion_status__is_complete=False)) \
+            .filter(Q(washout=None) | Q(washout__is_washout=False)) \
+            .filter(shipment__not_shipped=True)
+
+    @classmethod
+    def get_arrived_at_port_not_completed(cls, business):
+        return cls.objects.filter(created_by__profile__business=business)\
+            .filter(Q(completion_status=None)|Q(completion_status__is_complete=False)) \
+            .filter(shipment__arrived_at_port=True)
+
+    @classmethod
+    def get_expected_arrival(cls, business):
+        return cls.objects.filter(created_by__profile__business=business) \
+                .filter(Q(completion_status=None) | Q(completion_status__is_complete=False)) \
+                .filter(shipment__shipped=True)\
+                .filter(shipment__arrived_at_port=False)
+
+
+
+
 
 
     def get_obj(self):

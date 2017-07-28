@@ -174,6 +174,10 @@ urlpatterns = (
         TransactionDashboardAPI.as_view(),
         name='Transaction Dashboard API'),
 
+    url(r'transactions/arrived_not_completed/$',
+        TransactionArrivedNotCompletedListAPI.as_view(),
+        name='Transaction_Arrived_Not_Completed'),
+
     # url(r'transactions/(?P<tr_id>[a-zA-Z0-9.@_-]+)/shipment/$',
     #     TransactionShipmentAPI.as_view(),
     #     name='Transaction Shipment'),

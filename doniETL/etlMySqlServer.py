@@ -12,7 +12,7 @@ conn = pymssql.connect(server, user, password, "DoniEnterprises")
 
 
 from doniServer.models.dropDowns import *
-from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission, TrComplete, TrSellerInvoice
+from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission, TrComplete, TrSellerInvoice, TrWashout
 
 created_by = User.objects.get(username='immadimtiaz')
 
@@ -332,5 +332,201 @@ def update_arrived_at_port_transaction():
         except Transaction.DoesNotExist:
             print '%s file does not exist'%row[0]
     return all
+
+
+
+def update_not_shipped_transaction():
+    cursor = conn.cursor()
+    query = """
+                SELECT
+                      t.tr_fileID,
+                      ts.tr_transactionStatus
+                FROM TransactionsStatus as ts
+                INNER JOIN dbo.Transactions as t
+                ON t.tr_transactionID = ts.tr_transactionID
+                where tr_transactionStatus=\'Not Shipped\'
+            """
+    cursor.execute(query)
+    all = cursor.fetchall()
+    for row in all:
+        try:
+            transaction = Transaction.objects.get(file_id=row[0])
+            shipment= TrShipment() if not hasattr(transaction,'shipment') else transaction.shipment
+            shipment.not_shipped = True
+            shipment.save()
+            print 'Saved'
+        except Transaction.DoesNotExist:
+            print '%s file does not exist'%row[0]
+    return all
+
+
+def update_shipped_transaction():
+    cursor = conn.cursor()
+    query = """
+                SELECT
+                      t.tr_fileID,
+                      ts.tr_transactionStatus,
+                      sh.tr_expectedArrival,
+                      sh.tr_dateShipped,
+                      ts.tr_editedOn
+                FROM TransactionsStatus as ts
+                INNER JOIN dbo.Transactions as t
+                ON t.tr_transactionID = ts.tr_transactionID
+                INNER JOIN TransactionsShipment as sh
+                ON sh.tr_transactionID = ts.tr_transactionID
+                where tr_transactionStatus=\'Shipped\'
+            """
+    cursor.execute(query)
+    all = cursor.fetchall()
+    for row in all:
+        try:
+            transaction = Transaction.objects.get(file_id=row[0])
+            shipment= TrShipment() if not hasattr(transaction,'shipment') else transaction.shipment
+            shipment.created_by=created_by
+            shipment.transaction = transaction
+            shipment.not_shipped = False
+            shipment.shipped = True
+            shipment.expected_arrival = row[2]
+            shipment.date_shipped_on = row[3]
+            shipment.save()
+            print 'Saved'
+        except Transaction.DoesNotExist:
+            print '%s file does not exist'%row[0]
+    return all
+
+
+def transfer_washout_at_par_data():
+    cursor = conn.cursor()
+    query = """
+                SELECT
+                  t.tr_fileID,
+                  ts.tr_washoutValueAtPar,
+                  ts.tr_transactionStatus,
+                  ts.tr_editedOn
+                FROM TransactionsStatus ts
+                INNER JOIN dbo.Transactions as t
+                ON t.tr_transactionID = ts.tr_transactionID
+                WHERE tr_transactionStatus=\'Washout at Par\'
+            """
+
+    cursor.execute(query)
+    all = cursor.fetchall()
+    for row in all:
+        try:
+            transaction = Transaction.objects.get(file_id=row[0])
+            washout = TrWashout() if not hasattr(transaction,'washout') else transaction.washout
+            washout.transaction = transaction
+            washout.initial_commission_payable = True
+            washout.is_washout = True
+            washout.washout_date = row[3]
+            washout.washout_due_date = row[3]
+            washout.seller_washout_price = transaction.price
+            washout.buyer_washout_price = transaction.price
+            washout.broker_difference = 0.00
+            washout.created_by = created_by
+            washout.save()
+        except Transaction.DoesNotExist:
+            print '%s file does not exist' % row[0]
+
+import re
+def find_buyer_seller_price(other_info, file_id):
+    other_info = other_info.lower()
+    buyer_pos = other_info.find('buyer')
+    seller_pos = other_info.find('seller')
+
+    if buyer_pos == -1 and seller_pos == -1:
+        print 'No rates found %s'%file_id
+        return None, None
+    elif buyer_pos >-1 and seller_pos>-1:
+        if buyer_pos < seller_pos:
+            buyer_str = other_info[buyer_pos:seller_pos]
+            seller_st = other_info[seller_pos:]
+        else:
+            buyer_str = other_info[buyer_pos:]
+            seller_st = other_info[seller_pos: buyer_pos]
+        try:
+            return re.findall('\d+\.?\d?',buyer_str)[0], re.findall('\d+\.?\d?',seller_st)[0]
+        except IndexError:
+            try:
+                return re.findall('\d+\.?\d?', seller_st)[0],  re.findall('\d+\.?\d?',seller_st)[0]
+            except IndexError:
+                return re.findall('\d+\.?\d?', buyer_str)[0], re.findall('\d+\.?\d?', buyer_str)[0]
+    else:
+        'Only one found %s'%file_id
+        return None, None
+
+
+
+
+def transfer_washout_at_x_data():
+    cursor = conn.cursor()
+    query = """
+                SELECT
+                  t.tr_fileID,
+                  ts.tr_washoutValueAtPar,
+                  ts.tr_transactionStatus,
+                  ts.tr_editedOn
+                FROM TransactionsStatus ts
+                INNER JOIN dbo.Transactions as t
+                ON t.tr_transactionID = ts.tr_transactionID
+                WHERE tr_transactionStatus=\'Washout at X\'
+            """
+
+    cursor.execute(query)
+    all = cursor.fetchall()
+    for row in all:
+        try:
+            transaction = Transaction.objects.get(file_id=row[0])
+            other_info = transaction.other_info
+            buyer_price, seller_price = find_buyer_seller_price(other_info, row[0])
+            washout = TrWashout() if not hasattr(transaction,'washout') else transaction.washout
+            washout.transaction = transaction
+            washout.initial_commission_payable = True
+            washout.is_washout = True
+            washout.washout_date = row[3]
+            washout.washout_due_date = row[3]
+            washout.created_by = created_by
+            washout.updated_by = created_by
+            if buyer_price and seller_price:
+                washout.seller_washout_price = float(buyer_price)
+                washout.buyer_washout_price = float(seller_price)
+                washout.broker_difference = float(seller_price) - float(buyer_price)
+            else:
+                washout.buyer_washout_price = row[1]
+                washout.seller_washout_price = row[1]
+                washout.broker_difference = 0.00
+
+            washout.save()
+        except Transaction.DoesNotExist:
+            print '%s file does not exist' % row[0]
+
+
+
+
+def transfer_transaction_other_info():
+    cursor = conn.cursor()
+    query = """
+                    SELECT
+                      t.tr_fileID,
+                      t.tr_other_info
+                    FROM dbo.Transactions as t
+                """
+
+    cursor.execute(query)
+    all = cursor.fetchall()
+    for row in all:
+        try:
+            transaction = Transaction.objects.get(file_id=row[0])
+            transaction.other_info = row[1]
+            transaction.save()
+        except Transaction.DoesNotExist:
+            print '%s file does not exist' % row[0]
+
+
+
+
+
+
+
 
 
