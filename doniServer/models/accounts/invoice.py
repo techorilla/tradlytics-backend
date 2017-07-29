@@ -26,7 +26,7 @@ class IntTradeInvoice(models.Model):
 
     invoice_items = JSONField(null=False)
     invoice_amount = models.FloatField(default=0.00, null=False)
-
+    weight_in_mt = models.FloatField(default=0.00, null=True)
     weight_in_kg = models.FloatField(null=False, default=0.00)
     rate_per_kg = models.FloatField(null=False, default=0.00)
     currency = models.CharField(max_length=20, null=False, default='PKR')
@@ -53,6 +53,7 @@ class IntTradeInvoice(models.Model):
         quantity = trade.commission.quantity_shipped if trade.commission.quantity_shipped else trade.quantity
         currency = business.app_profile.currency
         self.currency = currency
+        self.weight_in_mt = quantity
         self.weight_in_kg = quantity*1000
         self.rate_per_kg = float(self.invoice_amount / self.weight_in_kg)
         super(IntTradeInvoice, self).save()

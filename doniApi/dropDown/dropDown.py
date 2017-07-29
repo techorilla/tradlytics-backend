@@ -11,6 +11,7 @@ from django.conf import settings
 from doniCore import Utilities
 from dateutil.relativedelta import relativedelta
 from datetime import datetime as dt
+from django.db.models import Q, F
 import dateutil.parser
 from doniCore import cache_results
 
@@ -26,7 +27,7 @@ class SimpleDropDownAPI(GenericAPIView):
         if q == 'all' or q == 'drop_down':
             result_objects = self.model.objects.filter(created_by__profile__business=business)
             if q == 'all':
-                results = [res.get_list_obj() for res in result_objects]
+                results = [res.drop_down_obj() if not hasattr(res, 'get_list_obj') else res.get_list_obj() for res in result_objects]
             else:
                 results = [res.drop_down_obj() for res in result_objects]
             return Response({'list': results}, status=status.HTTP_200_OK)
@@ -90,7 +91,7 @@ class BusinessDropDownAPI(GenericAPIView):
 
     # @cache_results
     def get_all_business_drop_down(self, type, page, business_id):
-        if not str(page):
+        if not page:
             return BpBasic.get_drop_down_obj(type)
         else:
             return Transaction.get_business_type_drop_down_for_transaction_page(type, business_id)
@@ -344,6 +345,25 @@ class ShippingPortDDAPI(GenericAPIView):
         all_ports = [port.get_drop_down_obj() for port in all_ports]
         return Response({
             'list': all_ports
+        }, status=status.HTTP_200_OK)
+
+
+class TransactionDropDownAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        file_id = str(request.GET.get('fileId'))
+        print file_id
+        user = request.user
+        transaction_list = Transaction.objects.filter(created_by__profile__business=user.profile.business)\
+            .filter(file_id__istartswith=file_id) \
+            .annotate(fileId=F('file_id')) \
+            .annotate(contractId=F('contract_id')) \
+            .annotate(blNo=F('shipment__bl_no')) \
+            .values('fileId','contractId', 'blNo')
+
+        return Response({
+            'transactionList': transaction_list
         }, status=status.HTTP_200_OK)
 
 

@@ -132,8 +132,6 @@ class Warehouse(models.Model):
 
         stock_percentage = (quantity_in_stock/self.get_current_weight_stored_in_kgs)*100
 
-
-
         return {
             'stockPercentage': stock_percentage,
             'quantityInStock': quantity_in_stock,
@@ -141,6 +139,54 @@ class Warehouse(models.Model):
             'selfQuantity': self_quantity,
             'otherBusinessQuantityInStock': other_business_quantity
         }
+
+    def get_business_product_report(self, business_id, business_name):
+        quantity_in_stock, business_in_flow, business_out_flow = self.get_business_quantity_details(business_id)
+        product_flow = self.get_business_product_distribution(business_id, quantity_in_stock)
+        return {
+            'productFlow': product_flow,
+            'business_name': business_name,
+            'businessInFlow': business_in_flow,
+            'businessOutFlow': business_out_flow,
+            'quantityInStock': quantity_in_stock,
+            'quantityPercentage': float(quantity_in_stock/self.get_current_weight_stored_in_kgs)*100
+        }
+
+
+
+    def get_business_product_distribution(self, business_id, quantity_in_stock=None):
+
+        business_product_in_flow = self.record.filter(positive=True).filter(transaction_business__bp_id=business_id) \
+            .values('product__id', 'product__name')\
+            .annotate(Sum('trucks__weight_in_kg'))
+
+        business_product_out_flow = self.record.filter(positive=False).filter(transaction_business__bp_id=business_id) \
+            .values('product__id', 'product__name') \
+            .annotate(Sum('trucks__weight_in_kg'))
+
+        def get_flow_objects(in_flow):
+            out_flow = next((flow for flow in business_product_out_flow if flow['product__id'] == in_flow['product__id']), None)
+            print in_flow, out_flow
+            trucks_out_flow = 0.00 if not out_flow else out_flow.get('trucks__weight_in_kg__sum', 0.00)
+            in_flow['truckOutFlow'] = trucks_out_flow
+            in_flow['truckInFlow'] = in_flow.get('trucks__weight_in_kg__sum', 0.00)
+            in_flow['currentQuantity'] = in_flow['truckInFlow'] - in_flow['truckOutFlow']
+            if quantity_in_stock:
+                in_flow['quantityPercentage'] = (in_flow['currentQuantity']/quantity_in_stock)*100
+            return in_flow
+        return map(get_flow_objects, business_product_in_flow)
+
+    def get_business_quantity_details(self, business_id):
+        business_out_flow = self.record.filter(positive=False).filter(transaction_business__bp_id=business_id) \
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+        business_in_flow = self.record.filter(positive=True).filter(transaction_business__bp_id=business_id) \
+            .aggregate(Sum('trucks__weight_in_kg')).get('trucks__weight_in_kg__sum', 0.00)
+        business_out_flow = business_out_flow if business_out_flow else 0.00
+        business_in_flow = business_in_flow if business_in_flow else 0.00
+        business_quantity_in_stock = business_in_flow - business_out_flow
+        return business_quantity_in_stock, business_in_flow, business_out_flow
+
+
 
 
 

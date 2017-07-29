@@ -100,15 +100,7 @@ class TransactionListAPI(GenericAPIView):
             'transactions': all_transactions
         }, status=status.HTTP_200_OK)
 
-class TransactionDropDownAPI(GenericAPIView):
-    permission_classes = (IsAuthenticated,)
 
-    def get(self, request, *args, **kwargs):
-        user=request.user
-        print request.get
-        return Response({
-            'transactionList': []
-        }, status=status.HTTP_200_OK)
 
 
 class TransactionWashoutAPI(GenericAPIView):

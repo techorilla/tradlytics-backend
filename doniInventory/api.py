@@ -238,7 +238,8 @@ class InventoryDashboardAPI(GenericAPIView):
 
         return Response({
             'data': {
-
+                'totalWarehouseCount': total_warehouse,
+                'ownedWarehouseCount': owned_warehouse,
                 'allWarehouse':all_warehouses
             }
         }, status=status.HTTP_200_OK)
@@ -250,17 +251,32 @@ class WarehouseProductReportAPI(GenericAPIView):
         user = request.user
         business = user.profile.business
         all_products= warehouse.record.all().values('product__id', 'product__name').distinct()
+        all_associated_ids = business.app_profile.all_associated_companies_id
 
         product_report = []
 
         for product in all_products:
-            product_report.append(warehouse.get_product_report(business.app_profile.all_associated_companies_id,
-                                                               product.get('product__id'), product.get('product__name')))
+            product_report.append(warehouse.get_product_report(all_associated_ids, product.get('product__id'), product.get('product__name')))
 
         return Response({
             'productReport': product_report
         }, status=status.HTTP_200_OK)
 
+class WarehouseBusinessReportAPI(GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            warehouse_id = request.GET.get('warehouseId')
+            warehouse = Warehouse.objects.get(id=warehouse_id)
+            all_business = warehouse.record.all().values('transaction_business__bp_id', 'transaction_business__bp_name').distinct()
+            business_report = []
+            print all_business
 
+            for business in all_business:
+                business_report.append(warehouse.get_business_product_report(business.get('transaction_business__bp_id'), business.get('transaction_business__bp_name')))
 
-
+            return Response({
+                'businessReport': business_report
+            }, status=status.HTTP_200_OK)
+        except Exception, e:
+            import traceback
+            traceback.print_exc()

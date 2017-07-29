@@ -11,6 +11,10 @@ urlpatterns = (
 
     # Business Partner Related API
 
+    url(r'^transaction/$',
+        TransactionDropDownAPI.as_view(),
+        name='Commission Type'),
+
     url(r'^commission_type/$',
         CommissionTypeAPI.as_view(),
         name='Commission Type'),

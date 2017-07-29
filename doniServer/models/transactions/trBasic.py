@@ -13,6 +13,7 @@ from functools import reduce
 from django.db.models import Q, F
 import operator
 import pycountry
+import re
 
 
 class Transaction(models.Model):
@@ -45,6 +46,9 @@ class Transaction(models.Model):
             return 'Washout At Par'
         if self.is_washout and (self.is_washout_at != self.price):
             return 'Washout At Price <span class="titled">USD %.2f</span>'%self.is_washout_at
+
+    def delete(self):
+        super(Transaction, self).save()
 
 
     @classmethod
@@ -295,5 +299,20 @@ def my_handler(sender, instance, created, **kwargs):
                     state_params={'id': instance.file_id}, user_image=user.profile.get_profile_pic())
 
 post_save.connect(my_handler, sender=Transaction)
+
+
+
+class PrimaryTrade(models.Model):
+    transaction = models.OneToOneField(
+        Transaction,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='secondary_trade'
+    )
+    primary_trade = models.ForeignKey(Transaction, null=False, related_name='primary_trade')
+
+    class Meta:
+        db_table = 'transaction_primary_trades'
+
 
 

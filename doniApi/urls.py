@@ -114,10 +114,6 @@ urlpatterns = (
         ShipmentNotShippedInfoAPI.as_view(),
         name='Transaction Not Shipped Info'),
 
-    url(r'transaction/list/dropdown/$',
-        TransactionDropDownAPI.as_view(),
-        name='Transaction List Dropdown'),
-
     url(r'transactions/basic/$',
         TransactionBasicAPI.as_view(),
         name='Transaction Basic'),
