@@ -164,9 +164,12 @@ class Warehouse(models.Model):
             .values('product__id', 'product__name') \
             .annotate(Sum('trucks__weight_in_kg'))
 
+        in_flow_for_out_flow_found = []
+
         def get_flow_objects(in_flow):
             out_flow = next((flow for flow in business_product_out_flow if flow['product__id'] == in_flow['product__id']), None)
-            print in_flow, out_flow
+            if out_flow:
+                in_flow_for_out_flow_found.append(out_flow['product__id'])
             trucks_out_flow = 0.00 if not out_flow else out_flow.get('trucks__weight_in_kg__sum', 0.00)
             in_flow['truckOutFlow'] = trucks_out_flow
             in_flow['truckInFlow'] = in_flow.get('trucks__weight_in_kg__sum', 0.00)
@@ -174,7 +177,20 @@ class Warehouse(models.Model):
             if quantity_in_stock:
                 in_flow['quantityPercentage'] = (in_flow['currentQuantity']/quantity_in_stock)*100
             return in_flow
-        return map(get_flow_objects, business_product_in_flow)
+
+        product_distribution = map(get_flow_objects, business_product_in_flow)
+
+        out_flow_with_no_in_flow_found = [flow for flow in business_product_out_flow if flow['product__id'] not in in_flow_for_out_flow_found]
+
+        def add_out_flow_with_no_inflow(out_flow):
+            out_flow['truckOutFlow'] = 0.00 if not out_flow else out_flow.get('trucks__weight_in_kg__sum', 0.00)
+            out_flow['truckInFlow'] = 0.00
+            out_flow['currentQuantity'] = 0.00
+            out_flow['quantityPercentage'] = 0.00
+            product_distribution.append(out_flow)
+
+        map(add_out_flow_with_no_inflow, out_flow_with_no_in_flow_found)
+        return product_distribution
 
     def get_business_quantity_details(self, business_id):
         business_out_flow = self.record.filter(positive=False).filter(transaction_business__bp_id=business_id) \
