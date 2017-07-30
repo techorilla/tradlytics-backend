@@ -122,10 +122,16 @@ class InventoryTransactionListAPI(GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         business = request.user.profile.business
-        all_inventory_transactions = InventoryTransaction.objects.filter(created_by__profile__business=business) \
+        start_date = request.GET.get(u'startDate')
+        end_date = request.GET.get(u'endDate')
+        start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
+        end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
+        all_inventory_transactions = InventoryTransaction.objects\
+            .filter(date__lte=end_date).filter(date__gte=start_date)\
+            .filter(created_by__profile__business=business) \
             .annotate(total_weight_in_kgs=Sum('trucks__weight_in_kg')).annotate(total_trucks=Count('trucks')) \
             .order_by('-date')\
-            .values('id','date','warehouse__id', 'warehouse__name', 'lot_no', 'fcl_quantity', 'positive', 'product__name',
+            .values('id','date','warehouse__id', 'warehouse__name', 'lot_no', 'fcl_quantity', 'positive', 'product__id', 'product__name',
                     'total_weight_in_kgs','total_trucks', 'transaction_business__bp_id', 'transaction_business__bp_name')
         return Response({
             'list': all_inventory_transactions
@@ -231,16 +237,26 @@ class InventoryTransactionAPI(GenericAPIView):
 
 class InventoryDashboardAPI(GenericAPIView):
     def get(self, request, *args, **kwargs):
+        user = request.user
+        business = user.profile.business
+        all_business_ids = business.app_profile.all_associated_companies_id
         total_warehouse = Warehouse.objects.count()
         owned_warehouse = Warehouse.objects.filter(self_warehouse=True).count()
         all_warehouses = Warehouse.objects.all()
         all_warehouses = [warehouse.dashboard_warehouse_card() for warehouse in all_warehouses]
+        all_warehouse_product = InventoryTransactionTruckFlow.get_product_report_for_all_warehouse()
+        own_warehouse_product = InventoryTransactionTruckFlow.get_product_report_for_all_warehouse()
+        business_product_report = InventoryTransactionTruckFlow.get_all_warehouse_butsiness_product_report(business_ids=all_business_ids)
+
 
         return Response({
             'data': {
                 'totalWarehouseCount': total_warehouse,
                 'ownedWarehouseCount': owned_warehouse,
-                'allWarehouse':all_warehouses
+                'allWarehouse':all_warehouses,
+                'allWarehousesProduct': all_warehouse_product,
+                'ownWarehouseProduct': own_warehouse_product,
+                'businessProductReport': business_product_report
             }
         }, status=status.HTTP_200_OK)
 

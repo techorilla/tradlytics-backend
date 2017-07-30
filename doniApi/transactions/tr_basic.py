@@ -155,9 +155,6 @@ class TransactionWashoutAPI(GenericAPIView):
             washout.broker_difference = float(broker_difference.replace(',',''))
             washout.save()
 
-
-            print washout.get_description_obj()
-
             return Response({
                 'transactionObj': transaction.get_complete_obj(base_url, user),
                 'success': True,

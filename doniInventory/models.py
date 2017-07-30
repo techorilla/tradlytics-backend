@@ -4,7 +4,9 @@ from django.db import models
 from doniServer.models import Products, BpBasic
 from django.contrib.auth.models import User
 from datetime import timedelta
-from django.db.models import Sum
+from django.db.models import Sum, F
+from django.db.models import CharField, Case, Value, When
+from django.db.models import IntegerField
 
 # Create your models here.
 
@@ -152,8 +154,6 @@ class Warehouse(models.Model):
             'quantityPercentage': float(quantity_in_stock/self.get_current_weight_stored_in_kgs)*100
         }
 
-
-
     def get_business_product_distribution(self, business_id, quantity_in_stock=None):
 
         business_product_in_flow = self.record.filter(positive=True).filter(transaction_business__bp_id=business_id) \
@@ -201,12 +201,6 @@ class Warehouse(models.Model):
         business_in_flow = business_in_flow if business_in_flow else 0.00
         business_quantity_in_stock = business_in_flow - business_out_flow
         return business_quantity_in_stock, business_in_flow, business_out_flow
-
-
-
-
-
-
 
 class WarehouseRent(models.Model):
     warehouse = models.ForeignKey(Warehouse, null=False, related_name='warehouse_rent')
@@ -256,7 +250,6 @@ class WarehouseRent(models.Model):
     def __unicode__(self):
         return '%s:%s:%s'%(self.warehouse.name, self.date_change, self.rent)
 
-
 class InventoryTransaction(models.Model):
     warehouse = models.ForeignKey(Warehouse, null=False, related_name='record')
     lot_no = models.IntegerField(default=1)
@@ -293,7 +286,6 @@ class InventoryTransaction(models.Model):
     def __unicode__(self):
         return '%s:%s:%s'%(self.date, self.product.name,self.fcl_quantity)
 
-
 class InventoryTransactionTruckFlow(models.Model):
     date = models.DateField(null=False)
     transaction = models.ForeignKey(InventoryTransaction, null=False, related_name='trucks')
@@ -313,6 +305,52 @@ class InventoryTransactionTruckFlow(models.Model):
             'weightInKg': self.weight_in_kg,
             'remarks': self.remarks
         }
+
+    @classmethod
+    def get_all_warehouse_butsiness_product_report(cls, business_ids=[]):
+        queryset = cls.objects.filter(transaction__transaction_business__bp_id__in=business_ids)\
+            .values('transaction__product__id', 'transaction__product__name').annotate(
+            in_flow_all=Sum(
+                Case(When(transaction__positive=True, then=F('weight_in_kg')), output_field=IntegerField())
+            ),
+            out_flow_all=Sum(
+                Case(When(transaction__positive=False, then=F('weight_in_kg')), output_field=IntegerField())
+            )
+        )
+
+        def get_total_quantity(item):
+            in_flow = 0.00 if not item['in_flow_all'] else item['in_flow_all']
+            out_flow = 0.00 if not item['out_flow_all'] else item['out_flow_all']
+            item['totalQuantity'] = in_flow - out_flow
+
+        map(get_total_quantity, queryset)
+        return queryset
+
+    @classmethod
+    def get_product_report_for_all_warehouse(cls, own=False):
+        queryset = cls.objects if own else cls.objects.filter(transaction__warehouse__self_warehouse=True)
+
+        queryset =  queryset.values('transaction__product__id', 'transaction__product__name').annotate(
+            in_flow_all=Sum(
+                Case(When(transaction__positive=True, then=F('weight_in_kg')), output_field=IntegerField())
+            ),
+            out_flow_all=Sum(
+                Case(When(transaction__positive=False, then=F('weight_in_kg')), output_field=IntegerField())
+            )
+        )
+
+        def get_total_quantity(item):
+            in_flow = 0.00 if not item['in_flow_all'] else item['in_flow_all']
+            out_flow = 0.00 if not item['out_flow_all'] else item['out_flow_all']
+            item['totalQuantity'] = in_flow - out_flow
+
+        map(get_total_quantity, queryset)
+        return queryset
+
+
+
+
+
 
     def __unicode__(self):
         return '%s:%s:%s'%(self.date, self.truck_no, self.weight_in_kg)

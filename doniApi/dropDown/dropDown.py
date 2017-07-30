@@ -25,7 +25,7 @@ class SimpleDropDownAPI(GenericAPIView):
         business = Utilities.get_user_business(user)
         q = request.GET.get('q')
         if q == 'all' or q == 'drop_down':
-            result_objects = self.model.objects.filter(created_by__profile__business=business)
+            result_objects = self.model.objects.filter(created_by__profile__business=business).order_by('name')
             if q == 'all':
                 results = [res.drop_down_obj() if not hasattr(res, 'get_list_obj') else res.get_list_obj() for res in result_objects]
             else:
