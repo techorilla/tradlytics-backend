@@ -245,7 +245,7 @@ class InventoryDashboardAPI(GenericAPIView):
         all_warehouses = Warehouse.objects.all()
         all_warehouses = [warehouse.dashboard_warehouse_card() for warehouse in all_warehouses]
         all_warehouse_product = InventoryTransactionTruckFlow.get_product_report_for_all_warehouse()
-        own_warehouse_product = InventoryTransactionTruckFlow.get_product_report_for_all_warehouse()
+        own_warehouse_product = InventoryTransactionTruckFlow.get_product_report_for_all_warehouse(own=True)
         business_product_report = InventoryTransactionTruckFlow.get_all_warehouse_butsiness_product_report(business_ids=all_business_ids)
 
 
