@@ -327,6 +327,7 @@ def update_arrived_at_port_transaction():
             shipment.not_shipped = False
             shipment.app_received = True
             shipment.shipped = True
+            shipment.date_arrived = row[3]
             shipment.arrived_at_port = True
             shipment.save()
             print 'Saved'
