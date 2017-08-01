@@ -10,66 +10,32 @@ from django.db.models.functions import Concat
 from django.db.models import Q, F
 import operator
 
-column_maping = {
-    'date': 'Date',
-    'buyer': 'Buyer',
-    'fileNo': 'File No',
-    'product': 'Product',
-    'origin': 'Origin',
-    'quantity': 'Quantity',
-    'rate': 'Rate',
-    'shipmentStart': 'Shipment Start',
-    'shipmentEnd': 'Shipment End'
+QUERY_MAPPING = {
+    'id':'tr_id',
+    'date': 'date',
+    'rate':'price',
+    'quantity':'quantity',
+    'shipmentStart':'shipment_start',
+    'shipmentEnd':'shipment_end',
+    'productName':'product_item__product_origin__product__name',
+    'buyerName': 'buyer__bp_name',
+    'buyerId': 'buyer__bp_id',
+    'sellerId': 'seller__bp_id',
+    'productItemId': 'product_item__id',
+    'sellerName': 'seller__bp_name',
+    'fileNo':'file_id',
+    'expectedCommission': 'commission__expected_commission',
+    'actualCommission': 'commission__actual_commission',
+    'productOriginName': 'product_item__product_origin__country_name',
+    'productOriginFlag': 'product_item__product_origin__country_flag',
+    'buyerCountry': 'buyer__locations__country_name',
+    'sellerCountry': 'seller__locations__country_name',
+    'contractNo': 'contract_id',
+    'blNo':'shipment__bl_no',
+    'dateArrived': 'shipment__date_arrived',
+    'expectedArrival': 'shipment__expected_arrival',
+    'shipmentExpiration': 'shipment_end'
 }
-
-
-
-BASE_TRANSACTION_LIST = {
-    'columns': [
-        'date',
-        'fileNo',
-        'buyer',
-        'product',
-        'origin',
-        'quantity',
-        'rate',
-        'shipmentStart',
-        'shipmentEnd'
-    ],
-    'restricted_columns':[
-        'expectedCommission',
-        'actualCommission'
-    ]
-}
-
-# ARRIVAL_TRANSACTION_LIST = {
-#     'columns': [
-#         'Arrival Date',
-#         'Day Since Arrival'
-#         'B/L</span> Number'
-#         'File No',
-#         'Buyer',
-#         'Product',
-#         'Origin',
-#         'Quantity <span class=\'titled\'>MT</span>',
-#         'Quantity Shipped<span class=\'titled\'>MT</span>',
-#         'Rate',
-#         'Shipment Start',
-#         'Shipment End'
-#     ],
-#     'restricted_columns':[
-#       'Seller Invoice No'
-#       'Invoice Amount <span class=\'titled\'>USD<span>',
-#       'Local Invoice No'
-#     ],
-#     'actions':['complete']
-# }
-
-# def get_transactions_list(business, start_date, end_date, list_type):
-#     Transaction.get_trades_in_date_range(business, start_date, end_date).order_by('-date') \
-#         .filter(get_business_location_query('seller')).filter(get_business_location_query('buyer'))
-#     .values
-
 
 
 def get_business_location_query(business_type):
@@ -81,23 +47,273 @@ def get_business_location_query(business_type):
     return reduce(operator.or_, location_query_list)
 
 
+TRADE_BOOK_LIST = {
+    'columns': [
+        'id',
+        'date',
+        'fileNo',
+        'productName',
+        'buyerName',
+        'buyerId',
+        'sellerName',
+        'sellerId',
+        'productItemId',
+        'quantity',
+        'rate',
+        'productOriginName',
+        'productOriginFlag',
+        'shipmentStart',
+        'shipmentEnd'
+    ],
+    'query_columns':{
+        'buyerCountry': get_business_location_query('buyer'),
+        'sellerCountry': get_business_location_query('seller')
+    },
+
+    'restricted_columns':[
+        {
+            'right': 'right_business_commission',
+            'columns':[
+                'expectedCommission',
+                'actualCommission'
+            ],
+            'column_header': [
+                {
+                    'name':'Expected Commission  <span class=\'titled\'>USD</span>',
+                    'sort': 'expectedCommission'
+                },
+                {
+                    'name':'Actual Commission  <span class=\'titled\'>USD</span>',
+                    'sort': 'actualCommission'
+                },
+
+            ]
+
+        }
+    ],
+    'order_by':'-date',
+    'column_header': [
+        {'name':'Date', 'sort':'date'},
+        {'name':'File No', 'sort':'fileNo'},
+        {'name':'Buyer', 'sort':'buyerName'},
+        {'name':'Product', 'sort':'productName'},
+        {'name':'Origin', 'sort':'productOriginName'},
+        {'name':'Quantity <span class=\'titled\'>MT</span>', 'sort':'quantity'},
+        {'name':'Rate <span class=\'titled\'>USD</span>', 'sort':'rate'},
+        {'name':'Seller', 'sort':'sellerName'},
+        {'name':'Shipment Start', 'sort':'shipmentStart'},
+        {'name':'Shipment End', 'sort':'shipmentEnd'}
+    ]
+}
+
+
+ARRIVED_LIST = {
+    'columns': [
+        'id',
+        'fileNo',
+        'productName',
+        'buyerName',
+        'buyerId',
+        'sellerName',
+        'sellerId',
+        'productItemId',
+        'quantity',
+        'rate',
+        'productOriginName',
+        'productOriginFlag',
+        'contractNo',
+        'blNo',
+        'dateArrived'
+    ],
+    'query_columns':{
+        'buyerCountry': get_business_location_query('buyer'),
+        'sellerCountry': get_business_location_query('seller')
+    },
+    'order_by':'-shipment__date_arrived',
+    'column_header': [
+        {'name':'Date Arrived', 'sort':'dateArrived'},
+        {'name':'Arrived Since', 'sort':None},
+        {'name': 'File No', 'sort': 'fileNo'},
+        {'name':'BL No.', 'sort':'blNo'},
+        {'name':'Contract No.', 'sort':'contractNo'},
+        {'name':'Buyer', 'sort':'buyerName'},
+        {'name':'Product', 'sort':'productName'},
+        {'name':'Origin', 'sort':'productOriginName'},
+        {'name':'Seller', 'sort':'sellerName'},
+        {'name':'Quantity <span class=\'titled\'>MT</span>', 'sort':'quantity'},
+        {'name':'Rate <span class=\'titled\'>USD</span>', 'sort':'rate'}
+    ]
+}
+
+EXPECTED_ARRIVAL_LIST = {
+    'order_by':'-expectedArrival',
+    'columns': [
+        'id',
+        'fileNo',
+        'productName',
+        'buyerName',
+        'buyerId',
+        'sellerName',
+        'sellerId',
+        'productItemId',
+        'quantity',
+        'rate',
+        'productOriginName',
+        'productOriginFlag',
+        'contractNo',
+        'blNo',
+        'expectedArrival'
+    ],
+    'query_columns':{
+        'buyerCountry': get_business_location_query('buyer'),
+        'sellerCountry': get_business_location_query('seller')
+    },
+    'column_header': [
+        {'name': 'Expected Arrival', 'sort': 'expectedArrival'},
+        {'name': 'Expected Since', 'sort': None},
+
+        {'name': 'File No', 'sort': 'fileNo'},
+        {'name': 'BL No.', 'sort': 'blNo'},
+        {'name': 'Contract No.', 'sort': 'contractNo'},
+        {'name': 'Buyer', 'sort': 'buyerName'},
+        {'name': 'Product', 'sort': 'productName'},
+        {'name': 'Origin', 'sort': 'productOriginName'},
+        {'name': 'Seller', 'sort': 'sellerName'},
+        {'name': 'Quantity <span class=\'titled\'>MT</span>', 'sort': 'quantity'},
+        {'name': 'Rate <span class=\'titled\'>USD</span>', 'sort': 'rate'}
+    ]
+}
+
+SHIPMENT_EXPIRATION_LIST = {
+    'columns': [
+        'id',
+        'fileNo',
+        'productName',
+        'buyerName',
+        'buyerId',
+        'sellerName',
+        'sellerId',
+        'productItemId',
+        'quantity',
+        'rate',
+        'productOriginName',
+        'productOriginFlag',
+        'contractNo',
+        'blNo',
+        'shipmentExpiration'
+    ],
+    'order_by': '-shipmentExpiration',
+    'query_columns':{
+        'buyerCountry': get_business_location_query('buyer'),
+        'sellerCountry': get_business_location_query('seller')
+    },
+    'column_header': [
+        {'name': 'Expired On', 'sort': 'shipmentExpiration'},
+        {'name': 'Expired Since', 'sort': None},
+
+        {'name': 'File No', 'sort': 'fileNo'},
+        {'name': 'BL No.', 'sort': 'blNo'},
+        {'name': 'Contract No.', 'sort': 'contractNo'},
+        {'name': 'Buyer', 'sort': 'buyerName'},
+        {'name': 'Product', 'sort': 'productName'},
+        {'name': 'Origin', 'sort': 'productOriginName'},
+        {'name': 'Seller', 'sort': 'sellerName'},
+        {'name': 'Quantity <span class=\'titled\'>MT</span>', 'sort': 'quantity'},
+        {'name': 'Rate <span class=\'titled\'>USD</span>', 'sort': 'rate'}
+    ]
+}
+
+
+TRANSACTION_LIST_CONFIG = {
+    'tradeBook': TRADE_BOOK_LIST,
+    'expectedArrival': EXPECTED_ARRIVAL_LIST,
+    'arrivedList': ARRIVED_LIST,
+    'expiredShipment': SHIPMENT_EXPIRATION_LIST
+}
+
+
+
+
+
+
+
+
+class TransactionListReportAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        user=request.user
+        business = user.profile.business
+
+
+
 
 
 class TransactionListAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
+    @staticmethod
+    def get_transaction_list(queryset, page_type, user):
+        page_config = TRANSACTION_LIST_CONFIG[page_type]
+        values = list()
+        annotate_obj = dict()
+        column_header = []
+        for column in page_config['columns']:
+            query_map = QUERY_MAPPING[column]
+            values.append(query_map)
+            if column != query_map:
+                annotate_obj[column] = F(query_map)
+        column_header = page_config['column_header']
+        restricted = page_config.get('restricted_columns', [])
+
+        for restrict in restricted:
+            if getattr(user.profile, restrict['right']):
+                for column in restrict['columns']:
+                    query_map = QUERY_MAPPING[column]
+                    values.append(query_map)
+                    if column != query_map:
+                        annotate_obj[column] = F(query_map)
+                column_header = column_header + restrict['column_header']
+
+        query_columns = page_config.get('query_columns', [])
+
+        for column, query in query_columns.items():
+            values.append(QUERY_MAPPING[column])
+            if column != query_map:
+                annotate_obj[column] = F(QUERY_MAPPING[column])
+                queryset = queryset.filter(query)
+                queryset = queryset.filter(query)
+
+            queryset = queryset.values(*values).annotate(**annotate_obj)
+        return queryset.order_by(*[page_config['order_by']]), column_header
+
     def get(self, request, *args, **kwargs):
         user = request.user
         business = user.profile.business
+        page_type = request.GET.get(u'pageType')
+
         start_date = request.GET.get(u'startDate')
         end_date = request.GET.get(u'endDate')
-        start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
-        end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
-        all_transactions = Transaction.get_trades_in_date_range(business, start_date, end_date).order_by('-date')
-        all_transactions = [trade.get_list_object() for trade in all_transactions]
+
+        if page_type == 'tradeBook':
+            if end_date and start_date:
+                start_date = dateutil.parser.parse(str(start_date).replace('"', ''))
+                end_date = dateutil.parser.parse(str(end_date).replace('"', ''))
+                all_transaction = Transaction.get_trades_in_date_range(business, start_date, end_date)
+            else:
+                all_transaction = Transaction.objects
+        elif page_type == 'expectedArrival':
+            all_transaction = Transaction.get_expected_arrival(business)
+        elif page_type == 'arrivedList':
+            all_transaction = Transaction.get_arrived_at_port_not_completed(business)
+        elif page_type == 'expiredShipment':
+            all_transaction = Transaction.get_not_shipped_not_washout_not_completed(business)
+
+        all_transaction, column_header = self.get_transaction_list(all_transaction, page_type, user)
         return Response({
             'success': True,
-            'transactions': all_transactions
+            'columnHeader': column_header,
+            'transactions': all_transaction
         }, status=status.HTTP_200_OK)
 
 

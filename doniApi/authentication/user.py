@@ -67,12 +67,17 @@ class User(GenericAPIView, BaseAPI):
         if designation_id:
             profile.designation = Designation.objects.get(id=designation_id)
         notification = updated_user.get('notify')
+        rights = updated_user.get('rights')
         profile.notify_new_transaction = notification.get('newTransaction')
         profile.notify_shipment_arrival = notification.get('shipmentArrival')
         profile.notify_messages = notification.get('messages')
         profile.notify_monthly_reports = notification.get('monthlyReports')
         profile.notify_weekly_reports = notification.get('weeklyReports')
         profile.notify_daily_reports = notification.get('dailyReports')
+        profile.right_business_analytics = rights.get('businessAnalytics')
+        profile.right_user_management = rights.get('userManagement')
+        profile.right_warehouse_module = rights.get('warehouseModule')
+        profile.right_business_commission = rights.get('businessCommission')
         return profile
 
     @staticmethod

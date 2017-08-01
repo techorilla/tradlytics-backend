@@ -12,6 +12,7 @@ from notifications.signals import notify
 from functools import reduce
 from django.db.models import Q, F
 import operator
+from datetime import datetime as dt
 import pycountry
 import re
 
@@ -78,11 +79,11 @@ class Transaction(models.Model):
             .filter(reduce(operator.or_, location_query_list))\
             .filter(reduce(operator.or_, contact_person_list)).distinct()\
             .annotate(id=F(business_type+'__bp_id')).annotate(name=F(business_type+'__bp_name'))\
-            .annotate(country=F(business_type+'__locations__country'))\
+            .annotate(country=F(business_type+'__locations__country_name'))\
             .annotate(contactPerson=F(business_type+'__contact_persons__full_name'))\
             .values('id', 'name', 'country', 'contactPerson')\
             .order_by('name')
-        map(country_flag, business_list)
+        # map(country_flag, business_list)
         return business_list
 
     @classmethod
@@ -135,7 +136,8 @@ class Transaction(models.Model):
         return cls.objects.filter(created_by__profile__business=business) \
             .filter(Q(completion_status=None) | Q(completion_status__is_complete=False)) \
             .filter(Q(washout=None) | Q(washout__is_washout=False)) \
-            .filter(shipment__not_shipped=True)
+            .filter(shipment__not_shipped=True)\
+            .filter(shipment_end__lt=dt.today())
 
     @classmethod
     def get_arrived_at_port_not_completed(cls, business):

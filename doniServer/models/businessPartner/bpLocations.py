@@ -3,6 +3,9 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from .bpBasic import BpBasic
 from cities_light.models import City, Region
+import pycountry
+from django.conf import settings
+
 
 class BpLocation(models.Model):
     bp = models.ForeignKey(BpBasic, null=False, blank=False, related_name='locations')
@@ -11,6 +14,8 @@ class BpLocation(models.Model):
     city = models.CharField(max_length=100, null=True)
     state = models.CharField(max_length=100, null=True)
     country = models.CharField(max_length=100, null=True)
+    country_name = models.CharField(max_length=200, null=True)
+    country_flag = models.CharField(max_length=100, null=True)
     is_primary = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None,  null=True)
@@ -19,6 +24,21 @@ class BpLocation(models.Model):
 
     class Meta:
         db_table = 'bp_location'
+
+    def save(self):
+        country_name = pycountry.countries.get(alpha_2=self.country).name
+        self.country_name = country_name
+        self.country_flag = settings.COUNTRIES_FLAG_URL.replace('{code}', self.country.lower())
+        super(BpLocation, self).save()
+
+    @classmethod
+    def re_save_all_business_location(cls):
+        all_locations = cls.objects.all()
+        for loc in all_locations:
+            try:
+                loc.save()
+            except KeyError:
+                pass
 
     def get_obj(self):
         regions = Region.objects.filter(country__code2=self.country).order_by('name')

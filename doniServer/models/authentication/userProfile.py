@@ -22,6 +22,10 @@ class UserProfile(models.Model):
     profile_pic = models.ImageField(
         upload_to=get_image_path, blank=True, null=True)
     business = models.ForeignKey(BpBasic, related_name='business_users')
+    right_business_commission = models.BooleanField(default=False)
+    right_business_analytics = models.BooleanField(default=True)
+    right_warehouse_module = models.BooleanField(default=False)
+    right_user_management = models.BooleanField(default=False)
     notify_new_transaction = models.BooleanField(default=False)
     notify_shipment_arrival = models.BooleanField(default=False)
     notify_messages = models.BooleanField(default=False)
@@ -69,6 +73,12 @@ class UserProfile(models.Model):
                 'monthlyReports': self.notify_monthly_reports,
                 'weeklyReports': self.notify_weekly_reports,
                 'dailyReports': self.notify_daily_reports
+            },
+            'rights':{
+                'businessAnalytics': self.right_business_analytics,
+                'userManagement': self.right_user_management,
+                'warehouseModule': self.right_warehouse_module,
+                'businessCommission': self.right_business_commission
             }
         }
 
