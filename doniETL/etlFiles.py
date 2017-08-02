@@ -7,7 +7,9 @@ import numpy as np
 from cities_light.models import City, Region, Country
 from django.conf import settings
 import dateutil.parser
+from doniServer.models.shipment import Vessel
 
+vessel_imo_file_path = settings.PROJECT_ROOT + '/dataSheets/imo-vessel-codes.csv'
 manifest_file_path = settings.PROJECT_ROOT + '/dataSheets/manifest.xlsx'
 shipper_file_path = settings.PROJECT_ROOT + '/dataSheets/shippingLines.xlsx'
 file_path = '~/rates/international.xlsx'
@@ -57,6 +59,34 @@ product_2 = [
     u'Yellow Peas Russ/Ukr',
     u'Black Mapte SQ'
 ]
+
+def get_vessel_imo_numbers():
+    not_exist = []
+    vessel_type_of_interest = ['Container Ship', 'Bulk Carrier', 'General Cargo', 'Cargo/Container Ship']
+    def update_mmsi_number(row):
+        imo_number = row['imo']
+        mmsi_number = row['mmsi']
+        type = row['type']
+        name = row['name']
+        try:
+            vessel=Vessel.objects.get(imo_number=imo_number)
+            vessel.mmsi_number = mmsi_number
+            vessel.save()
+        except Vessel.DoesNotExist:
+            not_exist.append(imo_number)
+            if type in vessel_type_of_interest:
+                vessel= Vessel()
+                vessel.imo_number = imo_number
+                vessel.mmsi_number = mmsi_number
+                vessel.name = name
+                vessel.first_name = name
+                vessel.created_by = created_by
+                vessel.save()
+                print 'Vessel Does not Exist %s'%imo_number
+    df = pd.read_csv(vessel_imo_file_path )
+    df.apply(update_mmsi_number, axis=1)
+    return not_exist
+
 
 def read_excel_file(filePath, sheetName):
     file = pd.ExcelFile(filePath)

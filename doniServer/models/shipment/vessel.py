@@ -11,7 +11,7 @@ def get_image_path(instance, filename):
 
 
 class Vessel(models.Model):
-    imo_number = models.CharField(max_length=20)
+    imo_number = models.CharField(max_length=20, unique=True)
     mmsi_number = models.CharField(max_length=20, null=True)
     name = models.CharField(max_length=300, null=True)
     broken = models.BooleanField(default=False)
