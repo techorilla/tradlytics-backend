@@ -9,7 +9,7 @@ from django.conf import settings
 import dateutil.parser
 from doniServer.models.shipment import Vessel
 
-vessel_imo_file_path = settings.PROJECT_ROOT + '/dataSheets/imo-vessel-codes.csv'
+vessel_imo_file_path = settings.DJANGO_ROOT + '/dataSheets/imo-vessel-codes.csv'
 manifest_file_path = settings.PROJECT_ROOT + '/dataSheets/manifest.xlsx'
 shipper_file_path = settings.PROJECT_ROOT + '/dataSheets/shippingLines.xlsx'
 file_path = '~/rates/international.xlsx'
