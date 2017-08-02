@@ -33,6 +33,8 @@ class TrShipment(models.Model):
     date_arrived = models.DateField(default=None, null=True)
     expected_arrival = models.DateField(default=None, null=True)
     transit_port = JSONField(null=True)
+    containers = JSONField(null=True)
+    voyage_no = models.CharField(max_length=100,null=True)
 
     date_arrived = models.DateField(default=None, null=True)
     date_shipped_on = models.DateField(default=None, null=True)
@@ -91,6 +93,8 @@ class TrShipment(models.Model):
 
             },
             'arrivedAtPort':{
+                'containers': [] if not self.containers else self.containers,
+                'voyageNo': self.voyage_no,
                 'vessel': [] if not self .vessel else [self.vessel.get_tag_obj()],
                 'active': self.arrived_at_port,
                 'quantityShipped': None if not self.transaction.commission.quantity_shipped else str(round(self.transaction.commission.quantity_shipped,2)),

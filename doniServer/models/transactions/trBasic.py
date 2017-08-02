@@ -158,6 +158,10 @@ class Transaction(models.Model):
 
 
     def get_obj(self):
+        partial_shipment = None if not hasattr(self, 'partial_shipment') \
+            else self.partial_shipment.primary_shipment.file_id
+        primary_trade = None if not hasattr(self, 'secondary_trade')\
+            else self.secondary_trade.primary_trade.file_id
 
         return {
             'id': self.tr_id,
@@ -177,7 +181,9 @@ class Transaction(models.Model):
                 'contractId': self.contract_id,
                 'price': str(round(self.price,2)),
                 'quantity': str(round(self.quantity,2)),
-                'quantityFcl': str(round(self.quantity_fcl, 2))
+                'quantityFcl': str(round(self.quantity_fcl, 2)),
+                'primaryShipment': partial_shipment,
+                'primaryTransaction': primary_trade
             },
             'commission':{
                 'sellerBrokerId': None if not self.commission.seller_broker else self.commission.seller_broker.bp_id,
@@ -265,7 +271,8 @@ class Transaction(models.Model):
                 'contractNo': self.contract_id,
                 'fileNo': self.file_id,
                 'shipmentEnd': self.shipment_end,
-                'shipmentStart': self.shipment_start
+                'shipmentStart': self.shipment_start,
+                'otherInfo': self.other_info
             },
             'invoice': None if not invoice else invoice.get_description_obj(),
             'completeObj': None if not hasattr(self, 'completion_status') else self.completion_status.get_description_obj(),
@@ -304,7 +311,7 @@ post_save.connect(my_handler, sender=Transaction)
 
 
 
-class PrimaryTrade(models.Model):
+class SecondaryTrades(models.Model):
     transaction = models.OneToOneField(
         Transaction,
         on_delete=models.CASCADE,
@@ -314,7 +321,20 @@ class PrimaryTrade(models.Model):
     primary_trade = models.ForeignKey(Transaction, null=False, related_name='primary_trade')
 
     class Meta:
-        db_table = 'transaction_primary_trades'
+        db_table = 'transaction_secondary_trades'
+
+class PartialShipments(models.Model):
+    transaction = models.OneToOneField(
+        Transaction,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='partial_shipment'
+    )
+    primary_trade = models.ForeignKey(Transaction, null=False, related_name='primary_shipment')
+
+    class Meta:
+        db_table = 'transaction_partial_shipment'
+
 
 
 

@@ -1,13 +1,13 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from doniServer.models import Transaction, TrCommission, BpBasic, ProductItem, \
-    Packaging, CommissionType, TrShipment, TransactionChangeLog, TrWashout, TrComplete
+    Packaging, CommissionType, TrShipment, TransactionChangeLog, TrWashout, TrComplete, SecondaryTrades, PartialShipments
 from datetime import datetime as dt
 import dateutil.parser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import dateutil.parser
 from notifications.signals import notify
 from django.db.models.functions import Concat
-from django.db.models import Q, F
+from django.db.models import Q, F, Case, When, Value, BooleanField
 import operator
 
 QUERY_MAPPING = {
@@ -284,7 +284,21 @@ class TransactionListAPI(GenericAPIView):
                 queryset = queryset.filter(query)
                 queryset = queryset.filter(query)
 
-            queryset = queryset.values(*values).annotate(**annotate_obj)
+            queryset = queryset.values(*values).annotate(**annotate_obj)\
+                            .annotate(
+                                        isSecondary=Case(
+                                        When(secondary_trade__isnull=False,
+                                            then=Value(True)),
+                                        default=Value(False),
+                                        output_field=BooleanField())
+                            )\
+                            .annotate(
+                                hasSecondary=Case(
+                                    When(primary_trade__gt=0,
+                                         then=Value(True)),
+                                    default=Value(False),
+                                    output_field=BooleanField())
+                            )
         return queryset.order_by(*[page_config['order_by']]), column_header
 
     def get(self, request, *args, **kwargs):
@@ -561,6 +575,43 @@ class TransactionBasicAPI(GenericAPIView):
                 shipment.not_shipped = True
                 shipment.created_by = user
                 shipment.save()
+
+            primary_transaction_id = basic.get('primaryTransaction')
+            primary_shipment_id = basic.get('primaryShipment')
+
+
+
+            if primary_transaction_id:
+                primary_transaction = Transaction.objects.get(file_id=primary_transaction_id)
+                if hasattr(transaction, 'secondary_trade'):
+                    secondary_trade = transaction.secondary_trade
+                else:
+                    secondary_trade = SecondaryTrades()
+                secondary_trade.transaction = transaction
+                secondary_trade.primary_trade = primary_transaction
+                secondary_trade.save()
+            else:
+                if hasattr(transaction, 'secondary_trade'):
+                    transaction.secondary_trade.delete()
+
+
+
+
+            if primary_shipment_id:
+                primary_shipment = Transaction.objects.get(file_id=primary_shipment_id)
+                if hasattr(transaction, 'partial_shipment'):
+                    partial_shipment = transaction.partial_shipment
+                else:
+                    partial_shipment = PartialShipments()
+                partial_shipment.transaction = transaction
+                partial_shipment.primary_shipment = primary_shipment
+                partial_shipment.save()
+            else:
+                if hasattr(transaction, 'partial_shipment'):
+                    transaction.primary_trade.all().delete()
+
+
+
 
 
             # Making Transaction Change Log

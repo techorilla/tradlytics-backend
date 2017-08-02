@@ -13,7 +13,7 @@ conn = pymssql.connect(server, user, password, "DoniEnterprises")
 
 from doniServer.models.dropDowns import *
 from doniServer.models import Transaction, TrFiles, TrShipment, ProductItem, BpBasic, TrCommission, \
-    TrComplete, TrSellerInvoice, TrWashout
+    TrComplete, TrSellerInvoice, TrWashout, SecondaryTrades
 
 created_by = User.objects.get(username='immadimtiaz')
 
@@ -537,18 +537,26 @@ def add_missing_transaction_status():
             new_status.created_by = created_by
             new_status.save()
 
-# def update_has_secondary_trades():
-#     all_trades = Transaction.objects.all()
-#     for trade in all_trades:
-#         real_file_id = re.findall("\d+", trade.file_id)[0]
-#         try:
-#             post_file_id = re.findall("[a-zA-Z]+", trade.file_id)[0]
-#             if 'st' in post_file_id.lower():
-#                 primary_trade = Transaction.objects.get(file_id=real_file_id)
-#                 primary_trade.has_secondary_trades = True
-#                 primary_trade.save()
-#         except IndexError:
-#             pass
+def update_has_secondary_trades():
+    all_trades = Transaction.objects.all()
+    SecondaryTrades.objects.all().delete()
+    for trade in all_trades:
+        file_id = trade.file_id
+        real_file_id = re.findall("\d+", trade.file_id)[0]
+        try:
+            post_file_id = re.findall("[a-zA-Z]+", trade.file_id)[0]
+            if 'st' in post_file_id.lower():
+                try:
+                    primary_trade = Transaction.objects.get(file_id=real_file_id)
+                    secondary_trade = Transaction.objects.get(file_id=file_id)
+                    sec = SecondaryTrades()
+                    sec.transaction = secondary_trade
+                    sec.primary_trade = primary_trade
+                    sec.save()
+                except Transaction.DoesNotExist:
+                    print file_id + ' Does Not Exist'
+        except IndexError:
+            pass
 
 
 

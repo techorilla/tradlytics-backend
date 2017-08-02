@@ -352,15 +352,13 @@ class TransactionDropDownAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
-        file_id = str(request.GET.get('fileId'))
-        print file_id
         user = request.user
         transaction_list = Transaction.objects.filter(created_by__profile__business=user.profile.business)\
-            .filter(file_id__istartswith=file_id) \
             .annotate(fileId=F('file_id')) \
             .annotate(contractId=F('contract_id')) \
             .annotate(blNo=F('shipment__bl_no')) \
-            .values('fileId','contractId', 'blNo')
+            .values('fileId','contractId', 'blNo')\
+            .order_by('fileId')
 
         return Response({
             'transactionList': transaction_list

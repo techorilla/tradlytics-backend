@@ -1,4 +1,4 @@
-from trBasic import Transaction
+from trBasic import Transaction, SecondaryTrades, PartialShipments
 from trCommission import TrCommission
 from trContract import TrContract
 from trFiles import TrFiles
