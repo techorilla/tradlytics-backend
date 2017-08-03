@@ -8,7 +8,7 @@ from django.db.models.aggregates import Max
 from doniServer.models.product import Products, PriceMetric, ProductItemPrice
 from datetime import datetime as dt, timedelta
 import pycountry
-from doniServer.models import CurrencyExchange
+from doniServer.models import CurrencyExchange, TransactionShipmentTracking
 import pandas as pd
 
 
@@ -79,6 +79,18 @@ class MainDashboardAPI(GenericAPIView):
                 manifest_contributer['lastUpdate'] = last_update.get('created_at')
                 manifest_top_three_contributors.append(manifest_contributer)
 
+        # find_arrived_at_port_with_no_status_changed
+
+
+        # get map data
+
+        shipment_tracking = TransactionShipmentTracking.objects.filter(business=business).order_by('-tracked_on').first()
+
+        tracking_data = [] if not shipment_tracking else shipment_tracking.data
+
+        #get Transaction already shipped
+
+
 
         return Response({'data': {
             'usdExchange': usd_currency_data,
@@ -89,7 +101,8 @@ class MainDashboardAPI(GenericAPIView):
             'manifestUpdate':{
                 'count':manifest_update_count,
                 'topThreeContributors': manifest_top_three_contributors
-            }
+            },
+            'trackingData':tracking_data
         }}, status=status.HTTP_200_OK)
 
 

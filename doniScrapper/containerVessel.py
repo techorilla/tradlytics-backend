@@ -1,20 +1,23 @@
 from string import ascii_lowercase
 from doniScrapper.proxy_manager import ProxyManager
 from bs4 import BeautifulSoup
-from doniServer.models import BpBasic, Transaction, BusinessAppProfile, TrShipment
+from doniServer.models import BpBasic, Transaction, BusinessAppProfile, TrShipment, TransactionShipmentTracking
 from doniServer.models.shipment import Vessel, ShippingPort
 from django.contrib.auth.models import User
-import requests
+import requests, time
 import re
 import dateutil.parser
+from operator import itemgetter
+from doniServer.celery import app
 
 VESSEL_FINDER_URL = 'https://www.vesselfinder.com/vessels/%s-IMO-%s-MMSI-%s'
 
 def get_port_by_containing_city_country(city, country):
-    all_string = ' '.split(city.strip())
+    all_string = city.replace('(', ' ').replace(')', ' ').replace('  ', ' ').replace('PORT', '').strip().split(' ')
+    all_string = list(set(all_string))
     for query in all_string:
         try:
-            port = ShippingPort.objects.get(country__contains=country.strip, name__contains=query)
+            port = ShippingPort.objects.get(country__icontains=country.strip(), name__icontains=query)
             return {
                 u'id': port.id,
                 u'lo_code': port.lo_code,
@@ -26,12 +29,16 @@ def get_port_by_containing_city_country(city, country):
     return None
 
 
-
+@app.task
 def get_vessel_position_for_all_business_app_profile():
     all_business_profiles = BusinessAppProfile.objects.all()
     for profile in all_business_profiles:
         business_not_shipped_info =  get_vessel_position_for_all_non_shipped(profile.business)
-    return business_not_shipped_info
+        business_not_shipped_info = [info for info in business_not_shipped_info if info is not None]
+        tr = TransactionShipmentTracking()
+        tr.business = profile.business
+        tr.data = business_not_shipped_info
+        tr.save()
 
 
 def get_vessel_position_for_all_non_shipped(business):
@@ -40,11 +47,51 @@ def get_vessel_position_for_all_non_shipped(business):
 def get_vessel_position_transactions(transactions=[]):
     return map(get_vessel_position_for_transaction, transactions)
 
+def save_transit_ports(vessel_position, transaction):
+    destination = transaction.shipment.port_destination
+    shipping_ports_found = vessel_position['lastFivePorts']
+    shipping_ports_found = sorted(shipping_ports_found, key=itemgetter('date'), reverse=True)
+    shipping_ports_found_mapping = []
+    lo_code_added_already = []
+    vessel_position['destinationReached'] = False
+    for port in shipping_ports_found:
+        arrival_date = port['date']
+        mapping_found = get_port_by_containing_city_country(port['name'], port['country'])
+        if mapping_found:
+            mapping_found['date'] = arrival_date
+            if mapping_found['lo_code'] == destination.lo_code:
+                vessel_position['destinationReached'] = True
+            if mapping_found['lo_code'] not in lo_code_added_already:
+                shipping_ports_found_mapping.append(mapping_found)
+                lo_code_added_already.append(mapping_found['lo_code'])
+    shipping_ports_found_mapping = [port for port in shipping_ports_found_mapping if port is not None]
+    shipping_ports_found_mapping = [dict(y) for y in set(tuple(x.items()) for x in shipping_ports_found_mapping)]
+    transaction.shipment.transit_port =  shipping_ports_found_mapping
+    transaction.shipment.save()
+
 def get_vessel_position_for_transaction(transaction):
     if transaction.shipment.vessel:
-        return transaction.file_id, get_vessel_position(transaction.shipment.vessel)
+        destination = transaction.shipment.port_destination
+        vessel_position = get_vessel_position(transaction.shipment.vessel)
+        vessel_position['fileId'] = transaction.file_id
+        vessel_position['contractId'] = transaction.contract_id
+        vessel_position['bl'] = transaction.shipment.bl_no
+        vessel_position['vesselName'] = transaction.shipment.vessel.first_name
+        vessel_position['containers'] = 0 if not transaction.shipment.containers else len(transaction.shipment.containers)
+        vessel_position['portDestination'] = str(destination.name) + ', ' + str(transaction.shipment.port_destination.country)
+        vessel_position['quantity'] = transaction.commission.quantity_shipped if transaction.commission.quantity_shipped else transaction.quantity
+        seller_country = transaction.seller.primary_country
+        vessel_position['seller'] = transaction.seller.bp_name if not seller_country else  transaction.seller.bp_name + ', ' + seller_country
+        buyer_country = transaction.buyer.primary_country
+        vessel_position['buyer'] = transaction.buyer.bp_name if not buyer_country else  transaction.buyer.bp_name + ', ' + buyer_country
+        vessel_position['product'] = transaction.product_item.product_origin.product.name
+        vessel_position['shippingLine'] = 'NA' if not transaction.shipment.shipping_line else transaction.shipment.shipping_line.name
+        save_transit_ports(vessel_position, transaction)
+        time.sleep(5)
+        return vessel_position
     else:
-        return transaction.file_id, None
+        return None
+
 
 def get_vessel_position(vessel):
     name = vessel.first_name if vessel.first_name else vessel.name
@@ -55,13 +102,19 @@ def get_vessel_position(vessel):
     longitude_element = soup.find("span", {'itemprop':'latitude'})
     latitude_element = soup.find("span", {'itemprop': 'longitude'})
     last_five_ports_elements = soup.find_all("div", {'itemtype':'http://schema.org/Event'})
-    last_five_ports = []
+    position_obj = dict()
+    position_obj['longitude'] = longitude_element.text
+    position_obj['latitude'] = latitude_element.text
+    position_obj['lastFivePorts'] = []
     for port in last_five_ports_elements:
+        last_port = dict()
         arrival_date = port.find('span', {'class': 'small-5 medium-6 columns'}).text
         city_country = port.find('a').text.split(',')
-        city_country.append(dateutil.parser.parse(arrival_date))
-        last_five_ports.append(city_country)
-    return longitude_element.text, latitude_element.text, last_five_ports
+        last_port['name'] = city_country[0]
+        last_port['country'] = city_country[1]
+        last_port['date'] = dateutil.parser.parse(arrival_date)
+        position_obj['lastFivePorts'].append(last_port)
+    return position_obj
 
 
 

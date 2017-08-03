@@ -4,7 +4,7 @@ from trContract import TrContract
 from trFiles import TrFiles
 from trNote import TrNote
 from trSecondary import SecondaryTransaction
-from trShipment import TrShipment
+from trShipment import TrShipment, TransactionShipmentTracking
 from trStatus import TrStatus
 from trWashout import TrWashout
 from trChangeLog import TransactionChangeLog

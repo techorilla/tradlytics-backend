@@ -7,6 +7,15 @@ from ..shipment import ShippingPort, ShippingLine, Vessel
 from jsonfield import JSONField
 from django.utils import timezone
 
+class TransactionShipmentTracking(models.Model):
+    business = models.ForeignKey(BpBasic, null=True, related_name='shipment_tracking')
+    data = JSONField(null=True)
+    tracked_on = models.DateTimeField(default=timezone.now)
+    class Meta:
+        db_table = 'shipment_tracking_data'
+
+
+
 
 class TrShipment(models.Model):
     transaction = models.OneToOneField(

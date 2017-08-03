@@ -93,6 +93,15 @@ class BpBasic(models.Model):
             return None
 
     @property
+    def primary_country(self):
+        try:
+            primary_location = self.locations.get(is_primary=True)
+            country = primary_location.country
+            return country
+        except Exception, e:
+            return None
+
+    @property
     def primary_origin(self):
         try:
             primary_location = self.locations.get(is_primary=True)
