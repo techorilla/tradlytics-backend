@@ -1,11 +1,70 @@
 from string import ascii_lowercase
 from doniScrapper.proxy_manager import ProxyManager
 from bs4 import BeautifulSoup
-from doniServer.models import BpBasic
-from doniServer.models.shipment import Vessel
+from doniServer.models import BpBasic, Transaction, BusinessAppProfile, TrShipment
+from doniServer.models.shipment import Vessel, ShippingPort
 from django.contrib.auth.models import User
 import requests
 import re
+import dateutil.parser
+
+VESSEL_FINDER_URL = 'https://www.vesselfinder.com/vessels/%s-IMO-%s-MMSI-%s'
+
+def get_port_by_containing_city_country(city, country):
+    all_string = ' '.split(city.strip())
+    for query in all_string:
+        try:
+            port = ShippingPort.objects.get(country__contains=country.strip, name__contains=query)
+            return {
+                u'id': port.id,
+                u'lo_code': port.lo_code,
+                u'name': port.name,
+                u'country': port.country
+            }
+        except ShippingPort.DoesNotExist:
+            pass
+    return None
+
+
+
+def get_vessel_position_for_all_business_app_profile():
+    all_business_profiles = BusinessAppProfile.objects.all()
+    for profile in all_business_profiles:
+        business_not_shipped_info =  get_vessel_position_for_all_non_shipped(profile.business)
+    return business_not_shipped_info
+
+
+def get_vessel_position_for_all_non_shipped(business):
+    return get_vessel_position_transactions(Transaction.get_expected_arrival(business))
+
+def get_vessel_position_transactions(transactions=[]):
+    return map(get_vessel_position_for_transaction, transactions)
+
+def get_vessel_position_for_transaction(transaction):
+    if transaction.shipment.vessel:
+        return transaction.file_id, get_vessel_position(transaction.shipment.vessel)
+    else:
+        return transaction.file_id, None
+
+def get_vessel_position(vessel):
+    name = vessel.first_name if vessel.first_name else vessel.name
+    name = name.upper().strip().replace(' ', '-')
+    url = VESSEL_FINDER_URL%(name, vessel.imo_number, vessel.mmsi_number)
+    response = requests.get(url, headers={'User-Agent': 'Google Chrome'})
+    soup = BeautifulSoup(response.text, 'html.parser')
+    longitude_element = soup.find("span", {'itemprop':'latitude'})
+    latitude_element = soup.find("span", {'itemprop': 'longitude'})
+    last_five_ports_elements = soup.find_all("div", {'itemtype':'http://schema.org/Event'})
+    last_five_ports = []
+    for port in last_five_ports_elements:
+        arrival_date = port.find('span', {'class': 'small-5 medium-6 columns'}).text
+        city_country = port.find('a').text.split(',')
+        city_country.append(dateutil.parser.parse(arrival_date))
+        last_five_ports.append(city_country)
+    return longitude_element.text, latitude_element.text, last_five_ports
+
+
+
 
 class VesselScrapper(object):
 

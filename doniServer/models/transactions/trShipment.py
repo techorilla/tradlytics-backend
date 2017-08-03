@@ -94,6 +94,7 @@ class TrShipment(models.Model):
             },
             'arrivedAtPort':{
                 'containers': [] if not self.containers else self.containers,
+                'dateArrived': self.date_arrived,
                 'voyageNo': self.voyage_no,
                 'vessel': [] if not self .vessel else [self.vessel.get_tag_obj()],
                 'active': self.arrived_at_port,

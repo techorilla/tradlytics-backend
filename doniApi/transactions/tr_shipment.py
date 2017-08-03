@@ -279,7 +279,10 @@ class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
             bl_no = data_obj.get('blNo')
             voyage_no = data_obj.get('voyageNo')
             containers = data_obj.get('containers')
-
+            date_arrived = data_obj.get('dateArrived')
+            if date_arrived:
+                date_arrived = dateutil.parser.parse(str(date_arrived).replace('"', ''))
+                date_arrived = date_arrived.replace(hour=0, minute=0, second=0, microsecond=0)
 
             loading_port = ShippingPort.objects.get(id=loading_port_id) if loading_port_id else None
             destination_port = ShippingPort.objects.get(id=destination_port_id) if destination_port_id else None
@@ -287,6 +290,7 @@ class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
 
             vessel = Vessel.objects.get(id=vessel_id) if vessel_id else None
             shipment.bl_no = bl_no
+            shipment.date_arrived = date_arrived
             shipment.voyage_no = voyage_no
             shipment.containers = containers
             shipment.port_loading = loading_port
