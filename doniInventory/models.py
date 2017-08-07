@@ -14,7 +14,6 @@ from django.db.models import IntegerField
 class Warehouse(models.Model):
 
     name = models.CharField(max_length=200)
-    lots = models.IntegerField(default=0)
     address = models.TextField()
     contact = models.TextField()
     self_warehouse = models.BooleanField(default=False)
@@ -41,7 +40,6 @@ class Warehouse(models.Model):
         complete_obj = {
             'id': self.id,
             'name': self.name,
-            'lots': self.lots,
             'selfWarehouse': self.self_warehouse,
             'totalCapacity': self.total_capacity_kgs,
             'consumedCapacity': 'NA',
@@ -66,7 +64,6 @@ class Warehouse(models.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'lots': self.lots,
             'selfWarehouse': self.self_warehouse,
             'totalCapacity': self.total_capacity_kgs,
             'consumedCapacity': self.get_current_weight_stored_in_kgs,
@@ -252,7 +249,7 @@ class WarehouseRent(models.Model):
 
 class InventoryTransaction(models.Model):
     warehouse = models.ForeignKey(Warehouse, null=False, related_name='record')
-    lot_no = models.IntegerField(default=1)
+    lot_no = models.CharField(max_length=10, default='MIX')
     date = models.DateField(null=False)
     transaction_business = models.ForeignKey(BpBasic, null=True, on_delete=models.SET_NULL)
     port_clearing_no = models.CharField(max_length=50, null=True)

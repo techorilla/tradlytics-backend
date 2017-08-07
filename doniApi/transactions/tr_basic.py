@@ -210,7 +210,6 @@ SHIPMENT_EXPIRATION_LIST = {
     'column_header': [
         {'name': 'Expired On', 'sort': 'shipmentExpiration'},
         {'name': 'Expired Since', 'sort': None},
-
         {'name': 'File No', 'sort': 'fileNo'},
         {'name': 'BL No.', 'sort': 'blNo'},
         {'name': 'Contract No.', 'sort': 'contractNo'},

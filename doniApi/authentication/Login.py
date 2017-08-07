@@ -32,6 +32,7 @@ class LoginAPI(APIView):
             'firstName': user.first_name,
             'lastName': user.last_name,
             'businessId': business.bp_id,
+            'currency': business.app_profile.currency,
             'businessName': business.bp_name,
             'businessAdmin': business.bp_admin,
             'smallProfilePic':  profile.get_profile_pic(base_url)

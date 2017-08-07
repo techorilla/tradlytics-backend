@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'emailApp',
     'website',
     'doniInventory',
+    'doniLocalTrade',
 
     # Third Party Application
     'grappelli',
