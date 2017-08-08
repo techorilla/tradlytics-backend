@@ -27,12 +27,15 @@ def get_port_by_containing_city_country(city, country):
             index = SequenceMatcher(None, port.name, city).ratio()
             if index > port_matching_index:
                 selected_port = port
-        return {
-            u'id': selected_port.id,
-            u'lo_code': selected_port.lo_code,
-            u'name': selected_port.name,
-            u'country': selected_port.country
-        }
+        if selected_port is not None:
+            return {
+                u'id': selected_port.id,
+                u'lo_code': selected_port.lo_code,
+                u'name': selected_port.name,
+                u'country': selected_port.country
+            }
+        else:
+            return selected_port
     except ShippingPort.DoesNotExist:
         return None
 
