@@ -16,7 +16,8 @@ VESSEL_FINDER_URL = 'https://www.vesselfinder.com/vessels/%s-IMO-%s-MMSI-%s'
 
 
 def get_port_by_containing_city_country(city, country):
-    all_string = city.replace('(', ' ').replace(')', ' ').replace('  ', ' ').replace('PORT', '').strip().split(' ')
+    all_string = city.replace('(', ' ').replace(')', ' ').replace('  ', ' ')\
+        .replace('/', ' ').replace('PORT', '').strip().split(' ')
     all_string = list(set(all_string))
     try:
         ports = ShippingPort.objects.filter(country__icontains=country.strip()).filter(reduce(lambda x, y: x | y, [Q(name__icontains=word) for word in all_string]))
