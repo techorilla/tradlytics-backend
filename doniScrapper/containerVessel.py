@@ -9,24 +9,31 @@ import re
 import dateutil.parser
 from operator import itemgetter
 from doniServer.celery import app
+from difflib import SequenceMatcher
+
 
 VESSEL_FINDER_URL = 'https://www.vesselfinder.com/vessels/%s-IMO-%s-MMSI-%s'
+
 
 def get_port_by_containing_city_country(city, country):
     all_string = city.replace('(', ' ').replace(')', ' ').replace('  ', ' ').replace('PORT', '').strip().split(' ')
     all_string = list(set(all_string))
-    for query in all_string:
-        try:
-            port = ShippingPort.objects.get(country__icontains=country.strip(), name__icontains=query)
-            return {
-                u'id': port.id,
-                u'lo_code': port.lo_code,
-                u'name': port.name,
-                u'country': port.country
-            }
-        except ShippingPort.DoesNotExist:
-            pass
-    return None
+    try:
+        ports = ShippingPort.objects.filter(country__icontains=country.strip(), name__icontains__in=all_string)
+        selected_port = None
+        port_matching_index = 0.00
+        for port in ports:
+            index = SequenceMatcher(None, port.name, city).ratio()
+            if index > port_matching_index:
+                selected_port = port
+        return {
+            u'id': selected_port.id,
+            u'lo_code': selected_port.lo_code,
+            u'name': selected_port.name,
+            u'country': selected_port.country
+        }
+    except ShippingPort.DoesNotExist:
+        return None
 
 
 @app.task
