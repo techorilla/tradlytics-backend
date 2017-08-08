@@ -10,7 +10,7 @@ import dateutil.parser
 from operator import itemgetter
 from doniServer.celery import app
 from difflib import SequenceMatcher
-
+from django.db.models import Q
 
 VESSEL_FINDER_URL = 'https://www.vesselfinder.com/vessels/%s-IMO-%s-MMSI-%s'
 
@@ -19,7 +19,7 @@ def get_port_by_containing_city_country(city, country):
     all_string = city.replace('(', ' ').replace(')', ' ').replace('  ', ' ').replace('PORT', '').strip().split(' ')
     all_string = list(set(all_string))
     try:
-        ports = ShippingPort.objects.filter(country__icontains=country.strip(), name__icontains__in=all_string)
+        ports = ShippingPort.objects.filter(country__icontains=country.strip()).filter(reduce(lambda x, y: x | y, [Q(name__contains=word) for word in all_string]))
         selected_port = None
         port_matching_index = 0.00
         for port in ports:
