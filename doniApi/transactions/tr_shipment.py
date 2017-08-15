@@ -283,6 +283,8 @@ class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
             if date_arrived:
                 date_arrived = dateutil.parser.parse(str(date_arrived).replace('"', ''))
                 date_arrived = date_arrived.replace(hour=0, minute=0, second=0, microsecond=0)
+            else:
+                date_arrived = None
 
             loading_port = ShippingPort.objects.get(id=loading_port_id) if loading_port_id else None
             destination_port = ShippingPort.objects.get(id=destination_port_id) if destination_port_id else None

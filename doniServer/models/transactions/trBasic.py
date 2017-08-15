@@ -94,7 +94,7 @@ class Transaction(models.Model):
 
     @classmethod
     def get_trades_in_date_range(cls, business,start, end):
-        return Transaction.objects.filter(created_by__profile__business=business)\
+        return cls.objects.filter(created_by__profile__business=business)\
             .filter(date__lte=end).filter(date__gte=start)
 
     @classmethod

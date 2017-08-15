@@ -6,6 +6,7 @@ from doniServer.models.product import ProductCategory, Products, PriceMarket, Pr
 from doniServer.models.product.priceMarket import get_all_currencies
 from doniServer.models.shipment import ShippingPort, ShippingLine, Vessel
 from doniServer.models import BpBasic, Transaction
+from doniLocalTrade.models import LocalTrade
 from django.utils import timezone
 from django.conf import settings
 from doniCore import Utilities
@@ -93,8 +94,11 @@ class BusinessDropDownAPI(GenericAPIView):
     def get_all_business_drop_down(self, type, page, business_id):
         if not page:
             return BpBasic.get_drop_down_obj(type)
-        else:
+        elif page == 'tradeBook':
             return Transaction.get_business_type_drop_down_for_transaction_page(type, business_id)
+        elif page == 'localTradeBook':
+            return LocalTrade.get_business_type_drop_down_for_transaction_page(type, business_id)
+
 
     def get(self, request, *args, **kwargs):
         type = request.GET.get('type')

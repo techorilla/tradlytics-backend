@@ -1,8 +1,9 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from doniServer.models import Transaction, TrComplete
+from doniServer.models import Transaction, TrComplete, SecondaryTrades
 from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta as rd
+from django.db.models import Q
 
 
 class TransactionArrivedNotCompletedListAPI(GenericAPIView):
@@ -95,6 +96,14 @@ class TransactionDashboardAPI(GenericAPIView):
         not_shipped = Transaction.get_not_shipped_not_washout_not_completed(business)
         not_shipped_count = not_shipped.count()
 
+        #Secondary Trades
+        secondary_trades_count = SecondaryTrades.objects.count()
+        partial_keys = ['A', 'B', 'C', 'D']
+        partial_shipment = Transaction.objects.filter(
+            reduce(lambda x, y: x | y, [Q(file_id__icontains=key) for key in partial_keys]))
+        partial_shipment_count = partial_shipment.count()
+
+
         return {
             'multiBar':{
               'newTrades': new_trades,
@@ -122,6 +131,11 @@ class TransactionDashboardAPI(GenericAPIView):
                 'washoutCount': washout_count,
                 'washoutAtXCount': washout_at_x_count,
                 'washoutPercentage': (float(washout_count)/float(total_trades)) * 100
+            },
+            'subTrades':{
+                'secondaryTradeCount': secondary_trades_count,
+                'partialShipmentCount': partial_shipment_count,
+                'secondaryTradePercentage': (float(secondary_trades_count)/float(total_trades)) *100
             },
             'arrivedNotCompletedCount': arrived_at_port_not_completed_count,
             'expectedArrivalCount': expected_arrival_count,

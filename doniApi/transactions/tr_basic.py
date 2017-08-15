@@ -9,6 +9,7 @@ from notifications.signals import notify
 from django.db.models.functions import Concat
 from django.db.models import Q, F, Case, When, Value, BooleanField
 import operator
+from doniCore.utils import get_days_ago
 
 QUERY_MAPPING = {
     'id':'tr_id',
@@ -30,6 +31,7 @@ QUERY_MAPPING = {
     'productOriginFlag': 'product_item__product_origin__country_flag',
     'buyerCountry': 'buyer__locations__country_name',
     'sellerCountry': 'seller__locations__country_name',
+    'expiredSince': 'expiredSince',
     'contractNo': 'contract_id',
     'blNo':'shipment__bl_no',
     'dateArrived': 'shipment__date_arrived',
@@ -171,7 +173,6 @@ EXPECTED_ARRIVAL_LIST = {
     'column_header': [
         {'name': 'Expected Arrival', 'sort': 'expectedArrival'},
         {'name': 'Expected Since', 'sort': None},
-
         {'name': 'File No', 'sort': 'fileNo'},
         {'name': 'BL No.', 'sort': 'blNo'},
         {'name': 'Contract No.', 'sort': 'contractNo'},
@@ -281,24 +282,30 @@ class TransactionListAPI(GenericAPIView):
             if column != query_map:
                 annotate_obj[column] = F(QUERY_MAPPING[column])
                 queryset = queryset.filter(query)
-                queryset = queryset.filter(query)
 
-            queryset = queryset.values(*values).annotate(**annotate_obj)\
-                            .annotate(
-                                        isSecondary=Case(
-                                        When(secondary_trade__isnull=False,
-                                            then=Value(True)),
-                                        default=Value(False),
-                                        output_field=BooleanField())
-                            )\
-                            .annotate(
-                                hasSecondary=Case(
-                                    When(primary_trade__gt=0,
-                                         then=Value(True)),
-                                    default=Value(False),
-                                    output_field=BooleanField())
-                            )
-        return queryset.order_by(*[page_config['order_by']]), column_header
+        # annotate_columns = page_config.get('annotate_columns', {})
+        # for column, annotation in annotate_columns.items():
+        #     values.append(QUERY_MAPPING[column])
+        #     if column != query_map:
+        #         annotate_obj[column] = annotation
+
+
+        queryset = queryset.values(*values).annotate(**annotate_obj) \
+            .annotate(
+            isSecondary=Case(
+                When(secondary_trade__isnull=False,
+                     then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField())
+        ) \
+            .annotate(
+            hasSecondary=Case(
+                When(primary_trade__gt=0,
+                     then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField())
+        )
+        return queryset.distinct().order_by(*[page_config['order_by']]), column_header
 
     def get(self, request, *args, **kwargs):
         user = request.user
