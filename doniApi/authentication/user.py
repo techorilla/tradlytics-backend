@@ -71,13 +71,13 @@ class User(GenericAPIView, BaseAPI):
         profile.notify_new_transaction = notification.get('newTransaction')
         profile.notify_shipment_arrival = notification.get('shipmentArrival')
         profile.notify_messages = notification.get('messages')
-        profile.notify_monthly_reports = notification.get('monthlyReports')
-        profile.notify_weekly_reports = notification.get('weeklyReports')
-        profile.notify_daily_reports = notification.get('dailyReports')
-        profile.right_business_analytics = rights.get('businessAnalytics')
-        profile.right_user_management = rights.get('userManagement')
-        profile.right_warehouse_module = rights.get('warehouseModule')
-        profile.right_business_commission = rights.get('businessCommission')
+        profile.notify_monthly_reports = notification.get('monthlyReports', False)
+        profile.notify_weekly_reports = notification.get('weeklyReports', False)
+        profile.notify_daily_reports = notification.get('dailyReports', False)
+        profile.right_business_analytics = rights.get('businessAnalytics', False)
+        profile.right_user_management = rights.get('userManagement', False)
+        profile.right_warehouse_module = rights.get('warehouseModule', False)
+        profile.right_business_commission = rights.get('businessCommission', False)
         return profile
 
     @staticmethod
@@ -119,28 +119,38 @@ class User(GenericAPIView, BaseAPI):
         }, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        new_user_data = request.data.get('user')
-        print new_user_data
         try:
-           user = self.set_user_obj_from_request(new_user_data)
-        except IntegrityError as e:
-            if e[1] == "Duplicate entry '' for key 'username'":
-                print e[1]
+            try:
+                new_user_data = request.data.get('user')
+                user = self.set_user_obj_from_request(new_user_data)
+            except IntegrityError as e:
+                if e[1] == "Duplicate entry '' for key 'username'":
+                    return Response({
+                        'success': False,
+                        'message': 'A user with this user name already exist'
+                    })
+            except Exception, e:
                 return Response({
                     'success': False,
-                    'message': 'A user with this user name already exist'
+                    'message': str(e)
                 })
-        business = Utilities.get_user_business(request.user)
-        new_profile = self.set_profile_obj_from_request(new_user_data, business=business)
-        new_profile.user = user
-        new_profile.created_by = request.user
-        new_profile.created_at = dt.now()
-        new_profile.save()
-        return Response({
-            'success': True,
-            'user_id': user.id,
-            'message': 'User Profile Added Successfully'
-        })
+
+            business = Utilities.get_user_business(request.user)
+            new_profile = self.set_profile_obj_from_request(new_user_data, business=business)
+            new_profile.user = user
+            new_profile.created_by = request.user
+            new_profile.created_at = dt.now()
+            new_profile.save()
+            return Response({
+                'success': True,
+                'user_id': user.id,
+                'message': 'User Profile Added Successfully'
+            })
+        except Exception, e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            })
 
     def delete(self, request, *args, **kwargs):
         user = request.user
