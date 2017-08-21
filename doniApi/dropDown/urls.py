@@ -13,7 +13,11 @@ urlpatterns = (
 
     url(r'^transaction/$',
         TransactionDropDownAPI.as_view(),
-        name='Commission Type'),
+        name='International Transaction Type'),
+
+    url(r'^localTransaction/$',
+        LocalTransactionDropDownAPI.as_view(),
+        name='Local Transaction'),
 
     url(r'^commission_type/$',
         CommissionTypeAPI.as_view(),

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import CharField, Case, Value, When
 from django.contrib.auth.models import User
 from ..businessPartner.bpBasic import BpBasic
 from ..product import ProductItem
@@ -47,6 +48,18 @@ class Transaction(models.Model):
             return 'Washout At Par'
         if self.is_washout and (self.is_washout_at != self.price):
             return 'Washout At Price <span class="titled">USD %.2f</span>'%self.is_washout_at
+
+    @classmethod
+    def get_status(cls, query_set):
+        query_set.annotate(
+            status=Case(
+                When(completion_status=True, then=Value('Completed')),
+                default=Value('Not Shipped'),
+                output_field=CharField(),
+            ),
+        )
+        return query_set
+
 
     def delete(self):
         super(Transaction, self).save()
@@ -130,6 +143,12 @@ class Transaction(models.Model):
     def get_business_all_washout(cls, business):
         return Transaction.objects.filter(created_by__profile__business=business) \
             .filter(washout__is_washout=True)
+
+    @classmethod
+    def get_business_all_disputed_trades(cls, business):
+        return Transaction.objects.filter(created_by__profile__business=business)\
+            .exclude(dispute=None)\
+            .filter(dispute__dispute_resolved=False)
 
     @classmethod
     def get_not_shipped_not_washout_not_completed(cls, business):
@@ -256,8 +275,15 @@ class Transaction(models.Model):
                      'extension': f.get('extension'),
                  } for f in files]
 
+        #dispute
+        is_disputed = hasattr(self, 'dispute')
+        dispute = None if not is_disputed else self.dispute.get_description_obj()
+
+
+
         return {
             'id': self.tr_id,
+            'isDisputed': is_disputed,
             'onOurContract': business.app_profile.on_our_contract(self.contractual_buyer),
             'invoiceCreation': business.app_profile.on_our_contract(self.contractual_buyer) and not self.invoices.exists(),
             'businessCurrency': currency,
@@ -274,6 +300,7 @@ class Transaction(models.Model):
                 'shipmentStart': self.shipment_start,
                 'otherInfo': self.other_info
             },
+            'dispute': dispute,
             'invoice': None if not invoice else invoice.get_description_obj(),
             'completeObj': None if not hasattr(self, 'completion_status') else self.completion_status.get_description_obj(),
             'washOut': None if not hasattr(self, 'washout') else self.washout.get_description_obj(),

@@ -36,7 +36,9 @@ QUERY_MAPPING = {
     'blNo':'shipment__bl_no',
     'dateArrived': 'shipment__date_arrived',
     'expectedArrival': 'shipment__expected_arrival',
-    'shipmentExpiration': 'shipment_end'
+    'shipmentExpiration': 'shipment_end',
+    'disputedOn': 'dispute__dispute_date',
+    'completedOn': 'completion_status__completion_date'
 }
 
 
@@ -47,6 +49,27 @@ def get_business_location_query(business_type):
     ]
     location_query_list = [Q(query) for query in location_query]
     return reduce(operator.or_, location_query_list)
+
+BUSINESS_ANALYTICS = {
+    'columns': [
+        'id',
+        'date',
+        'fileNo',
+        'productName',
+        'buyerName',
+        'buyerId',
+        'sellerName',
+        'sellerId',
+        'productItemId',
+        'quantity',
+        'rate',
+        'productOriginName',
+        'productOriginFlag',
+        'expectedCommission',
+        'actualCommission'
+    ],
+    'order_by':'-date',
+}
 
 
 TRADE_BOOK_LIST = {
@@ -71,7 +94,6 @@ TRADE_BOOK_LIST = {
         'buyerCountry': get_business_location_query('buyer'),
         'sellerCountry': get_business_location_query('seller')
     },
-
     'restricted_columns':[
         {
             'right': 'right_business_commission',
@@ -223,12 +245,51 @@ SHIPMENT_EXPIRATION_LIST = {
     ]
 }
 
+TRADE_DISPUTE = {
+    'columns': [
+        'id',
+        'fileNo',
+        'disputedOn',
+        'completedOn',
+        'productName',
+        'buyerName',
+        'buyerId',
+        'sellerName',
+        'sellerId',
+        'productItemId',
+        'quantity',
+        'rate',
+        'productOriginName',
+        'productOriginFlag',
+        'contractNo',
+    ],
+    'order_by': '-disputedOn',
+    'query_columns':{
+        'buyerCountry': get_business_location_query('buyer'),
+        'sellerCountry': get_business_location_query('seller')
+    },
+    'column_header': [
+        {'name': 'Disputed On', 'sort': 'disputedOn'},
+        {'name': 'Disputed Since', 'sort': None},
+        {'name': 'File No', 'sort': 'fileNo'},
+        {'name': 'Contract No.', 'sort': 'contractNo'},
+        {'name': 'Completed On', 'sort': 'completedOn'},
+        {'name': 'Buyer', 'sort': 'buyerName'},
+        {'name': 'Product', 'sort': 'productName'},
+        {'name': 'Origin', 'sort': 'productOriginName'},
+        {'name': 'Seller', 'sort': 'sellerName'},
+        {'name': 'Quantity <span class=\'titled\'>MT</span>', 'sort': 'quantity'},
+        {'name': 'Rate <span class=\'titled\'>USD</span>', 'sort': 'rate'}
+    ]
+}
 
 TRANSACTION_LIST_CONFIG = {
     'tradeBook': TRADE_BOOK_LIST,
     'expectedArrival': EXPECTED_ARRIVAL_LIST,
     'arrivedList': ARRIVED_LIST,
-    'expiredShipment': SHIPMENT_EXPIRATION_LIST
+    'expiredShipment': SHIPMENT_EXPIRATION_LIST,
+    'businessAnalytics': BUSINESS_ANALYTICS,
+    'tradeDispute': TRADE_DISPUTE
 }
 
 
@@ -322,22 +383,23 @@ class TransactionListAPI(GenericAPIView):
                 all_transaction = Transaction.get_trades_in_date_range(business, start_date, end_date)
             else:
                 all_transaction = Transaction.objects
+            all_transaction = Transaction.get_status(all_transaction)
         elif page_type == 'expectedArrival':
             all_transaction = Transaction.get_expected_arrival(business)
+        elif page_type == 'tradeDispute':
+            all_transaction = Transaction.get_business_all_disputed_trades(business)
         elif page_type == 'arrivedList':
             all_transaction = Transaction.get_arrived_at_port_not_completed(business)
         elif page_type == 'expiredShipment':
             all_transaction = Transaction.get_not_shipped_not_washout_not_completed(business)
 
         all_transaction, column_header = self.get_transaction_list(all_transaction, page_type, user)
+
         return Response({
             'success': True,
             'columnHeader': column_header,
             'transactions': all_transaction
         }, status=status.HTTP_200_OK)
-
-
-
 
 class TransactionWashoutAPI(GenericAPIView):
 
@@ -402,8 +464,6 @@ class TransactionWashoutAPI(GenericAPIView):
                 'success': False,
                 'message': str(e)
             })
-
-
 
 class TransactionCompleteStatusAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)

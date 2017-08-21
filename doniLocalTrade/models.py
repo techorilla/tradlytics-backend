@@ -39,13 +39,21 @@ class LocalTrade(models.Model):
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='tr_local_updated_by')
 
 
-
     def get_complete_obj(self, base_url, user):
         business = user.profile.business
         currency = business.app_profile.currency
         notes = []
         files = self.local_trade_files.values('file_name', 'extension', 'created_at', 'created_by__username', 'file_id') \
             .order_by('-created_at')
+
+        international_file_id = self.associated_international_trade.all().values('transaction_associated__file_id')
+        local_file_id = self.associated_local_trade.all().values('local_trade_associated__file_id')
+
+
+        international_file_id = [trade.get('transaction_associated__file_id') for trade in international_file_id]
+        local_file_id = [trade.get('local_trade_associated__file_id') for trade in local_file_id]
+
+
         return {
             'files': files,
             'price': self.price,
@@ -64,14 +72,19 @@ class LocalTrade(models.Model):
             'fundsDueDate': self.status.funds_due_date,
             'deliveryDueDate': self.status.delivery_due_date,
             'otherInfo': self.other_info,
-            'internationalFileId': None if not self.international_file else self.international_file.file_id,
+            'internationalFileId': international_file_id,
+            'localFileId': local_file_id,
             'paymentTerm': None if not hasattr(self, 'payment_term') else self.payment_term.payment_term_string
         }
-
 
     def get_obj(self):
         business = user.profile.business
         currency = business.app_profile.currency
+        international_file_id = self.associated_international_trade.all().values('transaction_associated__file_id')
+        local_file_id = self.associated_local_trade.all().values('local_trade_associated__file_id')
+
+        international_file_id = [trade.get('transaction_associated__file_id') for trade in international_file_id]
+        local_file_id = [trade.get('local_trade_associated__file_id') for trade in local_file_id]
         return {
             'price': self.price,
             'quantity': self.quantity,
@@ -89,10 +102,10 @@ class LocalTrade(models.Model):
             'fundsDueDate': self.status.funds_due_date,
             'deliveryDueDate': self.status.delivery_due_date,
             'otherInfo': self.other_info,
-            'internationalFileId': None if not self.international_file else self.international_file.file_id,
+            'internationalFileId': international_file_id,
+            'localFileId': local_file_id,
             'paymentTerm': None if not hasattr(self, 'payment_term') else self.payment_term.payment_term_string
         }
-
 
     class Meta:
         unique_together = ('file_id', 'business',)
@@ -133,6 +146,31 @@ class LocalTrade(models.Model):
         # map(country_flag, business_list)
         return business_list
 
+class AssociatedLocalTrade(models.Model):
+    local_trade = models.ForeignKey(
+        LocalTrade,
+        on_delete=models.CASCADE,
+        related_name='associated_local_trade'
+    )
+    local_trade_associated = models.ForeignKey(
+        LocalTrade,
+        on_delete=models.CASCADE,
+        related_name='associated_with_local'
+
+    )
+
+class AssociatedInternationalTrade(models.Model):
+    local_trade = models.ForeignKey(
+        LocalTrade,
+        on_delete=models.CASCADE,
+        related_name='associated_international_trade'
+    )
+    transaction_associated = models.ForeignKey(
+        Transaction,
+        on_delete=models.CASCADE,
+        related_name='associated_with_international'
+    )
+
 class LocalTradeChangeLog(models.Model):
     local_trade = models.ForeignKey(
         LocalTrade,
@@ -163,7 +201,6 @@ class LocalTradeChangeLog(models.Model):
         change_log.local_trade = local_trade
         change_log.save()
 
-
 class LocalTradeNotes(models.Model):
     localTrade = models.ForeignKey(
         LocalTrade,
@@ -192,8 +229,6 @@ class LocalTradeNotes(models.Model):
     class Meta:
         db_table = 'local_notes'
 
-
-
 class LocalTradeStatus(models.Model):
     local_trade = models.OneToOneField(
         LocalTrade,
@@ -209,6 +244,8 @@ class LocalTradeStatus(models.Model):
     funds_due_date = models.DateField(null=True)
     completion_status = models.BooleanField(default=False)
     completion_status_date = models.DateField(null=True)
+    actual_weight = models.FloatField(null=True)
+    actual_amount = models.FloatField(null=True)
 
 
     @classmethod
@@ -255,7 +292,7 @@ class PaymentTerm(models.Model):
 
     @classmethod
     def save_payment_term(cls, local_trade, term, on_date=None):
-        payment_term = PaymentTerm() if not hasattr(local_trade, 'payment_term') else local_trade.payment_terms
+        payment_term = PaymentTerm() if not hasattr(local_trade, 'payment_term') else local_trade.payment_term
         payment_term.local_trade = local_trade
         if term == 'advance':
             payment_term.advance = True
@@ -292,7 +329,12 @@ class DeliverySlip(models.Model):
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='local_delivery_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='local_delivery_updated_by')
 
+class LocalTradePayments(models.Model):
+    payment_received = models.FloatField()
+    payment_date = models.DateField(null=False)
 
+    class Meta:
+        db_table = 'local_tr_payments'
 
 class LocalFiles(models.Model):
     local_trade = models.ForeignKey(

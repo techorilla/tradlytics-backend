@@ -1,7 +1,8 @@
 from doniApi.apiImports import Response, GenericAPIView, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from doniServer.models import Transaction
-from .models import LocalTrade, LocalTradeChangeLog, LocalTradeNotes, LocalTradeStatus, PaymentTerm, DeliverySlip
+from .models import LocalTrade, LocalTradeChangeLog, LocalTradeNotes, LocalTradeStatus, PaymentTerm, DeliverySlip,\
+                    AssociatedLocalTrade, AssociatedInternationalTrade
 from datetime import datetime as dt
 from django.db.models import Q, F
 import operator
@@ -25,17 +26,13 @@ class LocalTradeAPI(GenericAPIView):
             contract_id = data.get('contractId')
             payment_date = data.get('paymentDate')
             quantity_fcl = data.get('quantityFCL')
+            local_trade_associated = data.get('localFileId')
+            international_trade_associated = data.get('internationalFileId')
+
+
             date = data.get('date')
             date = dateutil.parser.parse(str(date).replace('"', ''))
             date = date.replace(hour=0, minute=0, second=0, microsecond=0)
-            international_file_id = data.get('internationalFileId')
-            international_file = None
-            if international_file_id:
-                try:
-                    international_file = Transaction.objects.get(file_id=international_file_id)
-                except Transaction.DoesNotExist:
-                    pass
-
 
             buyer_id = data.get('buyerId')
             seller_id = data.get('sellerId')
@@ -62,20 +59,26 @@ class LocalTradeAPI(GenericAPIView):
                     'message': 'Buyer and Seller can not be same.'
                 })
 
+            local_trade_associated = LocalTrade.objects.filter(file_id__in=local_trade_associated)
+            international_trade_associated = Transaction.objects.filter(file_id__in=international_trade_associated)
+
             if method == 'POST':
                 local_trade = LocalTrade()
                 local_trade.business = user.profile.business
                 local_trade.created_by = user
             elif method == 'PUT':
                 local_trade = LocalTrade.objects.get(business=user.profile.business, file_id=str(file_id))
+                local_trade.associated_local_trade.all().delete()
+                local_trade.associated_international_trade.all().delete()
                 local_trade.updated_by = user
                 local_trade.updated_on = dt.now()
+
+
 
             local_trade.date = date
             local_trade.local_buyer_id = buyer_id
             local_trade.local_seller_id = seller_id
             local_trade.file_id = file_id
-            local_trade.international_file = international_file
             local_trade.contract_id = contract_id
             local_trade.price = price
             local_trade.quantity = quantity
@@ -84,7 +87,21 @@ class LocalTradeAPI(GenericAPIView):
             local_trade.product_item_id = product_id
             local_trade.save()
 
-            PaymentTerm.save_payment_term(local_trade, payment_term, payment_date)
+            for trade in local_trade_associated:
+                ass_trade = AssociatedLocalTrade()
+                ass_trade.local_trade = local_trade
+                ass_trade.local_trade_associated = trade
+                ass_trade.save()
+
+            for transaction in international_trade_associated:
+                ass_trade = AssociatedInternationalTrade()
+                ass_trade.local_trade = local_trade
+                ass_trade.transaction_associated = transaction
+                ass_trade.save()
+
+
+            PaymentTerm.ls\
+                (local_trade, payment_term, payment_date)
             LocalTradeStatus.save_delivery_due_date(local_trade, delivery_due_date, funds_due_date)
 
             return Response({
@@ -167,8 +184,6 @@ TRADE_BOOK_LIST = {
         'rate',
         'productOriginName',
         'productOriginFlag',
-        'internationalFileId',
-        'internationalFileNo',
         'fundsDueDate',
         'deliveryDueDate'
     ],
@@ -180,7 +195,6 @@ TRADE_BOOK_LIST = {
     'column_header': [
         {'name':'Date', 'sort':'date'},
         {'name':'File No', 'sort':'fileNo'},
-        {'name': '<span class=\'titled\'>International</span> File No'},
         {'name':'Buyer', 'sort':'buyerName'},
         {'name':'Product', 'sort':'productName'},
         {'name':'Origin', 'sort':'productOriginName'},
@@ -248,7 +262,6 @@ class LocalTradeListAPI(GenericAPIView):
             'columnHeader': column_header
         }, status=status.HTTP_200_OK)
 
-
 class LocalTradeDashboardAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
@@ -256,7 +269,6 @@ class LocalTradeDashboardAPI(GenericAPIView):
         return Response({
 
         }, status=status.HTTP_200_OK)
-
 
 class LocalTradeStatusAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
@@ -273,6 +285,8 @@ class LocalTradeDeliverySlipAPI(GenericAPIView):
         return Response({
 
         }, status=status.HTTP_200_OK)
+
+# class LocalTrade
 
 
 

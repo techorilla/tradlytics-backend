@@ -82,6 +82,10 @@ urlpatterns = (
         BpBankAPI.as_view(),
         name='Business Bank API'),
 
+    url('business/report/(?P<bp_id>[a-zA-Z0-9.@_-]+)/$',
+        BusinessReportAPI.as_view(),
+        name='Business Report API'),
+
     # Transaction Related API
 
     url(r'transactions/list/$',
@@ -171,6 +175,14 @@ urlpatterns = (
     url(r'transactions/dashboard/$',
         TransactionDashboardAPI.as_view(),
         name='Transaction Dashboard API'),
+
+    url(r'transactions/businessAnalytics/$',
+        TransactionBusinessAnalyticsAPI.as_view(),
+        name='Transaction Dashboard API'),
+
+    url(r'transactions/dispute/$',
+        TransactionDisputeAPI.as_view(),
+        name='Transaction DisputeBusinessReportAPI API'),
 
     url(r'transactions/arrived_not_completed/$',
         TransactionArrivedNotCompletedListAPI.as_view(),

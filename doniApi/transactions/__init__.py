@@ -8,3 +8,5 @@ from doniApi.transactions.tr_shipment import *
 from doniApi.transactions.tr_status import *
 from doniApi.transactions.tr_cashflow import *
 from doniApi.transactions.tr_dashboard import *
+from doniApi.transactions.tr_business_analytics import *
+from doniApi.transactions.tr_dispute import *

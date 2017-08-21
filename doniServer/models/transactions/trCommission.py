@@ -142,7 +142,7 @@ class TrCommission(models.Model):
             'price': self.transaction.price,
             'quantity': self.transaction.quantity,
             'quantityShipped': self.quantity_shipped,
-            'sellerBroker': None if not self.seller_broker else self.seller_broker.get_description_ob(base_url),
+            'sellerBroker': None if not self.seller_broker else self.seller_broker.get_description_obj(base_url),
             'buyerBroker': None if not self.buyer_broker else self.buyer_broker.get_description_obj(base_url),
             'buyerBrokerCommissionType': None if not self.buyer_broker else self.buyer_broker_comm_type.name,
             'buyerBrokerCommission': None if not self.buyer_broker else self.buyer_broker_comm,

@@ -96,6 +96,11 @@ class TransactionDashboardAPI(GenericAPIView):
         not_shipped = Transaction.get_not_shipped_not_washout_not_completed(business)
         not_shipped_count = not_shipped.count()
 
+
+        #Trade Dispute Count
+        disputed_trades = Transaction.get_business_all_disputed_trades(business)
+        disputed_trades_count = disputed_trades.count()
+
         #Secondary Trades
         secondary_trades_count = SecondaryTrades.objects.count()
         partial_keys = ['A', 'B', 'C', 'D']
@@ -137,6 +142,7 @@ class TransactionDashboardAPI(GenericAPIView):
                 'partialShipmentCount': partial_shipment_count,
                 'secondaryTradePercentage': (float(secondary_trades_count)/float(total_trades)) *100
             },
+            'tradeDisputeCount': disputed_trades_count,
             'arrivedNotCompletedCount': arrived_at_port_not_completed_count,
             'expectedArrivalCount': expected_arrival_count,
             'notShippedCount': not_shipped_count

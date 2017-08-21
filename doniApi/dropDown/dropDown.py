@@ -285,7 +285,12 @@ class PriceMarketDDAPI(GenericAPIView):
 class ProductItemDDAPI(GenericAPIView):
 
     def get(self, request, *args, **kwargs):
+        for_pricing = request.GET.get('pricingOnWebsiteOnly', False)
+        for_pricing = str(for_pricing)
+        print for_pricing
         product_items = ProductItem.objects.all().order_by('product_origin__product__name')
+        if for_pricing == 'true':
+            product_items = product_items.filter(price_on_website=True)
         product_items = [product.get_dropdown() for product in product_items]
         return Response({'list': product_items}, status=status.HTTP_200_OK)
 
@@ -360,14 +365,33 @@ class TransactionDropDownAPI(GenericAPIView):
         transaction_list = Transaction.objects.filter(created_by__profile__business=user.profile.business)\
             .annotate(fileId=F('file_id')) \
             .annotate(contractId=F('contract_id')) \
+            .annotate(buyerName=F('buyer__bp_name')) \
+            .annotate(sellerName=F('seller__bp_name')) \
             .annotate(blNo=F('shipment__bl_no')) \
-            .values('fileId','contractId', 'blNo')\
+            .values('fileId','contractId', 'blNo', 'buyerName', 'sellerName')\
             .order_by('fileId')
 
         return Response({
             'transactionList': transaction_list
         }, status=status.HTTP_200_OK)
 
+
+class LocalTransactionDropDownAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        transaction_list = LocalTrade.objects.filter(created_by__profile__business=user.profile.business)\
+            .annotate(fileId=F('file_id')) \
+            .annotate(contractId=F('contract_id')) \
+            .annotate(buyerName=F('local_buyer__bp_name'))\
+            .annotate(sellerName=F('local_seller__bp_name')) \
+            .values('fileId', 'contractId', 'buyerName', 'sellerName')\
+            .order_by('fileId')
+
+        return Response({
+            'transactionList': transaction_list
+        }, status=status.HTTP_200_OK)
 
 
 

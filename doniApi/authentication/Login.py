@@ -35,7 +35,21 @@ class LoginAPI(APIView):
             'currency': business.app_profile.currency,
             'businessName': business.bp_name,
             'businessAdmin': business.bp_admin,
-            'smallProfilePic':  profile.get_profile_pic(base_url)
+            'smallProfilePic':  profile.get_profile_pic(base_url),
+            'notify': {
+                'newTransaction': profile.notify_new_transaction,
+                'shipmentArrival': profile.notify_shipment_arrival,
+                'messages': profile.notify_messages,
+                'monthlyReports': profile.notify_monthly_reports,
+                'weeklyReports': profile.notify_weekly_reports,
+                'dailyReports': profile.notify_daily_reports
+            },
+            'rights': {
+                'businessAnalytics': profile.right_business_analytics,
+                'userManagement': profile.right_user_management,
+                'warehouseModule': profile.right_warehouse_module,
+                'businessCommission': profile.right_business_commission
+            }
         }
 
     def get(self, request, *args, **kwargs):

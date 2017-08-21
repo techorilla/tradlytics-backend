@@ -280,6 +280,8 @@ class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
             voyage_no = data_obj.get('voyageNo')
             containers = data_obj.get('containers')
             date_arrived = data_obj.get('dateArrived')
+            print date_arrived, request.META
+
             if date_arrived:
                 date_arrived = dateutil.parser.parse(str(date_arrived).replace('"', ''))
                 date_arrived = date_arrived.replace(hour=0, minute=0, second=0, microsecond=0)

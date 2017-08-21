@@ -16,6 +16,8 @@ class Warehouse(models.Model):
     name = models.CharField(max_length=200)
     address = models.TextField()
     contact = models.TextField()
+    go_down_contact = models.CharField(max_length=250)
+    go_down_keeper = models.CharField(max_length=250)
     self_warehouse = models.BooleanField(default=False)
     total_capacity_kgs = models.FloatField(default=0.00)
     business = models.ForeignKey(BpBasic, null=True, related_name='business_warehouse_added', on_delete=models.SET_NULL)
