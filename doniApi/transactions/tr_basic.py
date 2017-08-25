@@ -38,7 +38,8 @@ QUERY_MAPPING = {
     'expectedArrival': 'shipment__expected_arrival',
     'shipmentExpiration': 'shipment_end',
     'disputedOn': 'dispute__dispute_date',
-    'completedOn': 'completion_status__completion_date'
+    'completedOn': 'completion_status__completion_date',
+    'status': 'status'
 }
 
 
@@ -88,7 +89,8 @@ TRADE_BOOK_LIST = {
         'productOriginName',
         'productOriginFlag',
         'shipmentStart',
-        'shipmentEnd'
+        'shipmentEnd',
+        'status'
     ],
     'query_columns':{
         'buyerCountry': get_business_location_query('buyer'),

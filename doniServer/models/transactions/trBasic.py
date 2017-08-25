@@ -51,9 +51,13 @@ class Transaction(models.Model):
 
     @classmethod
     def get_status(cls, query_set):
-        query_set.annotate(
+        query_set = query_set.annotate(
             status=Case(
                 When(completion_status=True, then=Value('Completed')),
+                When(shipment__arrived_at_port=True, then=Value('Arrived At Port')),
+                When(shipment__shipped=True, then=Value('Arrived At Port')),
+                When(washout__total_difference=0.00, then=Value('Washout At Par')),
+                When(washout__total_difference__gt=0.00, then=Value('Washout At X')),
                 default=Value('Not Shipped'),
                 output_field=CharField(),
             ),
