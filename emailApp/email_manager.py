@@ -20,7 +20,6 @@ common_email_images = [
 @app.task
 def send_email(template_name, context, subject, send_to_email=['immadimtiaz1990@gmail.com']):
     from_email = 'Doni & Company <%s>' % settings.EMAIL_HOST_USER
-    print from_email
     email = EmailMessage.objects.get(name=template_name)
     base_template = email.base_template.template
     body = email.body
@@ -28,7 +27,6 @@ def send_email(template_name, context, subject, send_to_email=['immadimtiaz1990@
     msg = msg.replace('%body', body)
 
     for (cont, value) in context.items():
-        print (cont, value)
         msg = msg.replace(str('%') + cont, value)
 
     message = EmailMultiAlternatives(subject, msg, from_email, send_to_email)

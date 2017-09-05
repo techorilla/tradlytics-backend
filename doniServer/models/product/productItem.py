@@ -378,6 +378,7 @@ class ProductItem(models.Model):
             'image': self.product_origin.product.get_product_image(base_url),
             'name': self.product_origin.product.name,
             'id': self.id,
+            'keyword': self.keyword_str,
             'country': self.product_origin.country.name,
             'countryFlag': self.product_origin.country.flag
         }
