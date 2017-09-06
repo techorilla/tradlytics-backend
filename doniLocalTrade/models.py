@@ -329,7 +329,7 @@ class DeliverySlip(models.Model):
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='local_delivery_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='local_delivery_updated_by')
 
-class LocalTradePayments(models.Model):
+class LocalTradePayment(models.Model):
     payment_received = models.FloatField()
     payment_date = models.DateField(null=False)
 

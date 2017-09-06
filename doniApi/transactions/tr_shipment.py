@@ -156,9 +156,6 @@ class ShipmentShippedInfoAPI(GenericAPIView):
                 'message': 'Shipment Arrived At Port Information Updated!'
             })
         except Exception, e:
-            import traceback
-            print traceback.format_exc()
-            print str(e)
             return Response({
                 'success': False,
                 'message': str(e)
@@ -191,7 +188,6 @@ class ShipmentNotShippedInfoAPI(GenericAPIView):
                 'message': 'Shipment Arrived At Port Information Updated!'
             })
         except Exception, e:
-            print str(e),e
             return Response({
                 'success': False,
                 'message': str(e)
@@ -212,7 +208,6 @@ class ShipmentApprobationReceivedInfoAPI(GenericAPIView):
             shipment = transaction.shipment
 
             data_obj = data.get('dataObj')
-            print data_obj
 
             expected_shipment = data_obj.get('expectedShipment')
             in_transit = data_obj.get('inTransit')
@@ -237,7 +232,6 @@ class ShipmentApprobationReceivedInfoAPI(GenericAPIView):
                 'message': 'Shipment Approbation Information Updated!'
             })
         except Exception, e:
-            print str(e)
             return Response({
                 'success': False,
                 'message': str(e)
@@ -280,7 +274,6 @@ class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
             voyage_no = data_obj.get('voyageNo')
             containers = data_obj.get('containers')
             date_arrived = data_obj.get('dateArrived')
-            print date_arrived, request.META
 
             if date_arrived:
                 date_arrived = dateutil.parser.parse(str(date_arrived).replace('"', ''))
@@ -309,7 +302,6 @@ class ShipmentArrivedAtPortInfoAPI(GenericAPIView):
                 'message': 'Shipment Arrived At Port Information Updated!'
             })
         except Exception, e:
-            print str(e)
             return Response({
                 'success': False,
                 'message': str(e)

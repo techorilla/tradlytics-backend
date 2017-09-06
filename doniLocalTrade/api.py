@@ -2,7 +2,7 @@ from doniApi.apiImports import Response, GenericAPIView, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from doniServer.models import Transaction
 from .models import LocalTrade, LocalTradeChangeLog, LocalTradeNotes, LocalTradeStatus, PaymentTerm, DeliverySlip,\
-                    AssociatedLocalTrade, AssociatedInternationalTrade
+                    AssociatedLocalTrade, AssociatedInternationalTrade, LocalTradePayment
 from datetime import datetime as dt
 from django.db.models import Q, F
 import operator
@@ -274,6 +274,40 @@ class LocalTradeStatusAPI(GenericAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, *args, **kwargs):
+        return Response({
+
+        }, status=status.HTTP_200_OK)
+
+
+class LocalTradePaymentAPI(GenericAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        local_trade_id = kwargs.get('file_id')
+
+        return Response({
+
+        }, status=status.HTTP_200_OK)
+
+
+    def put(self, request, *args, **kwargs):
+        local_trade_id = kwargs.get('file_id')
+        payment_id = kwargs.get('payment_id')
+
+        return Response({
+
+        }, status=status.HTTP_200_OK)
+
+
+    def post(self, request, *args, **kwargs):
+        local_trade_id = kwargs.get('file_id')
+        new_payment = LocalTradePayment()
+
+        return Response({
+
+        }, status=status.HTTP_200_OK)
+
+    def delete(self, request, *args, **kwargs):
         return Response({
 
         }, status=status.HTTP_200_OK)
