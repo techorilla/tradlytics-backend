@@ -73,8 +73,6 @@ class LocalTradeAPI(GenericAPIView):
                 local_trade.updated_by = user
                 local_trade.updated_on = dt.now()
 
-
-
             local_trade.date = date
             local_trade.local_buyer_id = buyer_id
             local_trade.local_seller_id = seller_id
@@ -99,9 +97,7 @@ class LocalTradeAPI(GenericAPIView):
                 ass_trade.transaction_associated = transaction
                 ass_trade.save()
 
-
-            PaymentTerm.ls\
-                (local_trade, payment_term, payment_date)
+            PaymentTerm.save_payment_term(local_trade, payment_term, payment_date)
             LocalTradeStatus.save_delivery_due_date(local_trade, delivery_due_date, funds_due_date)
 
             return Response({
@@ -121,7 +117,6 @@ class LocalTradeAPI(GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         base_url = request.META.get('HTTP_HOST')
-        print 'here i am this is me'
         user = request.user
         file_id = request.GET.get('tradeId')
         full_obj = request.GET.get('full')

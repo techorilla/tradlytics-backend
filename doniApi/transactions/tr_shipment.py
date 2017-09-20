@@ -124,13 +124,7 @@ class ShipmentShippedInfoAPI(GenericAPIView):
             seller_invoice_no = shipped_data.get('sellerInvoiceNo')
             seller_invoice_amount = shipped_data.get('sellerInvoiceAmount')
 
-            seller_invoice = None if not hasattr(transaction, 'seller_invoice') else transaction.seller_invoice
-
-            if seller_invoice:
-                TrSellerInvoice.save_seller_invoice(seller_invoice_no,seller_invoice_amount, transaction)
-            else:
-                if seller_invoice_no and seller_invoice_amount:
-                    TrSellerInvoice.save_seller_invoice(seller_invoice_no, seller_invoice_amount, transaction)
+            TrSellerInvoice.save_seller_invoice(seller_invoice_no, seller_invoice_amount, transaction)
 
             if shipped_on:
                 shipped_on = dateutil.parser.parse(str(shipped_on).replace('"', ''))
@@ -156,6 +150,7 @@ class ShipmentShippedInfoAPI(GenericAPIView):
                 'message': 'Shipment Arrived At Port Information Updated!'
             })
         except Exception, e:
+            print str(e)
             return Response({
                 'success': False,
                 'message': str(e)

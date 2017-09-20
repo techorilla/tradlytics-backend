@@ -29,7 +29,6 @@ class LocalTrade(models.Model):
     quantity = models.FloatField(default=None)
     price = models.FloatField(default=None)
     file_id = models.CharField(max_length=100, null=False, blank=False)
-    international_file = models.ForeignKey(Transaction, null=True)
     contract_id = models.CharField(max_length=100, null=True)
     other_info = models.TextField()
     business = models.ForeignKey(BpBasic, null=True)
@@ -38,7 +37,6 @@ class LocalTrade(models.Model):
     created_by = models.ForeignKey(User, null=False, blank=False, related_name='tr_local_created_by')
     updated_by = models.ForeignKey(User, null=True, blank=False, related_name='tr_local_updated_by')
 
-
     def get_complete_obj(self, base_url, user):
         business = user.profile.business
         currency = business.app_profile.currency
@@ -46,12 +44,24 @@ class LocalTrade(models.Model):
         files = self.local_trade_files.values('file_name', 'extension', 'created_at', 'created_by__username', 'file_id') \
             .order_by('-created_at')
 
-        international_file_id = self.associated_international_trade.all().values('transaction_associated__file_id')
-        local_file_id = self.associated_local_trade.all().values('local_trade_associated__file_id')
+        international_file_id = self.associated_international_trade.all().extra(select={
+            'file_id': 'transaction_associated__file_id',
+            'buyer_name': 'transaction_associated__buyer__bp_name',
+            'seller_name': 'transaction_associated__seller__bp_name'
+        }).values('transaction_associated__file_id',
+                  'transaction_associated__buyer__bp_name',
+                  'transaction_associated__seller__bp_name')
+        local_file_id = self.associated_local_trade.all().extra(select={
+            'file_id': 'local_trade_associated__file_id',
+            'buyer_name': 'local_trade_associated__buyer__bp_name',
+            'seller_name': 'local_trade_associated__seller__bp_name'
+        }).values('local_trade_associated__file_id',
+                  'local_trade_associated__local_buyer__bp_name',
+                  'local_trade_associated__local_seller__bp_name')
 
 
-        international_file_id = [trade.get('transaction_associated__file_id') for trade in international_file_id]
-        local_file_id = [trade.get('local_trade_associated__file_id') for trade in local_file_id]
+        international_file_id = international_file_id
+        local_file_id = local_file_id
 
 
         return {
@@ -145,6 +155,7 @@ class LocalTrade(models.Model):
             .order_by('name')
         # map(country_flag, business_list)
         return business_list
+
 
 class AssociatedLocalTrade(models.Model):
     local_trade = models.ForeignKey(
