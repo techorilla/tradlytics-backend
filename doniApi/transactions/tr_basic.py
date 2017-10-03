@@ -285,13 +285,53 @@ TRADE_DISPUTE = {
     ]
 }
 
+NEXT_30_DAYS_EXPIRATION = {
+    'columns': [
+        'id',
+        'fileNo',
+        'productName',
+        'buyerName',
+        'buyerId',
+        'sellerName',
+        'sellerId',
+        'productItemId',
+        'quantity',
+        'rate',
+        'productOriginName',
+        'productOriginFlag',
+        'contractNo',
+        'blNo',
+        'shipmentExpiration'
+    ],
+    'order_by': '-shipmentExpiration',
+    'query_columns':{
+        'buyerCountry': get_business_location_query('buyer'),
+        'sellerCountry': get_business_location_query('seller')
+    },
+    'column_header': [
+        {'name': 'Expiry On', 'sort': 'shipmentExpiration'},
+        {'name': 'Days Left', 'sort': None},
+        {'name': 'File No', 'sort': 'fileNo'},
+        {'name': 'BL No.', 'sort': 'blNo'},
+        {'name': 'Contract No.', 'sort': 'contractNo'},
+        {'name': 'Buyer', 'sort': 'buyerName'},
+        {'name': 'Product', 'sort': 'productName'},
+        {'name': 'Origin', 'sort': 'productOriginName'},
+        {'name': 'Seller', 'sort': 'sellerName'},
+        {'name': 'Quantity <span class=\'titled\'>MT</span>', 'sort': 'quantity'},
+        {'name': 'Rate <span class=\'titled\'>USD</span>', 'sort': 'rate'}
+    ]
+}
+
+
 TRANSACTION_LIST_CONFIG = {
     'tradeBook': TRADE_BOOK_LIST,
     'expectedArrival': EXPECTED_ARRIVAL_LIST,
     'arrivedList': ARRIVED_LIST,
     'expiredShipment': SHIPMENT_EXPIRATION_LIST,
     'businessAnalytics': BUSINESS_ANALYTICS,
-    'tradeDispute': TRADE_DISPUTE
+    'tradeDispute': TRADE_DISPUTE,
+    'next30DaysExpiration': NEXT_30_DAYS_EXPIRATION
 }
 
 
@@ -394,6 +434,8 @@ class TransactionListAPI(GenericAPIView):
             all_transaction = Transaction.get_arrived_at_port_not_completed(business)
         elif page_type == 'expiredShipment':
             all_transaction = Transaction.get_not_shipped_not_washout_not_completed(business)
+        elif page_type == 'next30DaysExpiration':
+            all_transaction = Transaction.get_expiration_next_30_days(business)
 
         all_transaction, column_header = self.get_transaction_list(all_transaction, page_type, user)
 

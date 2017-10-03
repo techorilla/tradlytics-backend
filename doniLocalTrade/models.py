@@ -324,6 +324,7 @@ class PaymentTerm(models.Model):
             self.on_date_date = None
         super(PaymentTerm, self).save()
 
+
 class DeliverySlip(models.Model):
     date = models.DateField(null=False)
     delivery_date = models.DateField(null=True)
@@ -337,8 +338,39 @@ class DeliverySlip(models.Model):
     notes = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=None, null=True)
-    created_by = models.ForeignKey(User, null=False, blank=False, related_name='local_delivery_created_by')
-    updated_by = models.ForeignKey(User, null=True, blank=False, related_name='local_delivery_updated_by')
+    created_by = models.ForeignKey(User, null=False, blank=False, related_name='local_delivery_slip_created_by')
+    updated_by = models.ForeignKey(User, null=True, blank=False, related_name='local_delivery_slip_updated_by')
+
+
+class DeliveryDetails(models.Model):
+    local_trade = models.ForeignKey(
+        LocalTrade,
+        on_delete=models.CASCADE,
+        related_name='local_trade_delivery_detail'
+    )
+    delivery_dispatched = models.BooleanField(default=False)
+    delivery_dispatched_date = models.DateField(null=True)
+    delivery_reached = models.BooleanField(default=True)
+    delivery_reached_date = models.DateField(null=True)
+    delivery_slip = models.ForeignKey(DeliverySlip)
+    actual_weight = models.FloatField(null=True)
+    actual_amount = models.FloatField(null=True)
+    created_by = models.ForeignKey(User, null=False, blank=False, related_name='local_delivery_details_created_by')
+
+
+class DeliveryWeightSlip(models.Model):
+    delivery = models.ForeignKey(DeliveryDetails, related_name='weight_slip')
+    file_id = models.AutoField(primary_key=True)
+    file_name = models.CharField(max_length=400, null=True)
+    file = VarBinaryField()
+    extension = models.CharField(max_length=100, null=True)
+    weight = models.FloatField(null=False, default=0.00)
+    created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, null=False, blank=False, related_name='local_weight_slip_created_by')
+
+    class Meta:
+        db_table = 'local_delivery_weight_slips'
+
 
 class LocalTradePayment(models.Model):
     payment_received = models.FloatField()
