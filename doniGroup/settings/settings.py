@@ -40,7 +40,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'app.tramodity.com',
-    '54.202.234.113'
+    '34.210.76.241'
 ]
 
 
